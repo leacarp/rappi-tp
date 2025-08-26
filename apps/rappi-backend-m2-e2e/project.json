@@ -1,0 +1,17 @@
+{
+  "name": "rappi-backend-m2-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["rappi-backend-m2"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
+      "options": {
+        "jestConfig": "apps/rappi-backend-m2-e2e/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "dependsOn": ["rappi-backend-m2:build", "rappi-backend-m2:serve"]
+    }
+  }
+}
