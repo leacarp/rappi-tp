@@ -15,6 +15,8 @@ import { EarningsDetail } from '../../domain/entities/earnings-detail.entity';
 import { EarningsBreakdown } from '../../domain/entities/earnings-breakdown.entity';
 import { User as UserSchema, UserDocument } from '../schemas/user.schema';
 import { Address as AddressSchema } from '../schemas/address.schema';
+import { RatingReview as RatingReviewSchema } from '../schemas/rating-review.schema';
+import { EarningsDetail as EarningsDetailSchema } from '../schemas/earnings-detail.schema';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -61,8 +63,8 @@ export class UserRepository implements IUserRepository {
     return this.mapToUserEntity(updatedUserSchema);
   }  
 
-  private mapToUserEntity(userDoc: any): User {
-    const addresses = (userDoc.profile?.addresses || []).map((addr: any) => 
+  private mapToUserEntity(userDoc: UserDocument): User {
+    const addresses = (userDoc.profile?.addresses || []).map((addr: AddressSchema) => 
       new Address(
         addr._id.toString(),
         addr.street,
@@ -93,11 +95,11 @@ export class UserRepository implements IUserRepository {
     );
 
     const history = new History(
-      (userDoc.history?.orders || []).map((id: any) => id.toString()),
-      (userDoc.history?.deliveries || []).map((id: any) => id.toString())
+      (userDoc.history?.orders || []).map((id: Types.ObjectId) => id.toString()),
+      (userDoc.history?.deliveries || []).map((id: Types.ObjectId) => id.toString())
     );
 
-    const ratingsAndReviews = (userDoc.ratingsAndReviews || []).map((rating: any) =>
+    const ratingsAndReviews = (userDoc.ratingsAndReviews || []).map((rating: RatingReviewSchema) =>
       new RatingReview(
         rating.reviewerId.toString(),
         rating.score,
@@ -106,7 +108,7 @@ export class UserRepository implements IUserRepository {
       )
     );
 
-    const favorites = (userDoc.favorites || []).map((id: any) => id.toString());
+    const favorites = (userDoc.favorites || []).map((id: Types.ObjectId) => id.toString());
 
     return new User(
       userDoc._id.toString(),
@@ -126,7 +128,7 @@ export class UserRepository implements IUserRepository {
     const currentLocation = driverDoc.currentLocation ? 
       new Location(driverDoc.currentLocation.latitude, driverDoc.currentLocation.longitude) : undefined;
 
-    const earningsDetails = (driverDoc.earnings?.details || []).map((detail: any) => {
+    const earningsDetails = (driverDoc.earnings?.details || []).map((detail: EarningsDetailSchema) => {
       const breakdown = new EarningsBreakdown(
         detail.breakdown.baseFee,
         detail.breakdown.tips,
