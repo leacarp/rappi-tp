@@ -12,12 +12,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from '../../services/user.service';
-import { CreateAddressRequestService } from '../../services/dtos/create-address-request-service';
 import { CreateAddressRequest } from '../dtos/create-address-request';
 import { GetAddressResponse } from '../dtos/get-address-response';
-import { AddressItem, GetAddressesResponse } from '../dtos/get-addresses-response';
+import { GetAddressesResponse } from '../dtos/get-addresses-response';
 import { UpdateAddressRequest } from '../dtos/update-address-request';
-import { UpdateAddressRequestService } from '../../services/dtos/update-address-request-service';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -26,59 +24,29 @@ export class UserController {
 
   @Get(':userId/addresses')
   async getAddresses(@Param('userId') userId: string): Promise<GetAddressesResponse> {
-    const addresses = await this.userService.getAddresses(userId);
-    const lala = addresses.getAddresses();
-
-    const addressesResponse = lala.map(address => new AddressItem(
-      address.getId(),
-      address.getStreet(),
-      address.getCity(),
-      address.getZipCode(),
-      address.getIsFavorite()
-    ));
-
-    const addressesResponse1 = new GetAddressesResponse(addressesResponse);
-
-    return addressesResponse1;
+    const userAddressesData = await this.userService.getAddresses(userId);
+    
+    return GetAddressesResponse.fromServiceDto(userAddressesData);
   }
 
   @Get(':userId/addresses/:addressId')
   async getAddress(@Param('userId') userId: string, @Param('addressId') addressId: string): Promise<GetAddressResponse> {
     const address = await this.userService.getAddress(userId, addressId);
 
-    const addressResponse = new GetAddressResponse(
-      address.getId(),
-      address.getStreet(),
-      address.getCity(),
-      address.getZipCode(),
-      address.getIsFavorite()
-    );
-
-    return addressResponse;
+    return GetAddressResponse.fromServiceDto(address);
   }
 
   @Post(':userId/addresses')
   @HttpCode(HttpStatus.CREATED)
   async addAddress(@Param('userId') userId: string, @Body() body: CreateAddressRequest): Promise<void> {
-    const requestService = new CreateAddressRequestService(
-      body.getStreet(),
-      body.getCity(),
-      body.getZipCode(),
-      body.getIsFavorite()
-    );
+    const requestService = body.toServiceDto();
 
     await this.userService.addAddress(userId, requestService);
   }
 
   @Put(':userId/addresses/:addressId')
   async updateAddress(@Param('userId') userId: string, @Param('addressId') addressId: string, @Body() body: UpdateAddressRequest): Promise<void> {
-    const requestService = new UpdateAddressRequestService(
-      addressId,
-      body.getStreet(),
-      body.getCity(),
-      body.getZipCode(),
-      body.getIsFavorite()
-    );
+    const requestService = body.toServiceDto(addressId);
 
     await this.userService.updateAddress(userId, requestService);
   }

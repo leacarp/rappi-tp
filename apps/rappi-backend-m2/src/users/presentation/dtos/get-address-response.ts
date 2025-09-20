@@ -1,3 +1,5 @@
+import { GetAddressResponseService } from '../../services/dtos/get-address-response-service';
+
 export class GetAddressResponse {
   private readonly id: string;
   private readonly street: string;
@@ -17,5 +19,15 @@ export class GetAddressResponse {
     this.city = city;
     this.zipCode = zipCode;
     this.isFavorite = isFavorite;
+  }
+
+  static fromServiceDto(serviceDto: GetAddressResponseService): GetAddressResponse {
+    return new GetAddressResponse(
+      serviceDto.getId(),
+      serviceDto.getStreet(),
+      serviceDto.getCity(),
+      serviceDto.getZipCode(),
+      serviceDto.getIsFavorite()
+    );
   }
 }

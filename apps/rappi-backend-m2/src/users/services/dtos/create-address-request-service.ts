@@ -1,3 +1,5 @@
+import { Address } from '../../domain/entities/address.entity';
+
 export class CreateAddressRequestService {
   private readonly street: string;
   private readonly city: string;
@@ -30,5 +32,15 @@ export class CreateAddressRequestService {
 
   getIsFavorite(): boolean {
     return this.isFavorite;
+  }
+
+  toEntity(id: string): Address {
+    return new Address(
+      id,
+      this.street,
+      this.city,
+      this.zipCode,
+      this.isFavorite
+    );
   }
 }

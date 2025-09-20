@@ -1,3 +1,5 @@
+import { Address } from '../../domain/entities/address.entity';
+
 export class GetAddressesResponseService {
     private readonly addresses: AddressItemService[];
   
@@ -7,6 +9,13 @@ export class GetAddressesResponseService {
 
     getAddresses(): AddressItemService[] {
       return this.addresses;
+    }
+
+    static fromEntities(addresses: Address[]): GetAddressesResponseService {
+      const addressItems = addresses.map(address => 
+        AddressItemService.fromEntity(address)
+      );
+      return new GetAddressesResponseService(addressItems);
     }
   }
 
@@ -49,6 +58,16 @@ export class AddressItemService {
   
     getIsFavorite(): boolean {
       return this.isFavorite;
+    }
+
+    static fromEntity(address: Address): AddressItemService {
+      return new AddressItemService(
+        address.getId(),
+        address.getStreet(),
+        address.getCity(),
+        address.getZipCode(),
+        address.getIsFavorite()
+      );
     }
   }
   

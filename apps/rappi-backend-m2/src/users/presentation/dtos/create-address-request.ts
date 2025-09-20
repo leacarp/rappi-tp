@@ -1,4 +1,5 @@
 import { IsString, IsBoolean, IsNotEmpty } from 'class-validator';
+import { CreateAddressRequestService } from '../../services/dtos/create-address-request-service';
 
 export class CreateAddressRequest {
   @IsString({ message: 'La calle es requerida' })
@@ -42,5 +43,14 @@ export class CreateAddressRequest {
 
   getIsFavorite(): boolean {
     return this.isFavorite;
+  }
+
+  toServiceDto(): CreateAddressRequestService {
+    return new CreateAddressRequestService(
+      this.street,
+      this.city,
+      this.zipCode,
+      this.isFavorite
+    );
   }
 }
