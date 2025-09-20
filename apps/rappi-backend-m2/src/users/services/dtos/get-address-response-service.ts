@@ -1,3 +1,5 @@
+import { Address } from '../../domain/entities/address.entity';
+
 export class GetAddressResponseService {
     private readonly id: string;
     private readonly street: string;
@@ -37,6 +39,16 @@ export class GetAddressResponseService {
   
     getIsFavorite(): boolean {
       return this.isFavorite;
+    }
+
+    static fromEntity(address: Address): GetAddressResponseService {
+      return new GetAddressResponseService(
+        address.getId(),
+        address.getStreet(),
+        address.getCity(),
+        address.getZipCode(),
+        address.getIsFavorite()
+      );
     }
   }
   

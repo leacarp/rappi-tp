@@ -1,8 +1,17 @@
+import { GetAddressesResponseService, AddressItemService } from '../../services/dtos/get-addresses-response-service';
+
 export class GetAddressesResponse {
   private readonly addresses: AddressItem[];
 
   constructor(addresses: AddressItem[]) {
     this.addresses = addresses;
+  }
+
+  static fromServiceDto(serviceDto: GetAddressesResponseService): GetAddressesResponse {
+    const addresses = serviceDto.getAddresses().map(address => 
+      AddressItem.fromServiceDto(address)
+    );
+    return new GetAddressesResponse(addresses);
   }
 }
 
@@ -25,5 +34,15 @@ export class AddressItem {
     this.city = city;
     this.zipCode = zipCode;
     this.isFavorite = isFavorite;
+  }
+
+  static fromServiceDto(serviceDto: AddressItemService): AddressItem {
+    return new AddressItem(
+      serviceDto.getId(),
+      serviceDto.getStreet(),
+      serviceDto.getCity(),
+      serviceDto.getZipCode(),
+      serviceDto.getIsFavorite()
+    );
   }
 }
