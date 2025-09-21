@@ -16,6 +16,8 @@ import { CreateAddressRequest } from '../dtos/create-address-request';
 import { GetAddressResponse } from '../dtos/get-address-response';
 import { GetAddressesResponse } from '../dtos/get-addresses-response';
 import { UpdateAddressRequest } from '../dtos/update-address-request';
+import { CreateReviewRequest } from '../dtos/create-review-request';
+import { GetReviewsResponse } from '../dtos/get-reviews-response';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -55,5 +57,23 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAddress(@Param('userId') userId: string, @Param('addressId') addressId: string) {
     await this.userService.deleteAddress(userId, addressId);
+  }
+
+  @Post(':userId/reviews')
+  @HttpCode(HttpStatus.CREATED)
+  async addReview(
+    @Param('userId') userId: string,
+    @Body() body: CreateReviewRequest
+  ): Promise<void> {
+    const serviceDto = body.toServiceDto();
+    await this.userService.addReview(userId, serviceDto);
+  }
+
+  @Get(':userId/reviews')
+  async getReviews(
+    @Param('userId') userId: string
+  ): Promise<GetReviewsResponse> {
+    const serviceResponse = await this.userService.getReviews(userId);
+    return GetReviewsResponse.fromServiceDto(serviceResponse);
   }
 }

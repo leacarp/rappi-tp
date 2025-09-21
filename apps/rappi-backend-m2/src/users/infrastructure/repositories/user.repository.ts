@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IUserRepository } from '../../domain/interfaces/IUserRepository';
@@ -17,22 +17,62 @@ import { User as UserSchema, UserDocument } from '../schemas/user.schema';
 import { Address as AddressSchema } from '../schemas/address.schema';
 import { RatingReview as RatingReviewSchema } from '../schemas/rating-review.schema';
 import { EarningsDetail as EarningsDetailSchema } from '../schemas/earnings-detail.schema';
+import { DriverInfo as DriverInfoSchema } from '../schemas/driver-info.schema';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
   constructor(@InjectModel(UserSchema.name) private userModel: Model<UserDocument>) {}
 
-  async getUserById(userId: string): Promise<User | null> {
-    if (!Types.ObjectId.isValid(userId)) {
-      return null;
-    }
+  private readonly logger = new Logger(UserRepository.name);
 
-    const userSchema = await this.userModel.findById(userId).exec();
+  private buildIdFilter(id: string): { _id: Types.ObjectId | string } {
+    const trimmed = (id || '').trim();
+    if (Types.ObjectId.isValid(trimmed)) {
+      return { _id: new Types.ObjectId(trimmed) };
+    }
+ 
+    return { _id: trimmed } ;
+  }
+
+  async getUserById(userId: string): Promise<User | null> {
+    const filter = this.buildIdFilter(userId);
+    const isObjId = filter._id instanceof Types.ObjectId;
+    this.logger.debug(`getUserById id=${userId} len=${userId?.length} isObjId=${isObjId} collection=${this.userModel.collection.name}`);
+
+    const userSchema = await this.userModel.findOne(filter).exec();
+    this.logger.debug(`getUserById found=${!!userSchema}`);
     if (!userSchema) {
       return null;
     }
 
     return this.mapToUserEntity(userSchema);
+  }
+
+  async updateUserReview(
+    userId: string,
+    reviewerId: string,
+    score: number,
+    comment: string | undefined,
+    date: Date
+  ): Promise<User | null> {
+    const userFilter = this.buildIdFilter(userId);
+    if (!Types.ObjectId.isValid(reviewerId)) {
+      return null;
+    }
+
+    const updated = await this.userModel.findOneAndUpdate(
+      { ...userFilter, 'ratingsAndReviews.reviewerId': new Types.ObjectId(reviewerId) },
+      {
+        $set: {
+          'ratingsAndReviews.$.score': score,
+          'ratingsAndReviews.$.comment': comment,
+          'ratingsAndReviews.$.date': date,
+        },
+      },
+      { new: true }
+    ).exec();
+
+    return updated ? this.mapToUserEntity(updated) : null;
   }
 
   async updateUserAddress(userId: string, addresses: Address[]): Promise<User | null> {
@@ -62,6 +102,43 @@ export class UserRepository implements IUserRepository {
 
     return this.mapToUserEntity(updatedUserSchema);
   }  
+
+  async addUserReview(userId: string, review: RatingReview): Promise<User | null> {
+    const userFilter = this.buildIdFilter(userId);
+    const reviewDoc = {
+      reviewerId: new Types.ObjectId(review.getReviewerId()),
+      score: review.getScore(),
+      comment: review.getComment(),
+      date: review.getDate(),
+    };
+
+    const updatedUser = await this.userModel
+      .findOneAndUpdate(
+        userFilter,
+        { $push: { ratingsAndReviews: reviewDoc } },
+        { new: true }
+      )
+      .exec();
+
+    return updatedUser ? this.mapToUserEntity(updatedUser) : null;
+  }
+
+  async getUserReviews(userId: string): Promise<RatingReview[]> {
+    const userFilter = this.buildIdFilter(userId);
+    const userDoc = await this.userModel.findOne(userFilter, { ratingsAndReviews: 1 }).exec();
+    if (!userDoc || !userDoc.ratingsAndReviews) {
+      return [];
+    }
+
+    return (userDoc.ratingsAndReviews as RatingReviewSchema[]).map((rating) =>
+      new RatingReview(
+        rating.reviewerId.toString(),
+        rating.score,
+        rating.date,
+        rating.comment
+      )
+    );
+  }
 
   private mapToUserEntity(userDoc: UserDocument): User {
     const addresses = (userDoc.profile?.addresses || []).map((addr: AddressSchema) => 
@@ -124,7 +201,7 @@ export class UserRepository implements IUserRepository {
     );
   }
 
-  private mapToDriverInfoEntity(driverDoc: any): DriverInfo {
+  private mapToDriverInfoEntity(driverDoc: DriverInfoSchema): DriverInfo {
     const currentLocation = driverDoc.currentLocation ? 
       new Location(driverDoc.currentLocation.latitude, driverDoc.currentLocation.longitude) : undefined;
 

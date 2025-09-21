@@ -5,12 +5,13 @@ import { UserRepository } from './infrastructure/repositories/user.repository';
 import { USER_REPOSITORY_TOKEN } from './domain/tokens/user-repository.token';
 import { UserService } from './services/user.service';
 import { UserController } from './presentation/controllers/user.controller';
+import { VendorsController } from './presentation/controllers/vendors.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
   ],
-  controllers: [UserController],
+  controllers: [UserController, VendorsController],
   providers: [
     {
       provide: USER_REPOSITORY_TOKEN,
