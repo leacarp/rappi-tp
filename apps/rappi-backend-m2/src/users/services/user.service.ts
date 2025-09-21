@@ -1,15 +1,22 @@
-import { Types } from 'mongoose';
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { Types } from 'mongoose'; 
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { IUserRepository } from '../domain/interfaces/IUserRepository';
 import { USER_REPOSITORY_TOKEN } from '../domain/tokens/user-repository.token';
 import { CreateAddressRequestService } from './dtos/create-address-request-service';
 import { GetAddressesResponseService } from './dtos/get-addresses-response-service';
 import { GetAddressResponseService } from './dtos/get-address-response-service';
 import { UpdateAddressRequestService } from './dtos/update-address-request-service';
+import { CreateReviewRequestService } from './dtos/create-review-request-service';
+import { GetReviewsResponseService } from './dtos/get-reviews-response-service';
 
 @Injectable()
 export class UserService {
-  constructor(@Inject(USER_REPOSITORY_TOKEN) private readonly userRepository: IUserRepository) {}
+  constructor(
+    @Inject(USER_REPOSITORY_TOKEN)
+    private readonly userRepository: IUserRepository
+  ) {}
+
+  private readonly logger = new Logger(UserService.name);
 
   async getAddresses(userId: string): Promise<GetAddressesResponseService> {
     const user = await this.userRepository.getUserById(userId);
@@ -90,5 +97,79 @@ export class UserService {
     if (!updatedUser) {
       throw new NotFoundException('Usuario no encontrado');
     }
+  }
+
+  async addReview(userId: string, request: CreateReviewRequestService): Promise<void> {
+    const user = await this.userRepository.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    const entity = request.toEntity(new Date());
+    const updated = await this.userRepository.addUserReview(userId, entity);
+    if (!updated) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+  }
+
+  async getReviews(userId: string): Promise<GetReviewsResponseService> {
+    const user = await this.userRepository.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    const reviews = await this.userRepository.getUserReviews(userId);
+    return GetReviewsResponseService.fromEntities(reviews);
+  }
+
+  // VENDOR REVIEWS (vendors son usuarios con role 'vendor')
+  async addVendorReview(vendorId: string, request: CreateReviewRequestService): Promise<void> {
+    vendorId = (vendorId || '').trim();
+    this.logger.debug(`addVendorReview vendorId=${vendorId} len=${vendorId.length}`);
+    const vendor = await this.userRepository.getUserById(vendorId);
+    this.logger.debug(`addVendorReview vendor found? ${!!vendor}`);
+    if (!vendor) {
+      throw new NotFoundException('Vendor no encontrado');
+    }
+    // Validar que sea realmente un vendor
+    if (vendor.getRole() !== 'vendor') {
+      this.logger.debug(`addVendorReview role mismatch: role=${vendor.getRole()}`);
+      throw new NotFoundException('Vendor no encontrado');
+    }
+    const entity = request.toEntity(new Date());
+    // Upsert por reviewerId: si ya existe review de ese reviewer, actualizar; sino, agregar
+    const existing = await this.userRepository.getUserReviews(vendorId);
+    this.logger.debug(`addVendorReview existingReviews=${existing.length}`);
+    const already = existing.find(r => r.getReviewerId() === entity.getReviewerId());
+    if (already) {
+      const updated = await this.userRepository.updateUserReview(
+        vendorId,
+        entity.getReviewerId(),
+        entity.getScore(),
+        entity.getComment(),
+        entity.getDate()
+      );
+      this.logger.debug(`addVendorReview updatedExisting=${!!updated}`);
+      if (!updated) {
+        throw new NotFoundException('Vendor no encontrado');
+      }
+    } else {
+      const updated = await this.userRepository.addUserReview(vendorId, entity);
+      this.logger.debug(`addVendorReview insertedNew=${!!updated}`);
+      if (!updated) {
+        throw new NotFoundException('Vendor no encontrado');
+      }
+    }
+  }
+
+  async getVendorReviews(vendorId: string): Promise<GetReviewsResponseService> {
+    vendorId = (vendorId || '').trim();
+    this.logger.debug(`getVendorReviews vendorId=${vendorId} len=${vendorId.length}`);
+    const vendor = await this.userRepository.getUserById(vendorId);
+    this.logger.debug(`getVendorReviews vendor found? ${!!vendor}`);
+    if (!vendor) {
+      throw new NotFoundException('Vendor no encontrado');
+    }
+    const reviews = await this.userRepository.getUserReviews(vendorId);
+    this.logger.debug(`getVendorReviews reviewsCount=${reviews.length}`);
+    return GetReviewsResponseService.fromEntities(reviews);
   }
 }
