@@ -10,7 +10,7 @@ import {Items, ItemsSchema} from './items.schema'
 export type OrderDocument = Order & Document;
 
 
-@Schema({ timestamps: { createdAt: true, updatedAt: false } })
+@Schema({ timestamps: true})
 export class Order{
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     customerId: Types.ObjectId; 
@@ -49,6 +49,7 @@ export class Order{
     @Prop({required: true})
     notes: string;
 
+    createdAt?: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
