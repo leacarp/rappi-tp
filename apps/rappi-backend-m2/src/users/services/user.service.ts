@@ -2,12 +2,14 @@ import { Types } from 'mongoose';
 import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { IUserRepository } from '../domain/interfaces/IUserRepository';
 import { USER_REPOSITORY_TOKEN } from '../domain/tokens/user-repository.token';
+import { User } from '../domain/entities/user.entity';
 import { CreateAddressRequestService } from './dtos/create-address-request-service';
 import { GetAddressesResponseService } from './dtos/get-addresses-response-service';
 import { GetAddressResponseService } from './dtos/get-address-response-service';
 import { UpdateAddressRequestService } from './dtos/update-address-request-service';
 import { CreateReviewRequestService } from './dtos/create-review-request-service';
 import { GetReviewsResponseService } from './dtos/get-reviews-response-service';
+import { SearchRestaurantsResponseService } from './dtos/search-restaurants-response-service';
 
 @Injectable()
 export class UserService {
@@ -171,5 +173,16 @@ export class UserService {
     const reviews = await this.userRepository.getUserReviews(vendorId);
     this.logger.debug(`getVendorReviews reviewsCount=${reviews.length}`);
     return GetReviewsResponseService.fromEntities(reviews);
+  }
+
+  async searchRestaurantsByName(restaurantName: string): Promise<SearchRestaurantsResponseService> {
+    const trimmedName = (restaurantName || '').trim();
+    if (!trimmedName) {
+      return SearchRestaurantsResponseService.fromVendorInfoEntities([]);
+    }
+
+    const vendorInfos = await this.userRepository.searchRestaurantsByName(trimmedName);
+    
+    return SearchRestaurantsResponseService.fromVendorInfoEntities(vendorInfos);
   }
 }

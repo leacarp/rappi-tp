@@ -1,7 +1,8 @@
-import { Controller, Post, Get, Param, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { UserService } from '../../services/user.service';
 import { CreateReviewRequest } from '../dtos/create-review-request';
 import { GetReviewsResponse } from '../dtos/get-reviews-response';
+import { SearchRestaurantsResponse } from '../dtos/search-restaurants-response';
 
 @Controller('vendors')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -22,5 +23,11 @@ export class VendorsController {
   async getReviews(@Param('vendorId') vendorId: string): Promise<GetReviewsResponse> {
     const serviceResp = await this.userService.getVendorReviews(vendorId);
     return GetReviewsResponse.fromServiceDto(serviceResp);
+  }
+
+  @Get('searchRestaurants')
+  async searchRestaurants(@Query('name') restaurantName: string): Promise<SearchRestaurantsResponse> {
+    const serviceResponse = await this.userService.searchRestaurantsByName(restaurantName);
+    return SearchRestaurantsResponse.fromServiceDto(serviceResponse);
   }
 }
