@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ProductRepository } from '../infrastructure/repositories/product.repository';
 import { Product } from '../domain/entities/product.entity';
 import { Types } from 'mongoose';
@@ -19,6 +19,14 @@ export class ProductService {
     isAvailable: boolean = true,
     promotions: { isOnPromotion: boolean; discountedPrice: number } = { isOnPromotion: false, discountedPrice: 0 }
   ): Promise<Product> {
+    // Validar que vendorId sea un ObjectId válido
+    if (!Types.ObjectId.isValid(vendorId)) {
+      throw new BadRequestException('El vendorId debe ser un ObjectId válido');
+    }
+
+    // TODO: Aquí deberíamos validar que el vendor existe y tiene role 'vendor'
+    // Pero como no queremos tocar otros módulos, dejamos el TODO para futuras mejoras
+    
     const product = new Product(
       new Types.ObjectId(),
       new Types.ObjectId(vendorId),
@@ -47,6 +55,11 @@ export class ProductService {
   }
 
   async getProductsByVendor(vendorId: string): Promise<Product[]> {
+    // Validar que vendorId sea un ObjectId válido
+    if (!Types.ObjectId.isValid(vendorId)) {
+      throw new BadRequestException('El vendorId debe ser un ObjectId válido');
+    }
+    
     return await this.productRepository.findByVendorId(vendorId);
   }
 
@@ -62,11 +75,11 @@ export class ProductService {
 
     // Validaciones de negocio antes de actualizar
     if (updateData.price !== undefined && updateData.price <= 0) {
-      throw new Error('El precio debe ser mayor a 0');
+      throw new BadRequestException('El precio debe ser mayor a 0');
     }
 
     if (updateData.name !== undefined && (!updateData.name || updateData.name.trim().length === 0)) {
-      throw new Error('El nombre no puede estar vacío');
+      throw new BadRequestException('El nombre no puede estar vacío');
     }
 
     const result = await this.productRepository.update(id, updateData);
