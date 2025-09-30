@@ -47,7 +47,10 @@ export class OrderRepository implements IOrderRepository{
         return order ? this.toEntity(order) : null;
       }
 
-   
+  async findByUserId(userId: string): Promise<OrderEntity[]>{
+    // TODO: Implementar
+    return [];
+  }
 
     // Chequea si está poblado o no(Documento con datos o ObjectId)
     private getId<T extends { _id: Types.ObjectId }>(ref: Types.ObjectId | T): Types.ObjectId {

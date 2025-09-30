@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ProductRepository } from '../infrastructure/repositories/product.repository';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { IProductRepository } from '../domain/interfaces/IProductRepository';
+import { PRODUCT_REPOSITORY_TOKEN } from '../domain/tokens/product-repository.token';
 import { Product } from '../domain/entities/product.entity';
 import { Types } from 'mongoose';
 
 @Injectable()
 export class ProductService {
   constructor(
-    private readonly productRepository: ProductRepository
+    @Inject(PRODUCT_REPOSITORY_TOKEN)
+    private readonly productRepository: IProductRepository
   ) {}
 
   async createProduct(
