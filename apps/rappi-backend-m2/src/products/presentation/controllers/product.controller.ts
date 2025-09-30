@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   UsePipes,
   ValidationPipe,
   HttpCode,

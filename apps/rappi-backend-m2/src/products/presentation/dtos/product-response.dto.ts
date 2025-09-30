@@ -1,3 +1,5 @@
+import { Product } from '../../domain/entities/product.entity';
+
 export class PromotionResponseDto {
   constructor(
     public readonly isOnPromotion: boolean,
@@ -21,7 +23,7 @@ export class ProductResponseDto {
   ) {}
 
   // Método factory para crear desde entidad del dominio
-  static fromEntity(product: any): ProductResponseDto {
+  static fromEntity(product: Product): ProductResponseDto {
     return new ProductResponseDto(
       product.id.toString(),
       product.vendorId.toString(),

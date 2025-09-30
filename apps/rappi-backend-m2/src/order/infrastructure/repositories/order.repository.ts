@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IOrderRepository } from '../../domain/interfaces/IOrderRepository';
@@ -47,7 +47,7 @@ export class OrderRepository implements IOrderRepository{
         return order ? this.toEntity(order) : null;
       }
 
-  async findByUserId(userId: string): Promise<OrderEntity[]>{
+  async findByUserId(): Promise<OrderEntity[]>{
     // TODO: Implementar
     return [];
   }

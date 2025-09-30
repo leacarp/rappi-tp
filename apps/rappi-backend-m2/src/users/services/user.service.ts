@@ -2,7 +2,6 @@ import { Types } from 'mongoose';
 import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { IUserRepository } from '../domain/interfaces/IUserRepository';
 import { USER_REPOSITORY_TOKEN } from '../domain/tokens/user-repository.token';
-import { User } from '../domain/entities/user.entity';
 import { CreateAddressRequestService } from './dtos/create-address-request-service';
 import { GetAddressesResponseService } from './dtos/get-addresses-response-service';
 import { GetAddressResponseService } from './dtos/get-address-response-service';
