@@ -47,6 +47,15 @@ export class OrderRepository implements IOrderRepository{
         return order ? this.toEntity(order) : null;
       }
 
+
+      async findByUserId(userId: string): Promise<OrderEntity[]> {
+        const orders = await this.orderModel.find({ customerId: userId })
+        .populate('customerId')
+        .populate('vendorId')
+        .populate('driverId')
+        .exec();
+        return orders.map(order => this.toEntity(order));
+      }
    
 
     // Chequea si está poblado o no(Documento con datos o ObjectId)
