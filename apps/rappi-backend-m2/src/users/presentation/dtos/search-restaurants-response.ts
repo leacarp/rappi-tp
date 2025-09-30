@@ -1,7 +1,6 @@
 import { SearchRestaurantsResponseService } from '../../services/dtos/search-restaurants-response-service';
 
 export class RestaurantSearchResult {
-  private readonly id: string;
   private readonly restaurantName: string;
   private readonly description: string;
   private readonly rating: number;
@@ -9,23 +8,17 @@ export class RestaurantSearchResult {
   private readonly schedule: string;
 
   constructor(
-    id: string,
     restaurantName: string,
     description: string,
     rating: number,
     isAvailable: boolean,
     schedule: string
   ) {
-    this.id = id;
     this.restaurantName = restaurantName;
     this.description = description;
     this.rating = rating;
     this.isAvailable = isAvailable;
     this.schedule = schedule;
-  }
-
-  getId(): string {
-    return this.id;
   }
 
   getRestaurantName(): string {
@@ -73,7 +66,6 @@ export class SearchRestaurantsResponse {
   static fromServiceDto(serviceDto: SearchRestaurantsResponseService): SearchRestaurantsResponse {
     const restaurants = serviceDto.getRestaurants().map((restaurant) => 
       new RestaurantSearchResult(
-        restaurant.getId(),
         restaurant.getRestaurantName(),
         restaurant.getDescription(),
         restaurant.getRating(),
