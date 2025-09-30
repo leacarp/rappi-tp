@@ -1,7 +1,7 @@
 import { Types } from 'mongoose'; 
-import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
-import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
+import { ORDER_REPOSITORY_TOKEN } from '../domain/tokens/order-repository.token';
 import { CreateOrderDto } from './dtos/order/create-order.dto';
 import { GetOrderResponseDto } from '../presentation/dtos/get-order-response';
 import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response';
@@ -17,7 +17,7 @@ import { Payment } from '../domain/entities/payment.entity';
 @Injectable()
 export class OrderService {
   constructor(
-    @Inject(ORDER_REPOSITORY) 
+    @Inject(ORDER_REPOSITORY_TOKEN) 
     private readonly orderRepository: IOrderRepository
   ) {}
 

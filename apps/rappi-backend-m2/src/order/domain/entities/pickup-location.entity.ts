@@ -4,8 +4,8 @@ export class PickUpLocation{
 
 
     constructor(latitude: number, longitude: number){
-        this._latitude = latitude,
-        this._longitude = longitude
+        this._latitude = latitude;
+        this._longitude = longitude;
     }
 
     getLongitude(): number {

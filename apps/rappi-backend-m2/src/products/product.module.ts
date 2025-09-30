@@ -6,6 +6,7 @@ import { Product, ProductSchema } from './infrastructure/schemas/product.schema'
 
 // Repository 
 import { ProductRepository } from './infrastructure/repositories/product.repository';
+import { PRODUCT_REPOSITORY_TOKEN } from './domain/tokens/product-repository.token';
 
 // Service
 import { ProductService } from './application/product.service';
@@ -19,8 +20,11 @@ import { ProductController } from './presentation/controllers/product.controller
   ],
   controllers: [ProductController],
   providers: [
+    {
+      provide: PRODUCT_REPOSITORY_TOKEN,
+      useClass: ProductRepository
+    },
     ProductService,
-    ProductRepository,
   ],
   exports: [ProductService],
 })

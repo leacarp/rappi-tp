@@ -4,7 +4,7 @@ import { OrderService } from './services/order.service';
 import { OrderController } from './presentation/controllers/order.controller';
 import { Order, OrderSchema } from './infrastructure/schemas/order.schema';
 import { OrderRepository } from './infrastructure/repositories/order.repository';
-import { ORDER_REPOSITORY } from './infrastructure/constants/order.constants';
+import { ORDER_REPOSITORY_TOKEN } from './domain/tokens/order-repository.token';
 
 @Module({
   imports: [
@@ -14,10 +14,10 @@ import { ORDER_REPOSITORY } from './infrastructure/constants/order.constants';
   providers: [
     OrderService,
     {
-      provide: ORDER_REPOSITORY,
+      provide: ORDER_REPOSITORY_TOKEN,
       useClass: OrderRepository
     }
   ],
-  exports: [ORDER_REPOSITORY]
+  exports: [ORDER_REPOSITORY_TOKEN]
 })
 export class OrderModule {}
