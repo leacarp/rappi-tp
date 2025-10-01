@@ -140,6 +140,34 @@ export class UserRepository implements IUserRepository {
     );
   }
 
+  async searchRestaurantsByName(restaurantName: string): Promise<VendorInfo[]> {
+    const trimmedName = (restaurantName || '').trim();
+    if (!trimmedName) {
+      return [];
+    }
+
+    const usersWithRestaurantInfo = await this.userModel
+      .find({
+        role: 'vendor',
+        'profile.vendorInfo.restaurantName': {
+          $regex: trimmedName,
+          $options: 'i'
+        }
+      })
+      .select('profile.vendorInfo')
+      .exec();
+      
+    return usersWithRestaurantInfo
+      .filter(user => user.profile?.vendorInfo)
+      .map(user => new VendorInfo(
+        user.profile.vendorInfo.restaurantName,
+        user.profile.vendorInfo.description,
+        user.profile.vendorInfo.schedule,
+        user.profile.vendorInfo.rating,
+        user.profile.vendorInfo.isAvailable
+      ));
+  }
+
   private mapToUserEntity(userDoc: UserDocument): User {
     const addresses = (userDoc.profile?.addresses || []).map((addr: AddressSchema) => 
       new Address(
