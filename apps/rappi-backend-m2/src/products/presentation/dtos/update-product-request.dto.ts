@@ -40,4 +40,18 @@ export class UpdateProductRequestDto {
   @Type(() => PromotionDto)
   @IsOptional()
   promotions?: PromotionDto;
+
+  // Método para convertir a DTO de servicio
+  toServiceDto(): import('../../application/dtos/update-product-service.dto').UpdateProductServiceDto {
+    const { UpdateProductServiceDto } = require('../../application/dtos/update-product-service.dto');
+    return new UpdateProductServiceDto({
+      name: this.name,
+      description: this.description,
+      imageURL: this.imageURL,
+      price: this.price,
+      category: this.category,
+      isAvailable: this.isAvailable,
+      promotions: this.promotions
+    });
+  }
 }

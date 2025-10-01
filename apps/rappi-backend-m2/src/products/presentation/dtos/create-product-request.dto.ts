@@ -43,4 +43,19 @@ export class CreateProductRequestDto {
   @Type(() => PromotionDto)
   @IsOptional()
   promotions?: PromotionDto = { isOnPromotion: false, discountedPrice: 0 };
+
+  // Método para convertir a DTO de servicio
+  toServiceDto(): import('../../application/dtos/create-product-service.dto').CreateProductServiceDto {
+    const { CreateProductServiceDto } = require('../../application/dtos/create-product-service.dto');
+    return new CreateProductServiceDto(
+      this.vendorId,
+      this.name,
+      this.description,
+      this.imageURL,
+      this.price,
+      this.category,
+      this.isAvailable ?? true,
+      this.promotions ?? { isOnPromotion: false, discountedPrice: 0 }
+    );
+  }
 }

@@ -25,17 +25,8 @@ export class ProductController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createProduct(@Body() createProductDto: CreateProductRequestDto): Promise<ProductResponseDto> {
-    const product = await this.productService.createProduct(
-      createProductDto.vendorId,
-      createProductDto.name,
-      createProductDto.description,
-      createProductDto.imageURL,
-      createProductDto.price,
-      createProductDto.category,
-      createProductDto.isAvailable ?? true,
-      createProductDto.promotions ?? { isOnPromotion: false, discountedPrice: 0 }
-    );
-
+    const serviceDto = createProductDto.toServiceDto();
+    const product = await this.productService.createProduct(serviceDto);
     return ProductResponseDto.fromEntity(product);
   }
 
@@ -68,7 +59,8 @@ export class ProductController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductRequestDto
   ): Promise<ProductResponseDto> {
-    const product = await this.productService.updateProduct(id, updateProductDto);
+    const serviceDto = updateProductDto.toServiceDto();
+    const product = await this.productService.updateProduct(id, serviceDto);
     return ProductResponseDto.fromEntity(product);
   }
 
