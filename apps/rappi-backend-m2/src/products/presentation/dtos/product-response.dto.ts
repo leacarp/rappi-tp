@@ -1,8 +1,11 @@
 export class PromotionResponseDto {
-  constructor(
-    public readonly isOnPromotion: boolean,
-    public readonly discountedPrice: number
-  ) {}
+  public readonly isOnPromotion: boolean;
+  public readonly discountedPrice: number;
+
+  constructor(isOnPromotion: boolean, discountedPrice: number) {
+    this.isOnPromotion = isOnPromotion;
+    this.discountedPrice = discountedPrice;
+  }
 }
 
 export class ProductResponseDto {
@@ -22,6 +25,10 @@ export class ProductResponseDto {
 
   // Método factory para crear desde entidad del dominio
   static fromEntity(product: any): ProductResponseDto {
+    // Extraer promotions correctamente (manejar subdocumentos de Mongoose)
+    const promotions = product.promotions;
+    const promotionData = promotions._doc || promotions || { isOnPromotion: false, discountedPrice: 0 };
+    
     return new ProductResponseDto(
       product.id.toString(),
       product.vendorId.toString(),
@@ -32,8 +39,8 @@ export class ProductResponseDto {
       product.category,
       product.isAvailable,
       new PromotionResponseDto(
-        product.promotions.isOnPromotion,
-        product.promotions.discountedPrice
+        promotionData.isOnPromotion,
+        promotionData.discountedPrice
       ),
       product.getFinalPrice(),
       product.getDiscountPercentage()
