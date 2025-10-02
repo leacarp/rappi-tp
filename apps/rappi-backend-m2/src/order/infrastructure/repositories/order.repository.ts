@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IOrderRepository } from '../../domain/interfaces/IOrderRepository';
-import {Order as OrderEntity} from '../../domain/entities/order.entity';
+import {OrderEntity as OrderEntity} from '../../domain/entities/order.entity';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { PickUpLocation } from '../../domain/entities/pickup-location.entity';
 import { DeliveryLocation } from '../../domain/entities/deliveryLocation.entity';
@@ -22,11 +22,32 @@ export class OrderRepository implements IOrderRepository{
           vendorId: order.getVendorId(),
           driverId: order.getDriverId(),
           status: order.getStatus(),
-          pickUpLocation: order.getPickupLocation(),
-          deliveryLocation: order.getDeliveryLocation(),
-          items: order.getItems(),
-          summary: order.getSummary(),
-          payment: order.getPayment(),
+          pickUpLocation: {
+            latitude: order.getPickupLocation().getLatitude(),
+            longitude: order.getPickupLocation().getLongitude()
+          },
+          deliveryLocation: {
+            latitude: order.getDeliveryLocation().getLatitude(),
+            longitude: order.getDeliveryLocation().getLongitude()
+          },
+          items: order.getItems().map(item => ({
+            productId: item.getProductId(),
+            name: item.getName(),
+            quantity: item.getQuantity(),
+            price: item.getQuantity()
+          })),
+          summary: {
+            subtotal: order.getSummary().getSubTotal(),
+            shippingCost: order.getSummary().getShippingCost(),
+            taxes: order.getSummary().getTaxes(),
+            discount: order.getSummary().getDiscount(),
+            total: order.getSummary().getTotal()
+          },
+          payment: {
+            method: order.getPayment().getMethod(),
+            status: order.getPayment().getStatus(),
+            transactionId: order.getPayment().getTransactionId()
+          },
           trackingNumber: order.getTrackingNumber(),
           notes: order.getNotes(),
           });
@@ -47,15 +68,11 @@ export class OrderRepository implements IOrderRepository{
         return order ? this.toEntity(order) : null;
       }
 
+    async findByUserId(userId: string): Promise<OrderEntity[]> {
+        const orders = await this.orderModel.find({ customerId: userId }).exec();
+        return orders.map(order => this.toDomain(order));
+    }
 
-      async findByUserId(userId: string): Promise<OrderEntity[]> {
-        const orders = await this.orderModel.find({ customerId: userId })
-        .populate('customerId')
-        .populate('vendorId')
-        .populate('driverId')
-        .exec();
-        return orders.map(order => this.toEntity(order));
-      }
    
 
     // Chequea si está poblado o no(Documento con datos o ObjectId)
@@ -66,7 +83,7 @@ export class OrderRepository implements IOrderRepository{
     // Convierte documento de MongoDB a entidad del dominio
     private toEntity(orderDoc: OrderDocument): OrderEntity {
         return new OrderEntity(
-            orderDoc.id as Types.ObjectId,
+            orderDoc._id as Types.ObjectId,
             this.getId(orderDoc.customerId),
             this.getId(orderDoc.vendorId),
             this.getId(orderDoc.driverId),
@@ -88,5 +105,31 @@ export class OrderRepository implements IOrderRepository{
             orderDoc.notes,
             orderDoc.createdAt
         );
+    }
+
+    private toDomain(order: OrderDocument): OrderEntity {
+      return new OrderEntity(
+        order._id as Types.ObjectId,
+        order.customerId,
+        order.vendorId,
+        order.driverId,
+        order.status,
+        new PickUpLocation(order.pickUpLocation.latitude, order.pickUpLocation.longitude),
+        new DeliveryLocation(order.deliveryLocation.latitude, order.deliveryLocation.longitude),
+        order.items.map(
+                item => new Items(item.productId.toString(), item.name, item.quantity, item.price)
+            ),
+        new Summary(
+                        order.summary.subtotal, 
+                        order.summary.shippingCost,  
+                        order.summary.taxes,
+                        order.summary.discount,
+                        order.summary.total
+            ),
+        new Payment(order.payment.method, order.payment.status, order.payment.transactionId),
+        order.trackingNumber,
+        order.notes,
+        order.createdAt,
+      );
     }
 }

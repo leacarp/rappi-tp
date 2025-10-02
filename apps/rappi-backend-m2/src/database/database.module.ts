@@ -7,7 +7,7 @@ import { getDatabaseConfig } from '../config/database.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['apps/rappi-backend-m2/.env', '.env'],
+      envFilePath: ['apps/rappi-backend-m2/.env'],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

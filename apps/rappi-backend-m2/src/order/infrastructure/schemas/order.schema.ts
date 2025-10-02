@@ -20,7 +20,7 @@ export class Order{
 
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     driverId: Types.ObjectId; 
-
+    
     @Prop({
         required: true,
         enum: ['pending', 'accepted', 'preparing', 'ready for pickup', 'in transit', 'delivered', 'canceled'],

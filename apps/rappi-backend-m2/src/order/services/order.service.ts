@@ -1,12 +1,12 @@
 import { Types } from 'mongoose'; 
-import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, Inject} from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
 import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
 import { CreateOrderDto } from './dtos/order/create-order.dto';
 import { GetOrderResponseDto } from '../presentation/dtos/get-order-response';
 import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response';
 import { OrderSummaryDto } from '../presentation/dtos/order/order-summary.dto';
-import { Order } from '../domain/entities/order.entity';
+import { OrderEntity } from '../domain/entities/order.entity';
 import { PickUpLocation } from '../domain/entities/pickup-location.entity';
 import { DeliveryLocation } from '../domain/entities/deliveryLocation.entity';
 import { Items } from '../domain/entities/items.entity';
@@ -44,9 +44,49 @@ export class OrderService {
   }
 
 
+
+  private toOrderDocument(dto: CreateOrderDto) {
+    return {
+      customerId: new Types.ObjectId(dto.customerId),
+      vendorId: new Types.ObjectId(dto.vendorId),
+      driverId: new Types.ObjectId(dto.driverId),
+      status: 'pending',
+      pickUpLocation: {
+        latitude: dto.pickupLocation.latitude,
+        longitude: dto.pickupLocation.longitude
+      },
+      deliveryLocation: {
+        latitude: dto.deliveryLocation.latitude,
+        longitude: dto.deliveryLocation.longitude
+      },
+      items: dto.items.map(item => ({
+        productId: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      summary: {
+        subtotal: dto.summary.subtotal,
+        shippingCost: dto.summary.shippingCost,
+        taxes: dto.summary.taxes,
+        discount: dto.summary.discount,
+        total: dto.summary.total
+      },
+      payment: {
+        method: dto.payment.method,
+        status: dto.payment.status,
+        transactionId: dto.payment.transactionId
+      },
+      trackingNumber: dto.trackingNumber,
+      notes: dto.notes,
+      createdAt: new Date()
+    };
+  }
+
+
   // CreateOrderDto → OrderEntit
-  private toOrderEntity(dto: CreateOrderDto): Order {
-    return new Order(
+    private toOrderEntity(dto: CreateOrderDto): OrderEntity {
+    return new OrderEntity(
       undefined,
       new Types.ObjectId(dto.customerId),
       new Types.ObjectId(dto.vendorId),
@@ -68,26 +108,26 @@ export class OrderService {
       new Date()
     );
   } 
-
+ 
   // Mapper: OrderEntity → GetOrderResponseDto
-  private toGetOrderResponseDto(order: Order): GetOrderResponseDto {
+  private toGetOrderResponseDto(order: OrderEntity): GetOrderResponseDto {
   return {
     id: order.getId().toHexString(),
     
     customer: {
       id: order.getCustomerId().toHexString(),
-      name: (order.getCustomerId() as any).name || '', 
-      email: (order.getCustomerId() as any).email || ''
+      name: order.getCustomer()?.name || '',
+      email: order.getCustomer()?.email || ''
     },
     vendor: {
       id: order.getVendorId().toHexString(),
-      name: (order.getVendorId() as any).name || '',
-      email: (order.getVendorId() as any).email || ''
+      name: order.getVendor()?.name || '',
+      email: order.getVendor()?.email || ''
     },
     driver: {
       id: order.getDriverId().toHexString(),
-      name: (order.getDriverId() as any).name || '',
-      email: (order.getDriverId() as any).email || ''
+      name: order.getDriver()?.name || '',
+      email: order.getDriver()?.email || ''
     },
 
     status: order.getStatus(),
@@ -128,7 +168,7 @@ export class OrderService {
   };
   }
 
-  private toOrderSummaryDto(order: Order): OrderSummaryDto {
+  private toOrderSummaryDto(order: OrderEntity): OrderSummaryDto {
     return {
       id: order.getId().toHexString(),
       status: order.getStatus(),
