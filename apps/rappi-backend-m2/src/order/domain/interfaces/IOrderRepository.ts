@@ -1,7 +1,7 @@
-import { Order } from "../entities/order.entity";
+import { OrderEntity } from "../entities/order.entity";
 
 export interface IOrderRepository{
-    create(order: Order): Promise<Order>;
-    findById(id: string): Promise<Order | null>;
-    findByUserId(userId: string): Promise<Order[]>;
+    create(dto: OrderEntity): Promise<OrderEntity>; 
+    findById(id: string): Promise<OrderEntity | null>;
+    findByUserId(userId: string): Promise<OrderEntity[]>;
 }

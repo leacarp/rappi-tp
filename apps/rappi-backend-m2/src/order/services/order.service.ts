@@ -6,7 +6,7 @@ import { CreateOrderDto } from './dtos/order/create-order.dto';
 import { GetOrderResponseDto } from '../presentation/dtos/get-order-response';
 import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response';
 import { OrderSummaryDto } from '../presentation/dtos/order/order-summary.dto';
-import { Order } from '../domain/entities/order.entity';
+import { OrderEntity } from '../domain/entities/order.entity';
 import { PickUpLocation } from '../domain/entities/pickup-location.entity';
 import { DeliveryLocation } from '../domain/entities/deliveryLocation.entity';
 import { Items } from '../domain/entities/items.entity';
@@ -44,9 +44,49 @@ export class OrderService {
   }
 
 
+
+  private toOrderDocument(dto: CreateOrderDto) {
+    return {
+      customerId: new Types.ObjectId(dto.customerId),
+      vendorId: new Types.ObjectId(dto.vendorId),
+      driverId: new Types.ObjectId(dto.driverId),
+      status: 'pending',
+      pickUpLocation: {
+        latitude: dto.pickupLocation.latitude,
+        longitude: dto.pickupLocation.longitude
+      },
+      deliveryLocation: {
+        latitude: dto.deliveryLocation.latitude,
+        longitude: dto.deliveryLocation.longitude
+      },
+      items: dto.items.map(item => ({
+        productId: item.productId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      summary: {
+        subtotal: dto.summary.subtotal,
+        shippingCost: dto.summary.shippingCost,
+        taxes: dto.summary.taxes,
+        discount: dto.summary.discount,
+        total: dto.summary.total
+      },
+      payment: {
+        method: dto.payment.method,
+        status: dto.payment.status,
+        transactionId: dto.payment.transactionId
+      },
+      trackingNumber: dto.trackingNumber,
+      notes: dto.notes,
+      createdAt: new Date()
+    };
+  }
+
+
   // CreateOrderDto → OrderEntit
-  private toOrderEntity(dto: CreateOrderDto): Order {
-    return new Order(
+    private toOrderEntity(dto: CreateOrderDto): OrderEntity {
+    return new OrderEntity(
       undefined,
       new Types.ObjectId(dto.customerId),
       new Types.ObjectId(dto.vendorId),
@@ -68,9 +108,9 @@ export class OrderService {
       new Date()
     );
   } 
-
+ 
   // Mapper: OrderEntity → GetOrderResponseDto
-  private toGetOrderResponseDto(order: Order): GetOrderResponseDto {
+  private toGetOrderResponseDto(order: OrderEntity): GetOrderResponseDto {
   return {
     id: order.getId().toHexString(),
     
@@ -128,7 +168,7 @@ export class OrderService {
   };
   }
 
-  private toOrderSummaryDto(order: Order): OrderSummaryDto {
+  private toOrderSummaryDto(order: OrderEntity): OrderSummaryDto {
     return {
       id: order.getId().toHexString(),
       status: order.getStatus(),

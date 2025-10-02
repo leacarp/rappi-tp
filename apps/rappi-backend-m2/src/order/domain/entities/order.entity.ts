@@ -5,7 +5,7 @@ import { PickUpLocation } from "./pickup-location.entity";
 import { Summary } from "./summary.entity";
 import { Types } from 'mongoose';
 
-export class Order{
+export class OrderEntity{
     private readonly _id: Types.ObjectId;
     private readonly _customerId: Types.ObjectId;
     private readonly _vendorId : Types.ObjectId;
