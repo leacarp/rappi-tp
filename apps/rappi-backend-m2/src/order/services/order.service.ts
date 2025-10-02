@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'; 
-import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, Inject} from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
 import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
 import { CreateOrderDto } from './dtos/order/create-order.dto';
@@ -116,18 +116,18 @@ export class OrderService {
     
     customer: {
       id: order.getCustomerId().toHexString(),
-      name: (order.getCustomerId() as any).name || '', 
-      email: (order.getCustomerId() as any).email || ''
+      name: order.getCustomer()?.name || '',
+      email: order.getCustomer()?.email || ''
     },
     vendor: {
       id: order.getVendorId().toHexString(),
-      name: (order.getVendorId() as any).name || '',
-      email: (order.getVendorId() as any).email || ''
+      name: order.getVendor()?.name || '',
+      email: order.getVendor()?.email || ''
     },
     driver: {
       id: order.getDriverId().toHexString(),
-      name: (order.getDriverId() as any).name || '',
-      email: (order.getDriverId() as any).email || ''
+      name: order.getDriver()?.name || '',
+      email: order.getDriver()?.email || ''
     },
 
     status: order.getStatus(),

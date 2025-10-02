@@ -19,6 +19,9 @@ export class OrderEntity{
     private _payment: Payment;
     private _trackingNumber: string;
     private _notes: string;
+    private _customer?: { id: Types.ObjectId; name: string; email: string };
+    private _vendor?: { id: Types.ObjectId; name: string; email: string };
+    private _driver?: { id: Types.ObjectId; name: string; email: string };
 
     constructor(
         id: Types.ObjectId, 
@@ -33,7 +36,10 @@ export class OrderEntity{
         payment: Payment, 
         trackingNumber: string, 
         notes: string,
-        createdAt?: Date
+        createdAt?: Date,
+        customerData?: { id: Types.ObjectId; name: string; email: string },
+        vendorData?: { id: Types.ObjectId; name: string; email: string },
+        driverData?: { id: Types.ObjectId; name: string; email: string },
     ){
         this._id = id;
         this._customerId = customerId;
@@ -48,6 +54,9 @@ export class OrderEntity{
         this._trackingNumber = trackingNumber;
         this._notes = notes;
         this._createdAt = createdAt ?? new Date();
+        this._customer = customerData;
+        this._vendor = vendorData;
+        this._driver = driverData;
 
         this.validateBusinessRules();
     }
@@ -110,6 +119,18 @@ export class OrderEntity{
 
     markAsDelivered(): void {
         this._status = 'delivered';
+    }
+
+    getCustomer(): { id: Types.ObjectId; name: string; email: string } | undefined {
+        return this._customer;
+    }
+
+    getVendor(): { id: Types.ObjectId; name: string; email: string } | undefined {
+        return this._vendor;
+    }
+
+    getDriver(): { id: Types.ObjectId; name: string; email: string } | undefined {
+        return this._driver;
     }
 
 

@@ -3,7 +3,7 @@ export class DeliveryLocation{
     private _longitude: number;
 
     constructor(latitude: number, longitude: number){
-        this._latitude = latitude,
+        this._latitude = latitude;
         this._longitude = longitude
     }
 
