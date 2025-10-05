@@ -15,6 +15,7 @@ import { ProductService } from '../../application/product.service';
 import { CreateProductRequestDto } from '../dtos/create-product-request.dto';
 import { UpdateProductRequestDto } from '../dtos/update-product-request.dto';
 import { ProductResponseDto } from '../dtos/product-response.dto';
+import { RestaurantMenuResponseDto, RestaurantInfoDto } from '../dtos/restaurant-menu-response.dto';
 
 @Controller('products')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -45,6 +46,17 @@ export class ProductController {
   async getProductsByVendor(@Param('vendorId') vendorId: string): Promise<ProductResponseDto[]> {
     const products = await this.productService.getProductsByVendor(vendorId);
     return products.map(product => ProductResponseDto.fromEntity(product));
+  }
+
+  @Get('restaurant/:vendorId/menu')
+  async getRestaurantMenu(@Param('vendorId') vendorId: string): Promise<RestaurantMenuResponseDto> {
+    const { restaurant, products } = await this.productService.getRestaurantMenu(vendorId);
+    
+    const restaurantInfo = RestaurantInfoDto.fromEntity(restaurant);
+    const menuItems = products.map(product => ProductResponseDto.fromEntity(product));
+    const categories = [...new Set(products.map(product => product.category))];
+    
+    return new RestaurantMenuResponseDto(restaurantInfo, menuItems, categories);
   }
 
   @Get('category/:category')

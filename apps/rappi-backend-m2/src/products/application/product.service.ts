@@ -4,11 +4,14 @@ import { Product } from '../domain/entities/product.entity';
 import { Types } from 'mongoose';
 import { CreateProductServiceDto } from './dtos/create-product-service.dto';
 import { UpdateProductServiceDto } from './dtos/update-product-service.dto';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class ProductService {
   constructor(
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
+    private readonly httpService: HttpService
   ) {}
 
   async createProduct(createProductDto: CreateProductServiceDto): Promise<Product> {
@@ -115,5 +118,36 @@ export class ProductService {
       throw new NotFoundException('Producto no encontrado');
     }
     return result;
+  }
+
+  async getRestaurantMenu(vendorId: string): Promise<{ restaurant: any; products: Product[] }> {
+    // Validar que vendorId sea un ObjectId válido
+    if (!Types.ObjectId.isValid(vendorId)) {
+      throw new BadRequestException('El vendorId debe ser un ObjectId válido');
+    }
+
+    // Obtener los productos del restaurante
+    const products = await this.productRepository.findByVendorId(vendorId);
+
+    // Obtener información del restaurante desde el servicio de usuarios
+    let restaurant = null;
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`http://localhost:3000/users/${vendorId}`)
+      );
+      restaurant = response.data;
+    } catch (error) {
+      // Si no se puede obtener la información del restaurante, crear una básica
+      restaurant = {
+        id: vendorId,
+        name: 'Restaurante',
+        description: 'Información no disponible',
+        rating: 0,
+        isAvailable: true,
+        schedule: 'No especificado'
+      };
+    }
+
+    return { restaurant, products };
   }
 }

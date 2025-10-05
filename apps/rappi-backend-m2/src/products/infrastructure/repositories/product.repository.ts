@@ -13,7 +13,7 @@ export class ProductRepository implements IProductRepository {
 
   async create(product: ProductEntity): Promise<ProductEntity> {
     const createdProduct = new this.productModel({
-      vendorId: product.vendorId,
+      _vendorId: product.vendorId,
       name: product.name,
       description: product.description,
       imageURL: product.imageURL,
@@ -42,7 +42,7 @@ export class ProductRepository implements IProductRepository {
   }
 
   async findByVendorId(vendorId: string): Promise<ProductEntity[]> {
-    const products = await this.productModel.find({ vendorId }).exec();
+    const products = await this.productModel.find({ vendorId: new Types.ObjectId(vendorId) }).exec();
     return products.map(product => this.toEntity(product));
   }
 
@@ -78,7 +78,7 @@ export class ProductRepository implements IProductRepository {
   private toEntity(productDoc: ProductDocument): ProductEntity {
     return new ProductEntity(
       productDoc._id as Types.ObjectId,
-      productDoc.vendorId,
+      (productDoc as any).vendorId || productDoc._vendorId,
       productDoc.name,
       productDoc.description,
       productDoc.imageURL,

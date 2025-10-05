@@ -107,7 +107,7 @@ export class ProductResponseDto {
     
     return new ProductResponseDto(
       product.id.toString(),
-      product.vendorId.toString(),
+      product.vendorId ? product.vendorId.toString() : '',
       product.name,
       product.description,
       product.imageURL,

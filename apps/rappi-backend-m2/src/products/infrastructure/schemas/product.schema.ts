@@ -6,7 +6,7 @@ export type ProductDocument = Product & Document;
 @Schema({ timestamps: true })
 export class Product {
   @Prop({ type: Types.ObjectId, required: true })
-  vendorId: Types.ObjectId;
+  _vendorId: Types.ObjectId;
 
   @Prop({ required: true })
   name: string;
