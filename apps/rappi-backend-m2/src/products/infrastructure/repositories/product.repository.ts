@@ -47,7 +47,7 @@ export class ProductRepository implements IProductRepository {
   }
 
   async findByCategory(category: string): Promise<ProductEntity[]> {
-    const products = await this.productModel.find({ category }).exec();
+    const products = await this.productModel.find({ category: new RegExp(category, 'i') }).exec();
     return products.map(product => this.toEntity(product));
   }
 

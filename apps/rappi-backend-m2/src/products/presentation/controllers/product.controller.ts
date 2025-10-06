@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UsePipes,
   ValidationPipe,
   HttpCode,
@@ -32,6 +33,12 @@ export class ProductController {
   @Get()
   async getAllProducts(): Promise<ProductResponseDto[]> {
     const products = await this.productService.getAllProducts();
+    return products.map(product => ProductResponseDto.fromEntity(product));
+  }
+  
+  @Get('search')
+  async searchProducts(@Query('category') category: string): Promise<ProductResponseDto[]> {
+    const products = await this.productService.getProductsByCategory(category);
     return products.map(product => ProductResponseDto.fromEntity(product));
   }
 
