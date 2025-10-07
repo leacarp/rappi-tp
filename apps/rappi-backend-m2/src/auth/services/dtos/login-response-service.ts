@@ -2,9 +2,9 @@ export class LoginResponseService {
   private readonly _userId: string;
   private readonly _email: string;
   private readonly _role: string;
-  private readonly _token?: string;
+  private readonly _token: string;
 
-  constructor(userId: string, email: string, role: string, token?: string) {
+  constructor(userId: string, email: string, role: string, token: string) {
     this._userId = userId;
     this._email = email;
     this._role = role;
@@ -23,7 +23,7 @@ export class LoginResponseService {
     return this._role;
   }
 
-  getToken(): string | undefined {
+  getToken(): string {
     return this._token;
   }
 }

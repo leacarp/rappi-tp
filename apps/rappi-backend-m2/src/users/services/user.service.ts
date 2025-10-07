@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'; 
-import { Injectable, Inject, NotFoundException, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { IUserRepository } from '../domain/interfaces/IUserRepository';
 import { USER_REPOSITORY_TOKEN } from '../domain/tokens/user-repository.token';
@@ -10,8 +10,6 @@ import { UpdateAddressRequestService } from './dtos/update-address-request-servi
 import { CreateReviewRequestService } from './dtos/create-review-request-service';
 import { GetReviewsResponseService } from './dtos/get-reviews-response-service';
 import { SearchRestaurantsResponseService } from './dtos/search-restaurants-response-service';
-import { LoginRequestService } from './dtos/login-request-service';
-import { LoginResponseService } from './dtos/login-response-service';
 
 @Injectable()
 export class UserService {
@@ -188,23 +186,6 @@ export class UserService {
     return SearchRestaurantsResponseService.fromVendorInfoEntities(vendorInfos);
   }
 
-  async login(loginRequest: LoginRequestService): Promise<LoginResponseService> {
-    const user = await this.userRepository.getUserByEmail(loginRequest.getEmail());
-    if (!user) {
-      throw new UnauthorizedException('Usuario o contraseña incorrectos');
-    }
-
-    const isPasswordValid = await this.verifyPassword(loginRequest.getPassword(), user.getPassword());
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Usuario o contraseña incorrectos');
-    }
-
-    return new LoginResponseService(
-      user.getId(),
-      user.getEmail(),
-      user.getRole()
-    );
-  }
   
   async hashPassword(password: string): Promise<string> {
     const saltRounds = 12;
