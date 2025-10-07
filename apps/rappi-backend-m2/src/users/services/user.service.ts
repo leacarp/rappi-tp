@@ -1,5 +1,6 @@
 import { Types } from 'mongoose'; 
 import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { IUserRepository } from '../domain/interfaces/IUserRepository';
 import { USER_REPOSITORY_TOKEN } from '../domain/tokens/user-repository.token';
 import { CreateAddressRequestService } from './dtos/create-address-request-service';
@@ -183,5 +184,15 @@ export class UserService {
     const vendorInfos = await this.userRepository.searchRestaurantsByName(trimmedName);
     
     return SearchRestaurantsResponseService.fromVendorInfoEntities(vendorInfos);
+  }
+
+  
+  async hashPassword(password: string): Promise<string> {
+    const saltRounds = 12;
+    return await bcrypt.hash(password, saltRounds);
+  }
+  
+  async verifyPassword(password: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
   }
 }

@@ -10,6 +10,7 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from '../../services/user.service';
 import { CreateAddressRequest } from '../dtos/create-address-request';
@@ -18,8 +19,10 @@ import { GetAddressesResponse } from '../dtos/get-addresses-response';
 import { UpdateAddressRequest } from '../dtos/update-address-request';
 import { CreateReviewRequest } from '../dtos/create-review-request';
 import { GetReviewsResponse } from '../dtos/get-reviews-response';
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 
 @Controller('users')
+// @UseGuards(JwtAuthGuard)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class UserController {
   constructor(private readonly userService: UserService) {}

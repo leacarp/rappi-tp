@@ -48,6 +48,17 @@ export class UserRepository implements IUserRepository {
     return this.mapToUserEntity(userSchema);
   }
 
+  async getUserByEmail(email: string): Promise<User | null> {
+    const trimmedEmail = (email || '').trim().toLowerCase();
+
+    const userSchema = await this.userModel.findOne({ email: trimmedEmail }).exec();
+    if (!userSchema) {
+      return null;
+    }
+
+    return this.mapToUserEntity(userSchema);
+  }
+
   async updateUserReview(
     userId: string,
     reviewerId: string,
