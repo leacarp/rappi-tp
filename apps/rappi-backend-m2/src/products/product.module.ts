@@ -8,7 +8,7 @@ import { Product, ProductSchema } from './infrastructure/schemas/product.schema'
 import { ProductRepository } from './infrastructure/repositories/product.repository';
 
 // Service
-import { ProductService } from './application/product.service';
+import { ProductService } from './services/product.service';
 
 // Controller
 import { ProductController } from './presentation/controllers/product.controller';

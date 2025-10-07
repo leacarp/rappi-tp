@@ -45,7 +45,7 @@ export class CreateProductRequestDto {
   promotions?: PromotionDto = { isOnPromotion: false, discountedPrice: 0 };
 
   // Método para convertir a DTO de servicio
-  toServiceDto(): import('../../application/dtos/create-product-service.dto').CreateProductServiceDto {
+  toServiceDto(): import('../../services/dtos/create-product-service.dto').CreateProductServiceDto {
     const { CreateProductServiceDto } = require('../../application/dtos/create-product-service.dto');
     return new CreateProductServiceDto(
       this.vendorId,

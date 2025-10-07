@@ -42,7 +42,7 @@ export class UpdateProductRequestDto {
   promotions?: PromotionDto;
 
   // Método para convertir a DTO de servicio
-  toServiceDto(): import('../../application/dtos/update-product-service.dto').UpdateProductServiceDto {
+  toServiceDto(): import('../../services/dtos/update-product-service.dto').UpdateProductServiceDto {
     const { UpdateProductServiceDto } = require('../../application/dtos/update-product-service.dto');
     return new UpdateProductServiceDto({
       name: this.name,
