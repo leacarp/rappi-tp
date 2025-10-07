@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { ProductRepository } from '../infrastructure/repositories/product.repository';
 import { Product } from '../domain/entities/product.entity';
 import { Types } from 'mongoose';
+import { CreateProductServiceDto } from './dtos/create-product-service.dto';
+import { UpdateProductServiceDto } from './dtos/update-product-service.dto';
 
 @Injectable()
 export class ProductService {
@@ -9,18 +11,9 @@ export class ProductService {
     private readonly productRepository: ProductRepository
   ) {}
 
-  async createProduct(
-    vendorId: string,
-    name: string,
-    description: string,
-    imageURL: string,
-    price: number,
-    category: string,
-    isAvailable: boolean = true,
-    promotions: { isOnPromotion: boolean; discountedPrice: number } = { isOnPromotion: false, discountedPrice: 0 }
-  ): Promise<Product> {
+  async createProduct(createProductDto: CreateProductServiceDto): Promise<Product> {
     // Validar que vendorId sea un ObjectId válido
-    if (!Types.ObjectId.isValid(vendorId)) {
+    if (!Types.ObjectId.isValid(createProductDto.vendorId)) {
       throw new BadRequestException('El vendorId debe ser un ObjectId válido');
     }
 
@@ -29,14 +22,14 @@ export class ProductService {
     
     const product = new Product(
       new Types.ObjectId(),
-      new Types.ObjectId(vendorId),
-      name,
-      description,
-      imageURL,
-      price,
-      category,
-      isAvailable,
-      promotions
+      new Types.ObjectId(createProductDto.vendorId),
+      createProductDto.name,
+      createProductDto.description,
+      createProductDto.imageURL,
+      createProductDto.price,
+      createProductDto.category,
+      createProductDto.isAvailable,
+      createProductDto.promotions
     );
 
     return await this.productRepository.create(product);
@@ -67,22 +60,22 @@ export class ProductService {
     return await this.productRepository.findByCategory(category);
   }
 
-  async updateProduct(id: string, updateData: Partial<Omit<Product, 'id' | 'vendorId'>>): Promise<Product> {
+  async updateProduct(id: string, updateProductDto: UpdateProductServiceDto): Promise<Product> {
     const existingProduct = await this.productRepository.findById(id);
     if (!existingProduct) {
       throw new NotFoundException('Producto no encontrado');
     }
 
     // Validaciones de negocio antes de actualizar
-    if (updateData.price !== undefined && updateData.price <= 0) {
+    if (updateProductDto.price !== undefined && updateProductDto.price <= 0) {
       throw new BadRequestException('El precio debe ser mayor a 0');
     }
 
-    if (updateData.name !== undefined && (!updateData.name || updateData.name.trim().length === 0)) {
+    if (updateProductDto.name !== undefined && (!updateProductDto.name || updateProductDto.name.trim().length === 0)) {
       throw new BadRequestException('El nombre no puede estar vacío');
     }
 
-    const result = await this.productRepository.update(id, updateData);
+    const result = await this.productRepository.update(id, updateProductDto.toUpdateData());
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }
