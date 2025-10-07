@@ -5,6 +5,8 @@ import { OrderController } from './presentation/controllers/order.controller';
 import { Order, OrderSchema } from './infrastructure/schemas/order.schema';
 import { OrderRepository } from './infrastructure/repositories/order.repository';
 import { ORDER_REPOSITORY } from './infrastructure/constants/order.constants';
+import { PRODUCT_ADAPTER } from './infrastructure/constants/product-adapter.constants';
+import { ProductAdapter } from './infrastructure/adapters/product.adapter';
 
 @Module({
   imports: [
@@ -16,6 +18,10 @@ import { ORDER_REPOSITORY } from './infrastructure/constants/order.constants';
     {
       provide: ORDER_REPOSITORY,
       useClass: OrderRepository
+    },
+    {
+      provide: PRODUCT_ADAPTER,
+      useClass: ProductAdapter
     }
   ],
   exports: [ORDER_REPOSITORY]
