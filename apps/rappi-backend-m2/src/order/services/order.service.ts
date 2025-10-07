@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { Injectable, Inject} from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
 import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
+import { PRODUCT_ADAPTER } from '../infrastructure/constants/product-adapter.constants';
 import { CreateOrderDto } from './dtos/order/create-order.dto';
 import { GetOrderResponseDto } from '../presentation/dtos/get-order-response';
 import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response';
@@ -12,13 +13,16 @@ import { DeliveryLocation } from '../domain/entities/deliveryLocation.entity';
 import { Items } from '../domain/entities/items.entity';
 import { Summary } from '../domain/entities/summary.entity';
 import { Payment } from '../domain/entities/payment.entity';
-
+import { ProductOfItem } from '../domain/entities/product-of-item.entity';
+import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
 
 @Injectable()
 export class OrderService {
   constructor(
     @Inject(ORDER_REPOSITORY) 
-    private readonly orderRepository: IOrderRepository
+    private readonly orderRepository: IOrderRepository,
+    @Inject(PRODUCT_ADAPTER)
+    private readonly productAdapter: IProductAdapter
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
@@ -43,7 +47,9 @@ export class OrderService {
     return { orders: ordersSummary };
   }
 
-
+  async getProductById(id: string): Promise<ProductOfItem>{
+    return this.productAdapter.getProductById(id);
+  }
 
   private toOrderDocument(dto: CreateOrderDto) {
     return {
@@ -94,7 +100,14 @@ export class OrderService {
       'pending',
       new PickUpLocation(dto.pickupLocation.latitude, dto.pickupLocation.longitude),
       new DeliveryLocation(dto.deliveryLocation.latitude, dto.deliveryLocation.longitude),
-      dto.items.map(item => new Items(item.productId, item.name, item.quantity, item.price)),
+      dto.items.map(item => new Items(
+        new ProductOfItem(
+          new Types.ObjectId(item.productId),
+          item.name,
+          item.price
+        ),
+        item.quantity
+      )),
       new Summary(
         dto.summary.subtotal,
         dto.summary.shippingCost,
@@ -143,7 +156,7 @@ export class OrderService {
     },
 
     items: order.getItems().map(item => ({
-      productId: item.getProductId(),
+      productId: item.getProductId().toHexString(),
       name: item.getName(),
       quantity: item.getQuantity(),
       price: item.getPrice()
