@@ -1,5 +1,6 @@
 import { IsString, IsNumber, IsBoolean, IsNotEmpty, IsOptional, ValidateNested, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { CreateProductServiceDto } from '../../services/dtos/create-product-service.dto';
 
 class PromotionDto {
   @IsBoolean()
@@ -45,8 +46,7 @@ export class CreateProductRequestDto {
   promotions?: PromotionDto = { isOnPromotion: false, discountedPrice: 0 };
 
   // Método para convertir a DTO de servicio
-  toServiceDto(): import('../../services/dtos/create-product-service.dto').CreateProductServiceDto {
-    const { CreateProductServiceDto } = require('../../application/dtos/create-product-service.dto');
+  toServiceDto(): CreateProductServiceDto {
     return new CreateProductServiceDto(
       this.vendorId,
       this.name,
