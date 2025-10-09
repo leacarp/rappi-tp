@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PRODUCT_REPOSITORY } from "../constants/product-repository.constants";
+import { PRODUCT_REPOSITORY } from 'apps/rappi-backend-m2/src/order/infrastructure/constants/product-repository.constants'
 import { IProductAdapter } from "../../domain/interfaces/IProductAdapter";
 import { ProductOfItem } from "../../domain/entities/product-of-item.entity";
 import { IProductRepository } from "../../../products/domain/interfaces/IProductRepository";
