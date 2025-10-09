@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Product, ProductSchema } from '@rappi/products/infrastructure/schemas/product.schema';
-import { ProductRepository } from '@rappi/products/infrastructure/repositories/product.repository';
-import { ProductAdapter } from '@rappi/order/infrastructure/adapters/product.adapter';
-import { PRODUCT_REPOSITORY } from '@rappi/order/infrastructure/constants/product-repository.constants';
-import { PRODUCT_ADAPTER } from '@rappi/order/infrastructure/constants/product-adapter.constants';
+import { Product, ProductSchema } from '../../../products/infrastructure/schemas/product.schema';
+import { ProductRepository } from '../../../products/infrastructure/repositories/product.repository';
+import { ProductAdapter } from '../adapters/product.adapter';
+import { PRODUCT_REPOSITORY } from '../constants/product-repository.constants';
+import { PRODUCT_ADAPTER } from '../constants/product-adapter.constants';
 
 @Module({
   imports: [

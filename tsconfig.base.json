@@ -14,10 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "@rappi/order/*": ["apps/rappi-backend-m2/src/order/*"],
-      "@rappi/products/*": ["apps/rappi-backend-m2/src/products/*"]
-    }
+    "paths": {}
   },
   "exclude": ["node_modules", "tmp"]
 }

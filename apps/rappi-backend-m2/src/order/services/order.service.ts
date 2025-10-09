@@ -1,20 +1,20 @@
 import { Types } from 'mongoose'; 
 import { Injectable, Inject, BadRequestException} from '@nestjs/common';
-import { IOrderRepository } from '@rappi/order/domain/interfaces/IOrderRepository';
-import { ORDER_REPOSITORY } from '@rappi/order/infrastructure/constants/order.constants';
-import { PRODUCT_ADAPTER } from '@rappi/order/infrastructure/constants/product-adapter.constants';
+import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
+import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
+import { PRODUCT_ADAPTER } from '../infrastructure/constants/product-adapter.constants';
 import { CreateOrderDto } from './dtos/order/create-order.dto';
 import { GetOrderResponseDto } from '../presentation/dtos/get-order-response';
 import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response';
 import { OrderSummaryDto } from '../presentation/dtos/order/order-summary.dto';
-import { OrderEntity } from '@rappi/order/domain/entities/order.entity';
-import { PickUpLocation } from '@rappi/order/domain/entities/pickup-location.entity';
-import { DeliveryLocation } from '@rappi/order/domain/entities/deliveryLocation.entity';
-import { Items } from '@rappi/order/domain/entities/items.entity';
-import { Summary } from '@rappi/order/domain/entities/summary.entity';
-import { Payment } from '@rappi/order/domain/entities/payment.entity';
-import { ProductOfItem } from '@rappi/order/domain/entities/product-of-item.entity';
-import { IProductAdapter } from '@rappi/order/domain/interfaces/IProductAdapter';
+import { OrderEntity } from '../domain/entities/order.entity';
+import { PickUpLocation } from '../domain/entities/pickup-location.entity';
+import { DeliveryLocation } from '../domain/entities/deliveryLocation.entity';
+import { Items } from '../domain/entities/items.entity';
+import { Summary } from '../domain/entities/summary.entity';
+import { Payment } from '../domain/entities/payment.entity';
+import { ProductOfItem } from '../domain/entities/product-of-item.entity';
+import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
 import { itemsDtoService } from './dtos/order/items.dto';
 
 @Injectable()
