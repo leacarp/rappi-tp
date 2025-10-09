@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PRODUCT_REPOSITORY } from 'apps/rappi-backend-m2/src/order/infrastructure/constants/product-repository.constants'
-import { IProductAdapter } from "../../domain/interfaces/IProductAdapter";
-import { ProductOfItem } from "../../domain/entities/product-of-item.entity";
-import { IProductRepository } from "../../../products/domain/interfaces/IProductRepository";
-import { Product } from "../../../products/domain/entities/product.entity";
+import { PRODUCT_REPOSITORY } from '@rappi/order/infrastructure/constants/product-repository.constants'
+import { IProductAdapter } from "@rappi/order/domain/interfaces/IProductAdapter";
+import { ProductOfItem } from "@rappi/order/domain/entities/product-of-item.entity";
+import { IProductRepository } from '@rappi/products/domain/interfaces/IProductRepository';
+import { Product } from "@rappi/products/domain/entities/product.entity";
 
 @Injectable()
 export class ProductAdapter implements IProductAdapter {
