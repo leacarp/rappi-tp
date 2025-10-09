@@ -12,12 +12,15 @@ export class ProductAdapter implements IProductAdapter {
         private readonly productRepository: IProductRepository
     ) { }
 
-    async getProductById(id: string): Promise<ProductOfItem> {
+    async getProductById(id: string): Promise<ProductOfItem | null> {
         const entity = await this.productRepository.findById(id);
+        if(!entity) return null;
         return fromEntity(entity);
     }
 }
 
-function fromEntity(entity: Product): ProductOfItem {
-    return new ProductOfItem(entity.id, entity.name, entity.price);
-}
+
+
+    function fromEntity(entity: Product): ProductOfItem {
+        return new ProductOfItem(entity.id, entity.name, entity.price);
+    }

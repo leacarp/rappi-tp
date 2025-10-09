@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'; 
-import { Injectable, Inject} from '@nestjs/common';
+import { Injectable, Inject, BadRequestException} from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
 import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
 import { PRODUCT_ADAPTER } from '../infrastructure/constants/product-adapter.constants';
@@ -15,6 +15,7 @@ import { Summary } from '../domain/entities/summary.entity';
 import { Payment } from '../domain/entities/payment.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
+import { itemsDtoService } from './dtos/order/items.dto';
 
 @Injectable()
 export class OrderService {
@@ -26,9 +27,13 @@ export class OrderService {
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
-    const orderEntity = this.toOrderEntity(createOrderDto);
+    const items = await this.loadAndValidateItems(createOrderDto.items);  
+
+    const orderEntity = this.toOrderEntity(createOrderDto, items);
 
     const savedOrder = await this.orderRepository.create(orderEntity);
+
+
     return this.toGetOrderResponseDto(savedOrder);
   }
 
@@ -91,7 +96,7 @@ export class OrderService {
 
 
   // CreateOrderDto → OrderEntit
-    private toOrderEntity(dto: CreateOrderDto): OrderEntity {
+    private toOrderEntity(dto: CreateOrderDto, items: Items[]): OrderEntity {
     return new OrderEntity(
       undefined,
       new Types.ObjectId(dto.customerId),
@@ -100,14 +105,7 @@ export class OrderService {
       'pending',
       new PickUpLocation(dto.pickupLocation.latitude, dto.pickupLocation.longitude),
       new DeliveryLocation(dto.deliveryLocation.latitude, dto.deliveryLocation.longitude),
-      dto.items.map(item => new Items(
-        new ProductOfItem(
-          new Types.ObjectId(item.productId),
-          item.name,
-          item.price
-        ),
-        item.quantity
-      )),
+      items,
       new Summary(
         dto.summary.subtotal,
         dto.summary.shippingCost,
@@ -190,6 +188,41 @@ export class OrderService {
     };
   }
 
+  private async loadAndValidateItems(dtoItems: itemsDtoService[]): Promise<Items[]> {
+    const invalidProducts: string[] = [];
+
+    const items = await Promise.all(
+    dtoItems.map(async (itemDto) => {
+      const product = await this.productAdapter.getProductById(itemDto.productId);
+
+      if (!product) {
+        invalidProducts.push(itemDto.productId);
+        return null;
+      }
+
+      if (itemDto.quantity <= 0) {
+        throw new BadRequestException({
+          message: `Cantidad inválida para el producto ${product.getName()}`,
+          productId: itemDto.productId
+        });
+      }
+
+      return new Items(product, itemDto.quantity);
+      })
+    );
+
+  
+    const validItems = items.filter(i => i !== null);
+  
+    if (invalidProducts.length > 0) {
+      throw new BadRequestException({
+        message: 'Algunos productos no existen',
+        invalidProducts
+      });
+    }
+
+    return validItems;
+  }
 }
 
 
