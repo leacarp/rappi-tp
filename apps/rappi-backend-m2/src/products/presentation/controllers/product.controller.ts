@@ -12,7 +12,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ProductService } from '../../application/product.service';
+import { ProductService } from '../../services/product.service';
 import { CreateProductRequestDto } from '../dtos/create-product-request.dto';
 import { UpdateProductRequestDto } from '../dtos/update-product-request.dto';
 import { ProductResponseDto } from '../dtos/product-response.dto';
