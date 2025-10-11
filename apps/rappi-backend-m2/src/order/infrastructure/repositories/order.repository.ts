@@ -9,6 +9,7 @@ import { DeliveryLocation } from '../../domain/entities/deliveryLocation.entity'
 import { Items } from '../../domain/entities/items.entity';
 import { Summary } from '../../domain/entities/summary.entity';
 import { Payment } from '../../domain/entities/payment.entity';
+import { ProductOfItem } from '../../domain/entities/product-of-item.entity';
 
 @Injectable()
 export class OrderRepository implements IOrderRepository{
@@ -82,6 +83,12 @@ export class OrderRepository implements IOrderRepository{
 
     // Convierte documento de MongoDB a entidad del dominio
     private toEntity(orderDoc: OrderDocument): OrderEntity {
+          const items: Items[] = orderDoc.items.map(i =>
+          new Items(
+          new ProductOfItem(i.productId, i.name, i.price),
+            i.quantity
+          )
+        );
         return new OrderEntity(
             orderDoc._id as Types.ObjectId,
             this.getId(orderDoc.customerId),
@@ -90,9 +97,7 @@ export class OrderRepository implements IOrderRepository{
             orderDoc.status,
             new PickUpLocation(orderDoc.pickUpLocation.latitude, orderDoc.pickUpLocation.longitude),
             new DeliveryLocation(orderDoc.deliveryLocation.latitude, orderDoc.deliveryLocation.longitude),
-            orderDoc.items.map(
-                item => new Items(item.productId.toString(), item.name, item.quantity, item.price)
-            ),
+            items,
             new Summary(
                         orderDoc.summary.subtotal, 
                         orderDoc.summary.shippingCost,  
@@ -108,6 +113,12 @@ export class OrderRepository implements IOrderRepository{
     }
 
     private toDomain(order: OrderDocument): OrderEntity {
+      const items: Items[] = order.items.map(i =>
+          new Items(
+          new ProductOfItem(i.productId, i.name, i.price),
+            i.quantity
+          )
+        );
       return new OrderEntity(
         order._id as Types.ObjectId,
         order.customerId,
@@ -116,9 +127,7 @@ export class OrderRepository implements IOrderRepository{
         order.status,
         new PickUpLocation(order.pickUpLocation.latitude, order.pickUpLocation.longitude),
         new DeliveryLocation(order.deliveryLocation.latitude, order.deliveryLocation.longitude),
-        order.items.map(
-                item => new Items(item.productId.toString(), item.name, item.quantity, item.price)
-            ),
+        items,
         new Summary(
                         order.summary.subtotal, 
                         order.summary.shippingCost,  

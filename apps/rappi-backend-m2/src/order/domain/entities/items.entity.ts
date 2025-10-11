@@ -1,23 +1,21 @@
+import { Types } from "mongoose";
+import { ProductOfItem } from "./product-of-item.entity";
+
 export class Items{
-    private _productId: string;
-    private _name: string;
+    private _product: ProductOfItem;
     private _quantity: number;
-    private _price: number;
 
-
-    constructor(productId: string, name: string, quantity: number, price: number){
-        this._productId = productId;
-        this._name = name;
+    constructor(product: ProductOfItem, quantity: number){
+        this._product = product;
         this._quantity = quantity;
-        this._price = price;
     }
 
-    getProductId(): string{
-        return this._productId;
+    getProductId(): Types.ObjectId{
+        return this._product.getId();
     }   
 
     getName(): string {
-        return this._name;
+        return this._product.getName();
     }
 
     getQuantity(): number{
@@ -25,7 +23,7 @@ export class Items{
     }
 
     getPrice(): number{
-        return this._price;
+        return this._product.getPrice();
     }
 
 }

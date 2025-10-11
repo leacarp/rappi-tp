@@ -5,10 +5,13 @@ import { OrderController } from './presentation/controllers/order.controller';
 import { Order, OrderSchema } from './infrastructure/schemas/order.schema';
 import { OrderRepository } from './infrastructure/repositories/order.repository';
 import { ORDER_REPOSITORY } from './infrastructure/constants/order.constants';
+import { ProductModule } from './infrastructure/modules/product.module';
+
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }])
+    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+    ProductModule
   ],
   controllers: [OrderController],
   providers: [

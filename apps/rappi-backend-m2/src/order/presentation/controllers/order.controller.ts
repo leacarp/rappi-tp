@@ -1,8 +1,8 @@
 import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { OrderService } from '../../services/order.service';
-import { CreateOrderDto } from '../../services/dtos/order/create-order.dto'; 
-import { GetOrderResponseDto } from '../dtos/get-order-response';
-import { GetUserOrdersResponseDto } from '../dtos/get-orders-response';
+import { CreateOrderDto } from '../../services/dtos/order/create-order.dto';
+import { GetOrderResponseDto } from '../../presentation/dtos/get-order-response';
+import { GetUserOrdersResponseDto } from '../../presentation/dtos/get-orders-response';
 
 @Controller('orders')
 export class OrderController {
