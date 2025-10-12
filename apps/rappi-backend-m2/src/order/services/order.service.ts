@@ -40,8 +40,9 @@ export class OrderService {
   async getOrderById(id: string): Promise<GetOrderResponseDto> {
     const orderEntity = await this.orderRepository.findById(id);
     if (!orderEntity) {
-      throw new Error(`Order with id ${id} not found`);
+      throw new BadRequestException(`Orden con id ${id} not found`);
     }
+    
     return this.toGetOrderResponseDto(orderEntity);
   }
 
