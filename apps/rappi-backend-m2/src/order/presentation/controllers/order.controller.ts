@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
 import { OrderService } from '../../services/order.service';
 import { CreateOrderDto } from '../../services/dtos/order/create-order.dto';
 import { GetOrderResponseDto } from '../../presentation/dtos/get-order-response';
@@ -13,14 +13,15 @@ export class OrderController {
     return this.orderService.createOrder(createOrderDto);
   }
 
+  @Get('user/:userId')
+  async getOrdersByUser(@Param('userId') userId: string, @Query('role') role: 'customer' | 'vendor' | 'driver'): Promise<GetUserOrdersResponseDto> {
+    return this.orderService.getOrdersByUser(userId, role);
+  }
+  
   @Get(':id')
   async getOrderById(@Param('id') id: string): Promise<GetOrderResponseDto> {
     return this.orderService.getOrderById(id);
   }
 
-  @Get('user/:userId')
-  async getOrdersByUser(@Param('userId') userId: string): Promise<GetUserOrdersResponseDto> {
-    return this.orderService.getOrdersByUser(userId);
-  }
    
 }

@@ -78,14 +78,15 @@ export class OrderRepository implements IOrderRepository{
         
         
         return order ? this.toEntity(order) : null;
-      }
+    }
 
     
     
-    async findByUserId(userId: string): Promise<OrderEntity[]> {
-        const orders = await this.orderModel.find({ customerId: userId }).exec();
-        return orders.map(order => this.toDomain(order));
-    }
+   async findByField(field: string, value: string): Promise<OrderEntity[]> {
+      const orders = await this.orderModel.find({ [field]: new Types.ObjectId(value) }).exec();
+      return orders.map(order => this.toDomain(order));
+   }
+
 
    
 

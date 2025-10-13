@@ -39,15 +39,21 @@ export class OrderService {
 
   async getOrderById(id: string): Promise<GetOrderResponseDto> {
     const orderEntity = await this.orderRepository.findById(id);
-    if (!orderEntity) {
-      throw new BadRequestException(`Orden con id ${id} not found`);
-    }
+    if (!orderEntity) throw new BadRequestException(`Orden con id ${id} no encontrada`);
+    
     
     return this.toGetOrderResponseDto(orderEntity);
   }
 
-  async getOrdersByUser(userId: string): Promise<GetUserOrdersResponseDto> {
-    const orders = await this.orderRepository.findByUserId(userId);
+  async getOrdersByUser(userId: string, role: 'customer' | 'vendor' | 'driver'): Promise<GetUserOrdersResponseDto> {
+    const field = role === 'vendor' ? 'vendorId' : 
+    role === 'driver' ? 'driverId' :
+    'customerId';
+
+    const orders = await this.orderRepository.findByField(field, userId);
+
+    if(!orders.length) throw new BadRequestException(`Órdenes del usuario con id ${userId} y rol de ${role} no encontradas`)
+
     const ordersSummary = orders.map(order => this.toOrderSummaryDto(order));
 
     return { orders: ordersSummary };
@@ -120,6 +126,7 @@ export class OrderService {
       new Date()
     );
   } 
+
  
   // Mapper: OrderEntity → GetOrderResponseDto
   private toGetOrderResponseDto(order: OrderEntity): GetOrderResponseDto {
