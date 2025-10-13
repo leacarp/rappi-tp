@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { ProductRepository } from '../infrastructure/repositories/product.repository';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
+import { IProductRepository } from '../domain/interfaces/IProductRepository';
+import { PRODUCT_REPOSITORY } from '../infrastructure/constants/product-repository.constants';
 import { Product } from '../domain/entities/product.entity';
 import { Types } from 'mongoose';
 import { CreateProductServiceDto } from './dtos/create-product-service.dto';
@@ -8,7 +9,8 @@ import { UpdateProductServiceDto } from './dtos/update-product-service.dto';
 @Injectable()
 export class ProductService {
   constructor(
-    private readonly productRepository: ProductRepository
+    @Inject(PRODUCT_REPOSITORY)
+    private readonly productRepository: IProductRepository
   ) {}
 
   async createProduct(createProductDto: CreateProductServiceDto): Promise<Product> {
