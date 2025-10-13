@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { PRODUCT_REPOSITORY } from "../constants/product-repository.constants";
-import { IProductAdapter } from "../../domain/interfaces/IProductAdapter";
-import { ProductOfItem } from "../../domain/entities/product-of-item.entity";
-import { IProductRepository } from '../../../products/domain/interfaces/IProductRepository';
-import { Product } from "../../../products/domain/entities/product.entity";
+import { IProductAdapter } from "../../../order/domain/interfaces/IProductAdapter";
+import { ProductOfItem } from "../../../order/domain/entities/product-of-item.entity";
+import { IProductRepository } from '../../domain/interfaces/IProductRepository';
+import { Product } from "../../domain/entities/product.entity";
 
 @Injectable()
 export class ProductAdapter implements IProductAdapter {

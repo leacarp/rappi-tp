@@ -13,6 +13,11 @@ import { ProductService } from './services/product.service';
 // Controller
 import { ProductController } from './presentation/controllers/product.controller';
 
+// Adapter
+import { ProductAdapter } from './infrastructure/adapters/product.adapter';
+import { PRODUCT_REPOSITORY } from './infrastructure/constants/product-repository.constants';
+import { PRODUCT_ADAPTER } from '../order/infrastructure/constants/product-adapter.constants';
+
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }])
@@ -20,8 +25,15 @@ import { ProductController } from './presentation/controllers/product.controller
   controllers: [ProductController],
   providers: [
     ProductService,
-    ProductRepository,
+    {
+      provide: PRODUCT_REPOSITORY,
+      useClass: ProductRepository
+    },
+    {
+      provide: PRODUCT_ADAPTER,
+      useClass: ProductAdapter
+    }
   ],
-  exports: [ProductService],
+  exports: [ProductService, PRODUCT_ADAPTER],
 })
 export class ProductModule {}
