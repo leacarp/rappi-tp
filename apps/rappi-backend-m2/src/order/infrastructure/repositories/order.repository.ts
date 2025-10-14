@@ -1,4 +1,4 @@
-import { Injectable} from '@nestjs/common';
+import { BadRequestException, Injectable} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IOrderRepository } from '../../domain/interfaces/IOrderRepository';
@@ -10,6 +10,14 @@ import { Items } from '../../domain/entities/items.entity';
 import { Summary } from '../../domain/entities/summary.entity';
 import { Payment } from '../../domain/entities/payment.entity';
 import { ProductOfItem } from '../../domain/entities/product-of-item.entity';
+interface PopulatedUser {
+  _id: Types.ObjectId;
+  email: string;
+  profile?: {
+    name: string;
+  };
+}
+
 
 @Injectable()
 export class OrderRepository implements IOrderRepository{
@@ -58,59 +66,83 @@ export class OrderRepository implements IOrderRepository{
       }
 
     async findById(id: string): Promise<OrderEntity | null> {
+        
         if (!Types.ObjectId.isValid(id)) {
           return null;
         }
         const order = await this.orderModel.findById(id)
-        .populate('customerId')
-        .populate('vendorId')
-        .populate('driverId')
+        .populate('customerId', 'email profile.name')
+        .populate('vendorId', 'email profile.name')
+        .populate('driverId', 'email profile.name')
         .exec();
+        
+        
         return order ? this.toEntity(order) : null;
-      }
-
-    async findByUserId(userId: string): Promise<OrderEntity[]> {
-        const orders = await this.orderModel.find({ customerId: userId }).exec();
-        return orders.map(order => this.toDomain(order));
     }
+
+    
+    
+   async findByField(field: string, value: string): Promise<OrderEntity[]> {
+      const orders = await this.orderModel.find({ [field]: new Types.ObjectId(value) }).exec();
+      return orders.map(order => this.toDomain(order));
+   }
+
 
    
 
-    // Chequea si está poblado o no(Documento con datos o ObjectId)
-    private getId<T extends { _id: Types.ObjectId }>(ref: Types.ObjectId | T): Types.ObjectId {
-        return ref instanceof Types.ObjectId ? ref : ref._id;
+  
+  
+
+
+  private mapUser(user: Types.ObjectId | PopulatedUser | null | undefined): { id: Types.ObjectId; name: string; email: string } | undefined {
+      if (!user) return undefined;
+
+      if (user instanceof Types.ObjectId) {
+        return { id: user, name: '', email: '' }; 
+      }
+
+      return {
+        id: user._id,
+        name: user.profile?.name ?? '',
+        email: user.email,
+      };
+  }
+
+    private toEntity(orderDoc: OrderDocument): OrderEntity {
+        const items: Items[] = orderDoc.items.map(i =>
+          new Items(new ProductOfItem(i.productId, i.name, i.price), i.quantity)
+        );
+
+        const customerData = this.mapUser(orderDoc.customerId);
+        const vendorData = this.mapUser(orderDoc.vendorId);
+        const driverData = this.mapUser(orderDoc.driverId);
+
+        return new OrderEntity(
+          orderDoc._id as Types.ObjectId,
+          customerData?.id ?? orderDoc.customerId as Types.ObjectId,
+          vendorData?.id ?? orderDoc.vendorId as Types.ObjectId,
+          driverData?.id ?? orderDoc.driverId as Types.ObjectId,
+          orderDoc.status,
+          new PickUpLocation(orderDoc.pickUpLocation.latitude, orderDoc.pickUpLocation.longitude),
+          new DeliveryLocation(orderDoc.deliveryLocation.latitude, orderDoc.deliveryLocation.longitude),
+          items,
+          new Summary(
+            orderDoc.summary.subtotal,
+            orderDoc.summary.shippingCost,
+            orderDoc.summary.taxes,
+            orderDoc.summary.discount,
+            orderDoc.summary.total
+          ),
+          new Payment(orderDoc.payment.method, orderDoc.payment.status, orderDoc.payment.transactionId),
+          orderDoc.trackingNumber,
+          orderDoc.notes,
+          orderDoc.createdAt,
+          customerData,
+          vendorData,
+          driverData
+        );
     }
 
-    // Convierte documento de MongoDB a entidad del dominio
-    private toEntity(orderDoc: OrderDocument): OrderEntity {
-          const items: Items[] = orderDoc.items.map(i =>
-          new Items(
-          new ProductOfItem(i.productId, i.name, i.price),
-            i.quantity
-          )
-        );
-        return new OrderEntity(
-            orderDoc._id as Types.ObjectId,
-            this.getId(orderDoc.customerId),
-            this.getId(orderDoc.vendorId),
-            this.getId(orderDoc.driverId),
-            orderDoc.status,
-            new PickUpLocation(orderDoc.pickUpLocation.latitude, orderDoc.pickUpLocation.longitude),
-            new DeliveryLocation(orderDoc.deliveryLocation.latitude, orderDoc.deliveryLocation.longitude),
-            items,
-            new Summary(
-                        orderDoc.summary.subtotal, 
-                        orderDoc.summary.shippingCost,  
-                        orderDoc.summary.taxes,
-                        orderDoc.summary.discount,
-                        orderDoc.summary.total
-            ),
-            new Payment(orderDoc.payment.method, orderDoc.payment.status, orderDoc.payment.transactionId),
-            orderDoc.trackingNumber,
-            orderDoc.notes,
-            orderDoc.createdAt
-        );
-    }
 
     private toDomain(order: OrderDocument): OrderEntity {
       const items: Items[] = order.items.map(i =>
