@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { IUserAdapter } from './domain/interfaces/IUserAdapter';
-import { USER_ADAPTER_TOKEN } from './infrastructure/constants/user-adapter.constants';
+import { IUserAdapter } from '../users/domain/interfaces/IUserAdapter';
+import { USER_ADAPTER_TOKEN } from '../users/infrastructure/constants/user-adapter.constants';
 
 export interface JwtPayload {
   sub: string; // userId

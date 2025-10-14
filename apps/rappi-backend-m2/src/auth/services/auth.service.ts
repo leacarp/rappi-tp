@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { USER_ADAPTER_TOKEN } from '../infrastructure/constants/user-adapter.constants';
+import { USER_ADAPTER_TOKEN } from '../../users/infrastructure/constants/user-adapter.constants';
 import { LoginRequestService } from './dtos/login-request-service';
 import { LoginResponseService } from './dtos/login-response-service';
-import { IUserAdapter } from '../domain/interfaces/IUserAdapter';
+import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
 
 @Injectable()
 export class AuthService {
