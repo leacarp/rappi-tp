@@ -4,13 +4,16 @@ import { Payment } from "./payment.entity";
 import { PickUpLocation } from "./pickup-location.entity";
 import { Summary } from "./summary.entity";
 import { Types } from 'mongoose';
+import { OrderStatus } from "../enum/order-status";
+import { BadRequestException } from "@nestjs/common";
+
 
 export class OrderEntity{
     private readonly _id: Types.ObjectId;
     private readonly _customerId: Types.ObjectId;
     private readonly _vendorId : Types.ObjectId;
     private readonly _driverId: Types.ObjectId;
-    private _status: string;
+    private _status: OrderStatus;
     private _createdAt: Date;
     private _pickupLocation: PickUpLocation;
     private _deliveryLocation: DeliveryLocation;
@@ -28,7 +31,7 @@ export class OrderEntity{
         customerId: Types.ObjectId, 
         vendorId: Types.ObjectId, 
         driverId: Types.ObjectId, 
-        status: string, 
+        status: OrderStatus, 
         pickupLocation: PickUpLocation, 
         deliveryLocation: DeliveryLocation, 
         items: Items[], 
@@ -77,7 +80,7 @@ export class OrderEntity{
         return this._driverId;
     }
 
-    getStatus(): string{
+    getStatus(): OrderStatus{
         return this._status;
     }
 
@@ -117,10 +120,6 @@ export class OrderEntity{
         this._items.push(item);
     }
 
-    markAsDelivered(): void {
-        this._status = 'delivered';
-    }
-
     getCustomer(): { id: Types.ObjectId; name: string; email: string } | undefined {
         return this._customer;
     }
@@ -137,7 +136,15 @@ export class OrderEntity{
 
 
     private validateBusinessRules(): void{
-        const validStatuses = ['pending', 'accepted', 'preparing', 'delivered', 'canceled'];
+         const validStatuses = [
+            OrderStatus.Pending,
+            OrderStatus.Accepted,
+            OrderStatus.Preparing,
+            OrderStatus.ReadyForPickup,
+            OrderStatus.InTransit,
+            OrderStatus.Delivered,
+            OrderStatus.Canceled
+        ];
         if (!validStatuses.includes(this._status)) {
         throw new Error(`Estado inválido: ${this._status}`);
         }
@@ -152,4 +159,22 @@ export class OrderEntity{
 
     }
 
+    private readonly validTransitions: Record<OrderStatus, OrderStatus[]> = {
+        [OrderStatus.Pending]: [OrderStatus.Accepted, OrderStatus.Canceled],
+        [OrderStatus.Accepted]: [OrderStatus.Preparing, OrderStatus.Canceled],
+        [OrderStatus.Preparing]: [OrderStatus.ReadyForPickup, OrderStatus.Canceled],
+        [OrderStatus.ReadyForPickup]: [OrderStatus.InTransit, OrderStatus.Canceled],
+        [OrderStatus.InTransit]: [OrderStatus.Delivered, OrderStatus.Canceled],
+        [OrderStatus.Delivered]: [],
+        [OrderStatus.Canceled]: [],
+    };
+
+    changeStatus(newStatus: OrderStatus): void {
+    const currentStatus = this._status;
+
+    if (!this.validTransitions[currentStatus].includes(newStatus)) 
+        throw new BadRequestException(`No se puede cambiar el estado de '${currentStatus}' a '${newStatus}'`);
+    
+        this._status = newStatus;
+    }
 }

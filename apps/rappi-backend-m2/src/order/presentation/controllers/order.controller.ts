@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query, Put } from '@nestjs/common';
 import { OrderService } from '../../services/order.service';
 import { CreateOrderDto } from '../../services/dtos/order/create-order.dto';
 import { GetOrderResponseDto } from '../../presentation/dtos/get-order-response';
 import { GetUserOrdersResponseDto } from '../../presentation/dtos/get-orders-response';
+import { UpdateOrderStatusRequestDto } from '../dtos/update-status';
 
 @Controller('orders')
 export class OrderController {
@@ -21,6 +22,12 @@ export class OrderController {
   @Get(':id')
   async getOrderById(@Param('id') id: string): Promise<GetOrderResponseDto> {
     return this.orderService.getOrderById(id);
+  }
+
+  @Put(':id/status')
+  async updateOrderStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusRequestDto): Promise<{ message: string }> {
+    await this.orderService.UpdateOrderStatus(id, dto.status);
+    return { message: 'Estado actualizado correctamente' };
   }
 
    

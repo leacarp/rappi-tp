@@ -10,6 +10,7 @@ import { Items } from '../../domain/entities/items.entity';
 import { Summary } from '../../domain/entities/summary.entity';
 import { Payment } from '../../domain/entities/payment.entity';
 import { ProductOfItem } from '../../domain/entities/product-of-item.entity';
+import { OrderStatus } from '../../domain/enum/order-status';
 interface PopulatedUser {
   _id: Types.ObjectId;
   email: string;
@@ -88,9 +89,18 @@ export class OrderRepository implements IOrderRepository{
    }
 
 
-   
+  async updateStatus(orderId: string, newStatus: OrderStatus): Promise<void> {
+      if(!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
+      const result = await this.orderModel.updateOne(
+        { _id: orderId },
+        { $set: { status: newStatus } }
+      );
 
-  
+      if (result.matchedCount === 0) {
+        throw new BadRequestException('Orden no encontrada');
+      }
+  }
+
   
 
 

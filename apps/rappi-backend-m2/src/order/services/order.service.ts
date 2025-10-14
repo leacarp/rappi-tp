@@ -16,6 +16,7 @@ import { Payment } from '../domain/entities/payment.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
 import { itemsDtoService } from './dtos/order/items.dto';
+import { OrderStatus } from '../domain/enum/order-status';
 
 @Injectable()
 export class OrderService {
@@ -63,6 +64,21 @@ export class OrderService {
     return this.productAdapter.getProductById(id);
   }
 
+  async UpdateOrderStatus(orderId: string, newStatus: OrderStatus) : Promise<void>{
+    const order = await this.orderRepository.findById(orderId);
+    if(!order) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+
+    order.changeStatus(newStatus);
+
+    await this.orderRepository.updateStatus( orderId, order.getStatus());
+
+  }
+
+
+
+
+
+
   private toOrderDocument(dto: CreateOrderDto) {
     return {
       customerId: new Types.ObjectId(dto.customerId),
@@ -109,7 +125,7 @@ export class OrderService {
       new Types.ObjectId(dto.customerId),
       new Types.ObjectId(dto.vendorId),
       new Types.ObjectId(dto.driverId),
-      'pending',
+      OrderStatus.Pending,
       new PickUpLocation(dto.pickupLocation.latitude, dto.pickupLocation.longitude),
       new DeliveryLocation(dto.deliveryLocation.latitude, dto.deliveryLocation.longitude),
       items,
@@ -188,12 +204,12 @@ export class OrderService {
   }
 
   private toOrderSummaryDto(order: OrderEntity): OrderSummaryDto {
-    return {
-      id: order.getId().toHexString(),
-      status: order.getStatus(),
-      createdAt: order.getCreatedAt(),
-      trackingNumber: order.getTrackingNumber()
-    };
+    return new OrderSummaryDto(
+      order.getId().toHexString(),
+      order.getStatus(),
+      order.getCreatedAt(),
+      order.getTrackingNumber()
+    );
   }
 
   private async loadAndValidateItems(dtoItems: itemsDtoService[]): Promise<Items[]> {
