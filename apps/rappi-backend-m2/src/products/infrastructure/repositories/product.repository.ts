@@ -42,7 +42,10 @@ export class ProductRepository implements IProductRepository {
   }
 
   async findByVendorId(vendorId: string): Promise<ProductEntity[]> {
-    const products = await this.productModel.find({ vendorId }).exec();
+    if (!Types.ObjectId.isValid(vendorId)) {
+      return [];
+    }
+    const products = await this.productModel.find({ vendorId: new Types.ObjectId(vendorId) }).exec();
     return products.map(product => this.toEntity(product));
   }
 
