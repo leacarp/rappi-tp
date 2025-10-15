@@ -7,9 +7,19 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { json, urlencoded } from 'express';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,       // Elimina propiedades que no estén en el DTO
+      forbidNonWhitelisted: true, // Lanza error si llega propiedad extra
+      transform: true,       // Convierte JSON a instancias de DTO
+    }),
+  );
+
   
   // Increase payload limits to avoid 413 errors on larger JSON bodies
   app.use(json({ limit: '1mb' }));

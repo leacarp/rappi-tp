@@ -6,6 +6,7 @@ import { Summary } from "./summary.entity";
 import { Types } from 'mongoose';
 import { OrderStatus } from "../enum/order-status";
 import { BadRequestException } from "@nestjs/common";
+import { UserBasicEntity } from "./user-basic";
 
 
 export class OrderEntity{
@@ -22,9 +23,9 @@ export class OrderEntity{
     private _payment: Payment;
     private _trackingNumber: string;
     private _notes: string;
-    private _customer?: { id: Types.ObjectId; name: string; email: string };
-    private _vendor?: { id: Types.ObjectId; name: string; email: string };
-    private _driver?: { id: Types.ObjectId; name: string; email: string };
+    private _customer?: UserBasicEntity;
+    private _vendor?: UserBasicEntity;
+    private _driver?: UserBasicEntity;
 
     constructor(
         id: Types.ObjectId, 
@@ -40,9 +41,9 @@ export class OrderEntity{
         trackingNumber: string, 
         notes: string,
         createdAt?: Date,
-        customerData?: { id: Types.ObjectId; name: string; email: string },
-        vendorData?: { id: Types.ObjectId; name: string; email: string },
-        driverData?: { id: Types.ObjectId; name: string; email: string },
+        customerData?: UserBasicEntity,
+        vendorData?: UserBasicEntity,
+        driverData?: UserBasicEntity
     ){
         this._id = id;
         this._customerId = customerId;
@@ -120,15 +121,15 @@ export class OrderEntity{
         this._items.push(item);
     }
 
-    getCustomer(): { id: Types.ObjectId; name: string; email: string } | undefined {
+    getCustomer(): UserBasicEntity | undefined{
         return this._customer;
     }
 
-    getVendor(): { id: Types.ObjectId; name: string; email: string } | undefined {
+    getVendor(): UserBasicEntity | undefined{
         return this._vendor;
     }
 
-    getDriver(): { id: Types.ObjectId; name: string; email: string } | undefined {
+    getDriver(): UserBasicEntity | undefined{
         return this._driver;
     }
 

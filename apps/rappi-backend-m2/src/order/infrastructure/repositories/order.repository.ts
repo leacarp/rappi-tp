@@ -11,6 +11,7 @@ import { Summary } from '../../domain/entities/summary.entity';
 import { Payment } from '../../domain/entities/payment.entity';
 import { ProductOfItem } from '../../domain/entities/product-of-item.entity';
 import { OrderStatus } from '../../domain/enum/order-status';
+import { UserBasicEntity } from '../../domain/entities/user-basic';
 interface PopulatedUser {
   _id: Types.ObjectId;
   email: string;
@@ -63,7 +64,12 @@ export class OrderRepository implements IOrderRepository{
           });
     
         const savedOrder = await createdOrder.save();
-        return this.toEntity(savedOrder);
+        const populatedOrder = await this.orderModel.findById(savedOrder.id)
+          .populate('customerId', 'email profile')
+          .populate('vendorId', 'email profile')
+          .populate('driverId', 'email profile')
+          .exec();
+        return this.toEntity(populatedOrder);
       }
 
     async findById(id: string): Promise<OrderEntity | null> {
@@ -76,8 +82,7 @@ export class OrderRepository implements IOrderRepository{
         .populate('vendorId', 'email profile.name')
         .populate('driverId', 'email profile.name')
         .exec();
-        
-        
+    
         return order ? this.toEntity(order) : null;
     }
 
@@ -103,22 +108,24 @@ export class OrderRepository implements IOrderRepository{
 
   
 
+  private mapUser(user: Types.ObjectId | PopulatedUser | null | undefined): UserBasicEntity | undefined {;
+      if (!user || typeof user === 'string') return undefined;
+      const populated = user as PopulatedUser;
+      const id = populated._id;
+      const email = populated.email;
+      const name = populated.profile?.name ?? 'Desconocido';
+      
 
-  private mapUser(user: Types.ObjectId | PopulatedUser | null | undefined): { id: Types.ObjectId; name: string; email: string } | undefined {
-      if (!user) return undefined;
 
-      if (user instanceof Types.ObjectId) {
-        return { id: user, name: '', email: '' }; 
-      }
+      if (!id || !email) return undefined;
 
-      return {
-        id: user._id,
-        name: user.profile?.name ?? '',
-        email: user.email,
-      };
+    return new UserBasicEntity(id, name, email);
   }
 
-    private toEntity(orderDoc: OrderDocument): OrderEntity {
+  
+
+
+  private toEntity(orderDoc: OrderDocument): OrderEntity {
         const items: Items[] = orderDoc.items.map(i =>
           new Items(new ProductOfItem(i.productId, i.name, i.price), i.quantity)
         );
@@ -129,9 +136,9 @@ export class OrderRepository implements IOrderRepository{
 
         return new OrderEntity(
           orderDoc._id as Types.ObjectId,
-          customerData?.id ?? orderDoc.customerId as Types.ObjectId,
-          vendorData?.id ?? orderDoc.vendorId as Types.ObjectId,
-          driverData?.id ?? orderDoc.driverId as Types.ObjectId,
+          customerData?.getId() ?? orderDoc.customerId as Types.ObjectId,
+          vendorData?.getId() ?? orderDoc.vendorId as Types.ObjectId,
+          driverData?.getId() ?? orderDoc.driverId as Types.ObjectId,
           orderDoc.status,
           new PickUpLocation(orderDoc.pickUpLocation.latitude, orderDoc.pickUpLocation.longitude),
           new DeliveryLocation(orderDoc.deliveryLocation.latitude, orderDoc.deliveryLocation.longitude),
@@ -162,7 +169,7 @@ export class OrderRepository implements IOrderRepository{
           )
         );
       return new OrderEntity(
-        order._id as Types.ObjectId,
+        order.id as Types.ObjectId,
         order.customerId,
         order.vendorId,
         order.driverId,

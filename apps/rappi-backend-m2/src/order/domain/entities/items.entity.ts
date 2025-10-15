@@ -26,4 +26,8 @@ export class Items{
         return this._product.getPrice();
     }
 
+    getProduct(): ProductOfItem {
+        return this._product;
+    }
+
 }

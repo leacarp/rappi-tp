@@ -1,3 +1,6 @@
+import { OrderEntity } from "../../../domain/entities/order.entity";
+import { Types } from "mongoose";
+
 export class OrderSummaryDto {
  constructor(
   private readonly _id: string,
@@ -22,6 +25,14 @@ export class OrderSummaryDto {
   return this._trackingNumber;
  }
 
+ static fromEntity(order: OrderEntity): OrderSummaryDto {
+    return new OrderSummaryDto(
+      order.getId() instanceof Types.ObjectId ? order.getId().toHexString() : order.getId().toString(),
+      order.getStatus(),
+      order.getCreatedAt(),
+      order.getTrackingNumber(),
+    );
+  }
 
 }
 
