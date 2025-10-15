@@ -16,7 +16,7 @@ import { Payment } from '../domain/entities/payment.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
 import { itemsDtoService } from './dtos/order/items.dto';
-import { USER_ADAPTER } from '../../users/infrastructure/constants/user-of-adapter.constants';
+import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
 import { UserOfAdapter } from '../../users/domain/dtos/user-of-adapter.dto';
 

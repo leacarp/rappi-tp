@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { USER_ADAPTER_TOKEN } from '../../users/infrastructure/constants/user-adapter.constants';
+import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { LoginRequestService } from './dtos/login-request-service';
 import { LoginResponseService } from './dtos/login-response-service';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
@@ -9,7 +9,7 @@ import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(USER_ADAPTER_TOKEN)
+    @Inject(USER_ADAPTER)
     private readonly userAdapter: IUserAdapter,
     private readonly jwtService: JwtService
   ) {}
@@ -33,7 +33,7 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
 
     return new LoginResponseService(
-      user.getId(),
+      user.getId().toString(),
       user.getEmail(),
       user.getRole(),
       token
