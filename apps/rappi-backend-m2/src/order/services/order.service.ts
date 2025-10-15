@@ -16,6 +16,9 @@ import { Payment } from '../domain/entities/payment.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
 import { itemsDtoService } from './dtos/order/items.dto';
+import { USER_ADAPTER } from '../../users/infrastructure/constants/user-of-adapter.constants';
+import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
+import { UserOfAdapter } from '../../users/domain/dtos/user-of-adapter.dto';
 
 @Injectable()
 export class OrderService {
@@ -23,13 +26,21 @@ export class OrderService {
     @Inject(ORDER_REPOSITORY) 
     private readonly orderRepository: IOrderRepository,
     @Inject(PRODUCT_ADAPTER)
-    private readonly productAdapter: IProductAdapter
+    private readonly productAdapter: IProductAdapter,
+    @Inject(USER_ADAPTER)
+    private readonly userAdapter: IUserAdapter
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
     const items = await this.loadAndValidateItems(createOrderDto.items);  
 
-    const orderEntity = this.toOrderEntity(createOrderDto, items);
+    const users = await this.loadAndValidateUsers(
+      createOrderDto.customerId,
+      createOrderDto.vendorId,
+      createOrderDto.driverId
+    );
+
+    const orderEntity = this.toOrderEntity(createOrderDto, items, users);
 
     const savedOrder = await this.orderRepository.create(orderEntity);
 
@@ -103,7 +114,10 @@ export class OrderService {
 
 
   // CreateOrderDto → OrderEntit
-    private toOrderEntity(dto: CreateOrderDto, items: Items[]): OrderEntity {
+    private toOrderEntity(dto: CreateOrderDto, 
+      items: Items[], 
+      users: { customer: UserOfAdapter, vendor: UserOfAdapter, driver: UserOfAdapter }
+    ): OrderEntity {
     return new OrderEntity(
       undefined,
       new Types.ObjectId(dto.customerId),
@@ -123,7 +137,10 @@ export class OrderService {
       new Payment(dto.payment.method, dto.payment.status, dto.payment.transactionId),
       dto.trackingNumber,
       dto.notes,
-      new Date()
+      new Date(),
+      { id: users.customer.getId(), name: users.customer.getName(), email: users.customer.getEmail() },
+      { id: users.vendor.getId(), name: users.vendor.getName(), email: users.vendor.getEmail() },
+      { id: users.driver.getId(), name: users.driver.getName(), email: users.driver.getEmail() }
     );
   } 
 
@@ -230,6 +247,40 @@ export class OrderService {
     }
 
     return validItems;
+  }
+
+  private async loadAndValidateUsers(
+    customerId: string,
+    vendorId: string,
+    driverId: string
+  ): Promise<{
+    customer: UserOfAdapter;
+    vendor: UserOfAdapter;
+    driver: UserOfAdapter;
+  }> {
+    // 1. Buscar los 3 usuarios en paralelo
+    const [customer, vendor, driver] = await Promise.all([
+      this.userAdapter.getUserById(customerId),
+      this.userAdapter.getUserById(vendorId),
+      this.userAdapter.getUserById(driverId)
+    ]);
+  
+    // 2. Verificar cuáles NO existen
+    const errors = [];
+    if (!customer) errors.push({ role: 'customer', id: customerId });
+    if (!vendor) errors.push({ role: 'vendor', id: vendorId });
+    if (!driver) errors.push({ role: 'driver', id: driverId });
+  
+    // 3. Si hay errores, lanzar excepción
+    if (errors.length > 0) {
+      throw new BadRequestException({
+        message: 'Algunos usuarios no existen',
+        invalidUsers: errors
+      });
+    }
+  
+    // 4. Retornar los 3 usuarios validados
+    return { customer, vendor, driver };
   }
 }
 
