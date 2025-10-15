@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   async login(loginRequest: LoginRequestService): Promise<LoginResponseService> {
-    const user = await this.userAdapter.getUserByEmail(loginRequest.getEmail());
+    const user = await this.userAdapter.getUserForAuth(loginRequest.getEmail());
     if (!user) {
       throw new UnauthorizedException('Usuario o contraseña incorrectos');
     }
