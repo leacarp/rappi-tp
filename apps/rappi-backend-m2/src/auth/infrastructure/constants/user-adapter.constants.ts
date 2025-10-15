@@ -1,1 +1,0 @@
-export const USER_ADAPTER_TOKEN = Symbol('USER_ADAPTER_TOKEN');

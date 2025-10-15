@@ -7,7 +7,7 @@ import { UserService } from './services/user.service';
 import { UserController } from './presentation/controllers/user.controller';
 import { VendorsController } from './presentation/controllers/vendors.controller';
 import { UserAdapter } from './infrastructure/adapters/user.adapter';
-import { USER_ADAPTER } from './infrastructure/constants/user-of-adapter.constants';
+import { USER_ADAPTER } from './infrastructure/constants/user-adapter.constants';
 
 @Module({
   imports: [

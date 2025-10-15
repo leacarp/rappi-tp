@@ -32,6 +32,7 @@ function fromEntity(user: User): UserOfAdapter {
         new Types.ObjectId(user.getId()),  
         user.getProfile().getName(),        
         user.getEmail(),
+        user.getPassword(),
         user.getRole()
     );
 }
