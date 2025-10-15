@@ -1,6 +1,6 @@
-import { UserForAdapter } from "../../infrastructure/adapters/dtos/user-for-adapter.dto";
+import { UserOfAdapter } from "../dtos/user-of-adapter.dto";
 
 export interface IUserAdapter {
-    getUserByEmail(email: string): Promise<UserForAdapter | null>;
-    getUserById(userId: string): Promise<UserForAdapter | null>;
+    getUserById(userId: string): Promise<UserOfAdapter | null>;
+    getUserByEmail(email: string): Promise<UserOfAdapter | null>;
 }

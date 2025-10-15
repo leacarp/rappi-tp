@@ -7,7 +7,7 @@ import { UserService } from './services/user.service';
 import { UserController } from './presentation/controllers/user.controller';
 import { VendorsController } from './presentation/controllers/vendors.controller';
 import { UserAdapter } from './infrastructure/adapters/user.adapter';
-import { USER_ADAPTER_TOKEN } from './infrastructure/constants/user-adapter.constants';
+import { USER_ADAPTER } from './infrastructure/constants/user-of-adapter.constants';
 
 @Module({
   imports: [
@@ -19,12 +19,12 @@ import { USER_ADAPTER_TOKEN } from './infrastructure/constants/user-adapter.cons
       provide: USER_REPOSITORY_TOKEN,
       useClass: UserRepository
     },
+    UserService,
     {
-      provide: USER_ADAPTER_TOKEN,
+      provide: USER_ADAPTER,
       useClass: UserAdapter
-    },
-    UserService
+    }
   ],
-  exports: [UserService, USER_ADAPTER_TOKEN]
+  exports: [UserService, USER_ADAPTER]
 })
 export class UsersModule {}
