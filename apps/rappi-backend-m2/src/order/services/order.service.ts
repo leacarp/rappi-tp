@@ -16,9 +16,9 @@ import { Payment } from '../domain/entities/payment.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
 import { itemsDtoService } from './dtos/order/items.dto';
-import { USER_ADAPTER } from '../infrastructure/constants/user-adapter.constants';
-import { IUserAdapter } from '../domain/interfaces/IUserAdapter';
-import { UserOfOrder } from '../domain/entities/user-of-order.entity';
+import { USER_ADAPTER } from '../../users/infrastructure/constants/user-of-adapter.constants';
+import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
+import { UserOfAdapter } from '../../users/domain/dtos/user-of-adapter.dto';
 
 @Injectable()
 export class OrderService {
@@ -109,7 +109,7 @@ export class OrderService {
   // CreateOrderDto → OrderEntit
     private toOrderEntity(dto: CreateOrderDto, 
       items: Items[], 
-      users: { customer: UserOfOrder, vendor: UserOfOrder, driver: UserOfOrder }
+      users: { customer: UserOfAdapter, vendor: UserOfAdapter, driver: UserOfAdapter }
     ): OrderEntity {
     return new OrderEntity(
       undefined,
@@ -246,9 +246,9 @@ export class OrderService {
     vendorId: string,
     driverId: string
   ): Promise<{
-    customer: UserOfOrder;
-    vendor: UserOfOrder;
-    driver: UserOfOrder;
+    customer: UserOfAdapter;
+    vendor: UserOfAdapter;
+    driver: UserOfAdapter;
   }> {
     // 1. Buscar los 3 usuarios en paralelo
     const [customer, vendor, driver] = await Promise.all([
