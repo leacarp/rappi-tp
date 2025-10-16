@@ -23,6 +23,10 @@ import { SummaryDtoService } from './dtos/order/summary-service.dto';
 import { PaymentDtoService } from './dtos/order/payment-service.dto';
 import { DeliveryLocationDtoService } from './dtos/order/deliveryLocation-service.dto';
 import { PickupLocationDtoService } from './dtos/order/pickupLocation-service.dto';
+import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
+import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
+import { UserOfAdapter } from '../../users/domain/dtos/user-of-adapter.dto';
+import { UserBasicEntity } from '../domain/entities/user-basic';
 
 @Injectable()
 export class OrderService {
@@ -30,13 +34,22 @@ export class OrderService {
     @Inject(ORDER_REPOSITORY) 
     private readonly orderRepository: IOrderRepository,
     @Inject(PRODUCT_ADAPTER)
-    private readonly productAdapter: IProductAdapter
+    private readonly productAdapter: IProductAdapter,
+    @Inject(USER_ADAPTER)
+    private readonly userAdapter: IUserAdapter
   ) {}
 
   async createOrder(requestDto: CreateOrderRequestDto): Promise<GetOrderResponseDto> {
     const createOrderDto = this.toCreateOrderDto(requestDto);
 
     const items = await this.loadAndValidateItems(createOrderDto.getItems());  
+
+    await this.loadAndValidateUsers(
+      createOrderDto.getCustomerId(),
+      createOrderDto.getVendorId(),
+      createOrderDto.getDriverId()
+    );
+
 
     const orderEntity = this.toOrderEntity(createOrderDto, items);
 
@@ -129,7 +142,9 @@ export class OrderService {
 
 
   // CreateOrderDto → OrderEntit
-    private toOrderEntity(dto: CreateOrderDto, items: Items[]): OrderEntity {
+    private toOrderEntity(dto: CreateOrderDto, 
+      items: Items[]
+    ): OrderEntity {
     return new OrderEntity(
       undefined,
       new Types.ObjectId(dto.getCustomerId()),
@@ -152,8 +167,6 @@ export class OrderService {
       new Date()
     );
   } 
-
- 
 
   private async loadAndValidateItems(dtoItems: ItemsDtoService[]): Promise<Items[]> {
     const invalidProducts: string[] = [];
@@ -191,6 +204,30 @@ export class OrderService {
 
     return validItems;
   }
+
+  private async loadAndValidateUsers(customerId: string,vendorId: string,driverId: string): Promise<void> {
+        // 1. Buscar los 3 usuarios en paralelo
+        const [customer, vendor, driver] = await Promise.all([
+          this.userAdapter.getUserById(customerId),
+          this.userAdapter.getUserById(vendorId),
+          this.userAdapter.getUserById(driverId)
+        ]);
+      
+        // 2. Verificar cuáles NO existen
+        const errors = [];
+        if (!customer) errors.push({ role: 'customer', id: customerId });
+        if (!vendor) errors.push({ role: 'vendor', id: vendorId });
+        if (!driver) errors.push({ role: 'driver', id: driverId });
+      
+        // 3. Si hay errores, lanzar excepción
+        if (errors.length > 0) {
+          throw new BadRequestException({
+            message: 'Algunos usuarios no existen',
+            invalidUsers: errors
+          });
+        }
+     };
+  
 }
 
 

@@ -1,0 +1,1 @@
+export const USER_ADAPTER = Symbol('USER_ADAPTER');

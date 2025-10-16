@@ -115,8 +115,6 @@ export class OrderRepository implements IOrderRepository{
       const email = populated.email;
       const name = populated.profile?.name ?? 'Desconocido';
       
-
-
       if (!id || !email) return undefined;
 
     return new UserBasicEntity(id, name, email);
