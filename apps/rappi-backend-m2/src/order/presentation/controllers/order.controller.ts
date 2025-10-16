@@ -1,16 +1,17 @@
-import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query, Put } from '@nestjs/common';
 import { OrderService } from '../../services/order.service';
-import { CreateOrderDto } from '../../services/dtos/order/create-order.dto';
-import { GetOrderResponseDto } from '../../presentation/dtos/get-order-response';
-import { GetUserOrdersResponseDto } from '../../presentation/dtos/get-orders-response';
+import { CreateOrderRequestDto } from '../dtos/create-order-request.dto';
+import { GetOrderResponseDto } from '../dtos/get-order-response.dto';
+import { GetUserOrdersResponseDto } from '../dtos/get-orders-response.dto';
+import { UpdateOrderStatusRequestDto } from '../dtos/update-status.dto';
 
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
-    return this.orderService.createOrder(createOrderDto);
+  async createOrder(@Body() createOrderRequestDto: CreateOrderRequestDto): Promise<GetOrderResponseDto> {
+    return this.orderService.createOrder(createOrderRequestDto);
   }
 
   @Get('user/:userId')
@@ -21,6 +22,12 @@ export class OrderController {
   @Get(':id')
   async getOrderById(@Param('id') id: string): Promise<GetOrderResponseDto> {
     return this.orderService.getOrderById(id);
+  }
+
+  @Put(':id/status')
+  async updateOrderStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusRequestDto): Promise<{ message: string }> {
+    await this.orderService.UpdateOrderStatus(id, dto.status);
+    return { message: 'Estado actualizado correctamente' };
   }
 
    

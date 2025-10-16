@@ -5,6 +5,7 @@ import {Delivery_Location, DeliveryLocationSchema} from './delivery-location.sch
 import {Summary, SummarySchema} from './summary.schema'
 import {Payment, PaymentSchema} from './payment.schema'
 import {Items, ItemsSchema} from './items.schema'
+import { OrderStatus } from '../../domain/enum/order-status';
 
 
 export type OrderDocument = Order & Document;
@@ -21,12 +22,9 @@ export class Order{
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     driverId: Types.ObjectId; 
     
-    @Prop({
-        required: true,
-        enum: ['pending', 'accepted', 'preparing', 'ready for pickup', 'in transit', 'delivered', 'canceled'],
-        default: 'pending' 
-    })
-    status: string;
+    @Prop({ type: String, enum: Object.values(OrderStatus), required: true })
+    status: OrderStatus;
+
 
     @Prop({ type: PickUpLocationSchema })
     pickUpLocation?: PickUp_Location;

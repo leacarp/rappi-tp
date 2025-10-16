@@ -3,10 +3,10 @@ import { Injectable, Inject, BadRequestException} from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
 import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
 import { PRODUCT_ADAPTER } from '../infrastructure/constants/product-adapter.constants';
-import { CreateOrderDto } from './dtos/order/create-order.dto';
-import { GetOrderResponseDto } from '../presentation/dtos/get-order-response';
-import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response';
-import { OrderSummaryDto } from '../presentation/dtos/order/order-summary.dto';
+import { CreateOrderDto } from './dtos/order/create-order-service.dto';
+import { GetOrderResponseDto } from '../presentation/dtos/get-order-response.dto';
+import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response.dto';
+import { OrderSummaryDto } from '../presentation/dtos/order-dto-response/order-summary.dto';
 import { OrderEntity } from '../domain/entities/order.entity';
 import { PickUpLocation } from '../domain/entities/pickup-location.entity';
 import { DeliveryLocation } from '../domain/entities/deliveryLocation.entity';
@@ -15,10 +15,17 @@ import { Summary } from '../domain/entities/summary.entity';
 import { Payment } from '../domain/entities/payment.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
-import { itemsDtoService } from './dtos/order/items.dto';
+import { OrderStatus } from '../domain/enum/order-status';
+import { ItemsDtoService } from './dtos/order/items-service.dto';
+import { CreateOrderRequestDto } from '../presentation/dtos/create-order-request.dto';
+import { ProductOfItemDtoService } from './dtos/order/productOfItem.dto';
+import { SummaryDtoService } from './dtos/order/summary-service.dto';
+import { PaymentDtoService } from './dtos/order/payment-service.dto';
+import { DeliveryLocationDtoService } from './dtos/order/deliveryLocation-service.dto';
+import { PickupLocationDtoService } from './dtos/order/pickupLocation-service.dto';
 import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
-import { UserOfAdapter } from '../../users/domain/dtos/user-of-adapter.dto';
+
 
 @Injectable()
 export class OrderService {
@@ -31,29 +38,31 @@ export class OrderService {
     private readonly userAdapter: IUserAdapter
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
-    const items = await this.loadAndValidateItems(createOrderDto.items);  
+  async createOrder(requestDto: CreateOrderRequestDto): Promise<GetOrderResponseDto> {
+    const createOrderDto = this.toCreateOrderDto(requestDto);
 
-    const users = await this.loadAndValidateUsers(
-      createOrderDto.customerId,
-      createOrderDto.vendorId,
-      createOrderDto.driverId
+    const items = await this.loadAndValidateItems(createOrderDto.getItems());  
+
+    await this.loadAndValidateUsers(
+      createOrderDto.getCustomerId(),
+      createOrderDto.getVendorId(),
+      createOrderDto.getDriverId()
     );
 
-    const orderEntity = this.toOrderEntity(createOrderDto, items, users);
+
+    const orderEntity = this.toOrderEntity(createOrderDto, items);
 
     const savedOrder = await this.orderRepository.create(orderEntity);
 
 
-    return this.toGetOrderResponseDto(savedOrder);
+    return GetOrderResponseDto.fromEntity(savedOrder);
   }
 
-  async getOrderById(id: string): Promise<GetOrderResponseDto> {
-    const orderEntity = await this.orderRepository.findById(id);
-    if (!orderEntity) throw new BadRequestException(`Orden con id ${id} no encontrada`);
-    
-    
-    return this.toGetOrderResponseDto(orderEntity);
+  async getOrderById(orderId: string): Promise<GetOrderResponseDto> {
+    const orderEntity = await this.orderRepository.findById(orderId);
+    if (!orderEntity) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+
+    return GetOrderResponseDto.fromEntity(orderEntity);
   }
 
   async getOrdersByUser(userId: string, role: 'customer' | 'vendor' | 'driver'): Promise<GetUserOrdersResponseDto> {
@@ -65,174 +74,120 @@ export class OrderService {
 
     if(!orders.length) throw new BadRequestException(`Órdenes del usuario con id ${userId} y rol de ${role} no encontradas`)
 
-    const ordersSummary = orders.map(order => this.toOrderSummaryDto(order));
+    const ordersSummary = orders.map(OrderSummaryDto.fromEntity);
 
-    return { orders: ordersSummary };
+    return GetUserOrdersResponseDto.fromEntities(ordersSummary)
   }
 
   async getProductById(id: string): Promise<ProductOfItem>{
     return this.productAdapter.getProductById(id);
   }
 
-  private toOrderDocument(dto: CreateOrderDto) {
-    return {
-      customerId: new Types.ObjectId(dto.customerId),
-      vendorId: new Types.ObjectId(dto.vendorId),
-      driverId: new Types.ObjectId(dto.driverId),
-      status: 'pending',
-      pickUpLocation: {
-        latitude: dto.pickupLocation.latitude,
-        longitude: dto.pickupLocation.longitude
-      },
-      deliveryLocation: {
-        latitude: dto.deliveryLocation.latitude,
-        longitude: dto.deliveryLocation.longitude
-      },
-      items: dto.items.map(item => ({
-        productId: item.productId,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price
-      })),
-      summary: {
-        subtotal: dto.summary.subtotal,
-        shippingCost: dto.summary.shippingCost,
-        taxes: dto.summary.taxes,
-        discount: dto.summary.discount,
-        total: dto.summary.total
-      },
-      payment: {
-        method: dto.payment.method,
-        status: dto.payment.status,
-        transactionId: dto.payment.transactionId
-      },
-      trackingNumber: dto.trackingNumber,
-      notes: dto.notes,
-      createdAt: new Date()
-    };
+  async UpdateOrderStatus(orderId: string, newStatus: OrderStatus) : Promise<void>{
+    const order = await this.orderRepository.findById(orderId);
+    if(!order) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+
+    order.changeStatus(newStatus);
+
+    await this.orderRepository.updateStatus( orderId, order.getStatus());
+
   }
+
+
+
+
+
+
+  private toCreateOrderDto(request: CreateOrderRequestDto): CreateOrderDto {
+  const itemsDto = request.items.map(item =>
+      new ItemsDtoService(
+        new ProductOfItemDtoService(
+          item.product.productId,
+          item.product.name,
+          item.product.price,
+        ),
+        item.quantity,
+      )
+  );
+
+  const summaryDto = new SummaryDtoService(
+    request.summary.subtotal,
+    request.summary.shippingCost,
+    request.summary.taxes,
+    request.summary.discount,
+    request.summary.total,
+  );
+
+  const paymentDto = new PaymentDtoService(
+    request.payment.method,
+    request.payment.status,
+    request.payment.transactionId,
+  );
+
+  return new CreateOrderDto(
+    request.customerId,
+    request.vendorId,
+    request.driverId,
+    new PickupLocationDtoService(request.pickupLocation.latitude, request.pickupLocation.longitude),
+    new DeliveryLocationDtoService(request.deliveryLocation.latitude, request.deliveryLocation.longitude),
+    itemsDto,
+    summaryDto,
+    paymentDto,
+    request.trackingNumber,
+    request.notes,
+  );
+}
+
 
 
   // CreateOrderDto → OrderEntit
     private toOrderEntity(dto: CreateOrderDto, 
-      items: Items[], 
-      users: { customer: UserOfAdapter, vendor: UserOfAdapter, driver: UserOfAdapter }
+      items: Items[]
     ): OrderEntity {
     return new OrderEntity(
       undefined,
-      new Types.ObjectId(dto.customerId),
-      new Types.ObjectId(dto.vendorId),
-      new Types.ObjectId(dto.driverId),
-      'pending',
-      new PickUpLocation(dto.pickupLocation.latitude, dto.pickupLocation.longitude),
-      new DeliveryLocation(dto.deliveryLocation.latitude, dto.deliveryLocation.longitude),
+      new Types.ObjectId(dto.getCustomerId()),
+      new Types.ObjectId(dto.getVendorId()),
+      new Types.ObjectId(dto.getDriverId()),
+      OrderStatus.Pending,
+      new PickUpLocation(dto.getPickupLocation().getLatitude(), dto.getPickupLocation().getLongitude()),
+      new DeliveryLocation(dto.getDeliveryLocation().getLatitude(), dto.getDeliveryLocation().getLongitude()),
       items,
       new Summary(
-        dto.summary.subtotal,
-        dto.summary.shippingCost,
-        dto.summary.taxes,
-        dto.summary.discount,
-        dto.summary.total
+        dto.getSummary().getSubtotal(),
+        dto.getSummary().getShippingCost(),
+        dto.getSummary().getTaxes(),
+        dto.getSummary().getDiscount(),
+        dto.getSummary().getTotal()
       ),
-      new Payment(dto.payment.method, dto.payment.status, dto.payment.transactionId),
-      dto.trackingNumber,
-      dto.notes,
-      new Date(),
-      { id: users.customer.getId(), name: users.customer.getName(), email: users.customer.getEmail() },
-      { id: users.vendor.getId(), name: users.vendor.getName(), email: users.vendor.getEmail() },
-      { id: users.driver.getId(), name: users.driver.getName(), email: users.driver.getEmail() }
+      new Payment(dto.getPayment().getMethod(), dto.getPayment().getStatus(), dto.getPayment().getTransactionId()),
+      dto.getTrackingNumber(),
+      dto.getNotes(),
+      new Date()
     );
   } 
 
- 
-  // Mapper: OrderEntity → GetOrderResponseDto
-  private toGetOrderResponseDto(order: OrderEntity): GetOrderResponseDto {
-  return {
-    id: order.getId().toHexString(),
-    
-    customer: {
-      id: order.getCustomerId().toHexString(),
-      name: order.getCustomer()?.name || '',
-      email: order.getCustomer()?.email || ''
-    },
-    vendor: {
-      id: order.getVendorId().toHexString(),
-      name: order.getVendor()?.name || '',
-      email: order.getVendor()?.email || ''
-    },
-    driver: {
-      id: order.getDriverId().toHexString(),
-      name: order.getDriver()?.name || '',
-      email: order.getDriver()?.email || ''
-    },
-
-    status: order.getStatus(),
-    createdAt: order.getCreatedAt(),
-
-    pickupLocation: {
-      latitude: order.getPickupLocation().getLatitude(),
-      longitude: order.getPickupLocation().getLongitude()
-    },
-    deliveryLocation: {
-      latitude: order.getDeliveryLocation().getLatitude(),
-      longitude: order.getDeliveryLocation().getLongitude()
-    },
-
-    items: order.getItems().map(item => ({
-      productId: item.getProductId().toHexString(),
-      name: item.getName(),
-      quantity: item.getQuantity(),
-      price: item.getPrice()
-    })),
-
-    summary: {
-      subtotal: order.getSummary().getSubTotal(),
-      shippingCost: order.getSummary().getShippingCost(),
-      taxes: order.getSummary().getTaxes(),
-      discount: order.getSummary().getDiscount(),
-      total: order.getSummary().getTotal()
-    },
-
-    payment: {
-      method: order.getPayment().getMethod(),
-      status: order.getPayment().getStatus(),
-      transactionId: order.getPayment().getTransactionId()
-    },
-
-    trackingNumber: order.getTrackingNumber(),
-    notes: order.getNotes()
-  };
-  }
-
-  private toOrderSummaryDto(order: OrderEntity): OrderSummaryDto {
-    return {
-      id: order.getId().toHexString(),
-      status: order.getStatus(),
-      createdAt: order.getCreatedAt(),
-      trackingNumber: order.getTrackingNumber()
-    };
-  }
-
-  private async loadAndValidateItems(dtoItems: itemsDtoService[]): Promise<Items[]> {
+  private async loadAndValidateItems(dtoItems: ItemsDtoService[]): Promise<Items[]> {
     const invalidProducts: string[] = [];
+
 
     const items = await Promise.all(
     dtoItems.map(async (itemDto) => {
-      const product = await this.productAdapter.getProductById(itemDto.productId);
+      const product = await this.productAdapter.getProductById(itemDto.getProduct().getId());
 
       if (!product) {
-        invalidProducts.push(itemDto.productId);
+        invalidProducts.push(itemDto.getProduct().getId());
         return null;
       }
 
-      if (itemDto.quantity <= 0) {
+      if (itemDto.getQuantity() <= 0) {
         throw new BadRequestException({
           message: `Cantidad inválida para el producto ${product.getName()}`,
-          productId: itemDto.productId
+          productId: itemDto.getProduct().getId()
         });
       }
 
-      return new Items(product, itemDto.quantity);
+      return new Items(product, itemDto.getQuantity());
       })
     );
 
@@ -249,39 +204,29 @@ export class OrderService {
     return validItems;
   }
 
-  private async loadAndValidateUsers(
-    customerId: string,
-    vendorId: string,
-    driverId: string
-  ): Promise<{
-    customer: UserOfAdapter;
-    vendor: UserOfAdapter;
-    driver: UserOfAdapter;
-  }> {
-    // 1. Buscar los 3 usuarios en paralelo
-    const [customer, vendor, driver] = await Promise.all([
-      this.userAdapter.getUserById(customerId),
-      this.userAdapter.getUserById(vendorId),
-      this.userAdapter.getUserById(driverId)
-    ]);
+  private async loadAndValidateUsers(customerId: string,vendorId: string,driverId: string): Promise<void> {
+        // 1. Buscar los 3 usuarios en paralelo
+        const [customer, vendor, driver] = await Promise.all([
+          this.userAdapter.getUserById(customerId),
+          this.userAdapter.getUserById(vendorId),
+          this.userAdapter.getUserById(driverId)
+        ]);
+      
+        // 2. Verificar cuáles NO existen
+        const errors = [];
+        if (!customer) errors.push({ role: 'customer', id: customerId });
+        if (!vendor) errors.push({ role: 'vendor', id: vendorId });
+        if (!driver) errors.push({ role: 'driver', id: driverId });
+      
+        // 3. Si hay errores, lanzar excepción
+        if (errors.length > 0) {
+          throw new BadRequestException({
+            message: 'Algunos usuarios no existen',
+            invalidUsers: errors
+          });
+        }
+     };
   
-    // 2. Verificar cuáles NO existen
-    const errors = [];
-    if (!customer) errors.push({ role: 'customer', id: customerId });
-    if (!vendor) errors.push({ role: 'vendor', id: vendorId });
-    if (!driver) errors.push({ role: 'driver', id: driverId });
-  
-    // 3. Si hay errores, lanzar excepción
-    if (errors.length > 0) {
-      throw new BadRequestException({
-        message: 'Algunos usuarios no existen',
-        invalidUsers: errors
-      });
-    }
-  
-    // 4. Retornar los 3 usuarios validados
-    return { customer, vendor, driver };
-  }
 }
 
 
