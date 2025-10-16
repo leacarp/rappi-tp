@@ -25,8 +25,7 @@ import { DeliveryLocationDtoService } from './dtos/order/deliveryLocation-servic
 import { PickupLocationDtoService } from './dtos/order/pickupLocation-service.dto';
 import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
-import { UserOfAdapter } from '../../users/domain/dtos/user-of-adapter.dto';
-import { UserBasicEntity } from '../domain/entities/user-basic';
+
 
 @Injectable()
 export class OrderService {
