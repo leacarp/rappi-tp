@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserAdapter } from '../../domain/interfaces/IUserAdapter';
 import { UserOfAdapter } from '../../domain/dtos/user-of-adapter.dto';
+import { UserForAuth } from '../../domain/dtos/user-for-auth.dto';
 import { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { User } from '../../domain/entities/user.entity';
 import { USER_REPOSITORY_TOKEN } from '../../domain/tokens/user-repository.token';
@@ -20,10 +21,10 @@ export class UserAdapter implements IUserAdapter {
         return fromEntity(user);
     }
 
-    async getUserByEmail(email: string): Promise<UserOfAdapter | null> {
+    async getUserForAuth(email: string): Promise<UserForAuth | null> {
         const user = await this.userRepository.getUserByEmail(email);
         if (!user) return null;
-        return fromEntity(user);
+        return fromEntityForAuth(user);
     }
 }
 
@@ -31,6 +32,15 @@ function fromEntity(user: User): UserOfAdapter {
     return new UserOfAdapter(
         new Types.ObjectId(user.getId()),  
         user.getProfile().getName(),        
+        user.getEmail(),
+        user.getRole()
+    );
+}
+
+function fromEntityForAuth(user: User): UserForAuth {
+    return new UserForAuth(
+        new Types.ObjectId(user.getId()),
+        user.getProfile().getName(),
         user.getEmail(),
         user.getPassword(),
         user.getRole()
