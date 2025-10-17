@@ -22,5 +22,5 @@ export interface IUserRepository {
     date: Date
   ): Promise<User | null>;
 
-  searchRestaurantsByName(restaurantName: string): Promise<VendorInfo[]>;
+  searchRestaurantsByNameOrCategory(param: string): Promise<VendorInfo[]>;
 }

@@ -175,13 +175,13 @@ export class UserService {
     return GetReviewsResponseService.fromEntities(reviews);
   }
 
-  async searchRestaurantsByName(restaurantName: string): Promise<SearchRestaurantsResponseService> {
-    const trimmedName = (restaurantName || '').trim();
-    if (!trimmedName) {
+  async searchRestaurantsByNameOrCategory(param: string): Promise<SearchRestaurantsResponseService> {
+    const trimmedParam = (param || '').trim();
+    if (!trimmedParam) {
       return SearchRestaurantsResponseService.fromVendorInfoEntities([]);
     }
 
-    const vendorInfos = await this.userRepository.searchRestaurantsByName(trimmedName);
+    const vendorInfos = await this.userRepository.searchRestaurantsByNameOrCategory(trimmedParam);
     
     return SearchRestaurantsResponseService.fromVendorInfoEntities(vendorInfos);
   }

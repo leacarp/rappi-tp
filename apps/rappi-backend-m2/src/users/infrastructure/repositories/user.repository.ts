@@ -151,19 +151,19 @@ export class UserRepository implements IUserRepository {
     );
   }
 
-  async searchRestaurantsByName(restaurantName: string): Promise<VendorInfo[]> {
-    const trimmedName = (restaurantName || '').trim();
-    if (!trimmedName) {
+  async searchRestaurantsByNameOrCategory(param: string): Promise<VendorInfo[]> {
+    const trimmedParam = (param || '').trim();
+    if (!trimmedParam) {
       return [];
     }
 
     const usersWithRestaurantInfo = await this.userModel
       .find({
         role: 'vendor',
-        'profile.vendorInfo.restaurantName': {
-          $regex: trimmedName,
-          $options: 'i'
-        }
+        $or: [
+          { 'profile.vendorInfo.restaurantName': { $regex: trimmedParam, $options: 'i' } },
+          { 'profile.vendorInfo.category': { $regex: trimmedParam, $options: 'i' } }
+        ]
       })
       .select('profile.vendorInfo')
       .exec();
