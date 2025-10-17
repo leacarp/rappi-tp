@@ -26,8 +26,8 @@ export class VendorsController {
   }
 
   @Get('searchRestaurants')
-  async searchRestaurants(@Query('name') restaurantName: string): Promise<SearchRestaurantsResponse> {
-    const serviceResponse = await this.userService.searchRestaurantsByName(restaurantName);
+  async searchRestaurants(@Query('param') param: string): Promise<SearchRestaurantsResponse> {
+    const serviceResponse = await this.userService.searchRestaurantsByNameOrCategory(param);
     return SearchRestaurantsResponse.fromServiceDto(serviceResponse);
   }
 }

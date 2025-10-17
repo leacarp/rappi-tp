@@ -19,6 +19,9 @@ export class VendorInfo {
 
   @Prop({ default: true })
   isAvailable: boolean;
+
+  @Prop({ required: true })
+  category: string;
 }
 
 export const VendorInfoSchema = SchemaFactory.createForClass(VendorInfo);
