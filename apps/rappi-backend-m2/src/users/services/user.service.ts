@@ -1,6 +1,7 @@
 import { Types } from 'mongoose'; 
-import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { IUserRepository } from '../domain/interfaces/IUserRepository';
 import { USER_REPOSITORY_TOKEN } from '../domain/tokens/user-repository.token';
 import { CreateAddressRequestService } from './dtos/create-address-request-service';
@@ -10,6 +11,8 @@ import { UpdateAddressRequestService } from './dtos/update-address-request-servi
 import { CreateReviewRequestService } from './dtos/create-review-request-service';
 import { GetReviewsResponseService } from './dtos/get-reviews-response-service';
 import { SearchRestaurantsResponseService } from './dtos/search-restaurants-response-service';
+import { GetVendorProfile } from './dtos/get-vendor-profile-service';
+import { UpdateVendorProfile } from './dtos/update-vendor-profile-service';
 
 @Injectable()
 export class UserService {
@@ -19,6 +22,53 @@ export class UserService {
   ) {}
 
   private readonly logger = new Logger(UserService.name);
+
+  async getVendorProfile(vendorId: string): Promise<GetVendorProfile> {
+    const vendor = await this.userRepository.getUserById(vendorId);
+    if (!vendor) {
+      throw new NotFoundException('Vendor no encontrado');
+    }
+    return GetVendorProfile.fromEntity(vendor);
+  }
+
+  async updateVendorProfile(vendorId: string, editedVendorProfile: UpdateVendorProfile): Promise<void> {
+    const vendor = await this.userRepository.getUserById(vendorId);
+    if (!vendor) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    if (vendor.getRole() !== 'vendor') {
+      throw new NotFoundException('Usuario no es un vendor');
+    }
+
+    const vendorInfo = vendor.getProfile().getVendorInfo();
+    if (!vendorInfo){
+      throw new NotFoundException('El vendor no tiene información del perfil');
+    }
+
+    if (editedVendorProfile.getRestaurantName() !== undefined) {
+      vendorInfo.setRestaurantName(editedVendorProfile.getRestaurantName());
+    }
+
+    if (editedVendorProfile.getSchedule() !== undefined) {
+      vendorInfo.setSchedule(editedVendorProfile.getSchedule());
+    }
+
+    if (editedVendorProfile.getPhone() !== undefined) {
+      vendor.getProfile().setPhone(editedVendorProfile.getPhone());
+    }
+
+    const updateVendor = await this.userRepository.updateVendorProfile(
+      vendorId,
+      editedVendorProfile.getRestaurantName(),
+      editedVendorProfile.getSchedule(),
+      editedVendorProfile.getPhone()
+    )
+
+    if (!updateVendor) {
+      throw new NotFoundException('Error al actualizar el perfil del vendor');
+    }
+  }
 
   async getAddresses(userId: string): Promise<GetAddressesResponseService> {
     const user = await this.userRepository.getUserById(userId);

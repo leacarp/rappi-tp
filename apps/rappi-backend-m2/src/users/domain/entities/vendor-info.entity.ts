@@ -38,4 +38,18 @@ export class VendorInfo {
   getIsAvailable(): boolean {
     return this._isAvailable;
   }
+
+  setRestaurantName(restaurante: string): void {
+    if (!restaurante || restaurante.trim().length === 0) {
+      throw new Error('El nombre del restaurante es requerido');
+    }
+    this._restaurantName = restaurante;
+  }
+
+  setSchedule(schedule:string): void {
+    if (!schedule || schedule.trim().length === 0) {
+      throw new Error('El horario es requerido');
+    }
+    this._schedule = schedule
+  }
 }

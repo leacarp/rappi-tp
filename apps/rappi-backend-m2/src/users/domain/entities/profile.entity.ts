@@ -39,6 +39,13 @@ export class Profile {
     this._addresses = addresses;
   }
 
+  setPhone(phone: string): void{
+    if (!phone || phone.trim().length === 0) {
+      throw new Error('El teléfono es requerido');
+    }
+    this._phone = phone ? phone.trim() : undefined;
+  }
+
   addAddress(address: Address): void {
     if (address.getIsFavorite()) {
       this._addresses.forEach(addr => addr.makeAsNotFavorite());

@@ -14,6 +14,13 @@ export interface IUserRepository {
 
   getUserReviews(userId: string): Promise<RatingReview[]>;
 
+  updateVendorProfile(
+    vendorId: string,
+    restaurantName?: string,
+    schedule?: string,
+    phone?:string
+  ): Promise<User | null>;
+
   updateUserReview(
     userId: string,
     reviewerId: string,

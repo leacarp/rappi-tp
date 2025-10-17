@@ -114,6 +114,43 @@ export class UserRepository implements IUserRepository {
     return this.mapToUserEntity(updatedUserSchema);
   }  
 
+  async updateVendorProfile(
+    vendorId: string,
+    restaurantName?: string,
+    schedule?: string,
+    phone?: string
+  ): Promise<User | null> {
+    if (!Types.ObjectId.isValid(vendorId)) {
+      return null;
+    }
+
+    const updateFields: any = {}
+    
+    if (restaurantName !== undefined) {
+      updateFields['profile.vendorInfo.restaurantName'] = restaurantName;
+    }
+
+    if (schedule !== undefined) {
+      updateFields['profile.vendorInfo.schedule'] = schedule;
+    }
+
+    if (phone !== undefined) {
+      updateFields['profile.phone'] = phone;
+    }
+
+    if (Object.keys(updateFields).length === 0) {
+      return null;
+    }
+
+    const updateVendor = await this.userModel.findByIdAndUpdate(
+      vendorId,
+      { $set: updateFields },
+      { new: true }
+    ).exec();
+
+    return updateVendor ? this.mapToUserEntity(updateVendor) : null;
+  }
+
   async addUserReview(userId: string, review: RatingReview): Promise<User | null> {
     const userFilter = this.buildIdFilter(userId);
     const reviewDoc = {
