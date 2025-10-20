@@ -13,12 +13,20 @@ import { GetReviewsResponseService } from './dtos/get-reviews-response-service';
 import { SearchRestaurantsResponseService } from './dtos/search-restaurants-response-service';
 import { GetVendorProfile } from './dtos/get-vendor-profile-service';
 import { UpdateVendorProfile } from './dtos/update-vendor-profile-service';
+import { PRODUCT_ADAPTER } from '../../order/infrastructure/constants/product-adapter.constants';
+import { IProductAdapter } from '../../order/domain/interfaces/IProductAdapter';
+import { AddCartItemRequestService } from './dtos/add-cart-item-request-service';
+import { SetCartItemQuantityRequestService } from './dtos/set-cart-item-quantity-request-service';
+import { GetCartResponseService } from './dtos/get-cart-response-service';
+import { CartItem } from '../domain/entities/cart-item.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN)
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
+    @Inject(PRODUCT_ADAPTER)
+    private readonly productAdapter: IProductAdapter
   ) {}
 
   private readonly logger = new Logger(UserService.name);
@@ -244,5 +252,41 @@ export class UserService {
   
   async verifyPassword(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
+  }
+
+  async addCartItem(userId: string, req: AddCartItemRequestService): Promise<void> {
+    const user = await this.userRepository.getUserById(userId);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    const product = await this.productAdapter.getProductById(req.getProductId());
+    if (!product) throw new NotFoundException('Producto no encontrado');
+
+    user.addOrIncrementCartItem(
+        new CartItem(
+            product.getId().toString(), // FIX: convertir ObjectId a string
+            product.getName(),
+            product.getPrice(),
+            1
+        )
+    );
+    const updated = await this.userRepository.updateUserCart(userId, user.getCart());
+    if (!updated) throw new NotFoundException('Usuario no encontrado');
+  }
+
+  async setCartItemQuantity(userId: string, req: SetCartItemQuantityRequestService): Promise<void> {
+    const user = await this.userRepository.getUserById(userId);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    user.setCartItemQuantity(req.getProductId(), req.getQuantity());
+
+    const updated = await this.userRepository.updateUserCart(userId, user.getCart());
+    if (!updated) throw new NotFoundException('Usuario no encontrado');
+  }
+
+  async getCart(userId: string): Promise<GetCartResponseService> {
+    const user = await this.userRepository.getUserById(userId);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    return GetCartResponseService.fromEntities(user.getCart());
   }
 }

@@ -8,10 +8,12 @@ import { UserController } from './presentation/controllers/user.controller';
 import { VendorsController } from './presentation/controllers/vendors.controller';
 import { UserAdapter } from './infrastructure/adapters/user.adapter';
 import { USER_ADAPTER } from './infrastructure/constants/user-adapter.constants';
+import { ProductModule } from '../products/product.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    ProductModule
   ],
   controllers: [UserController, VendorsController],
   providers: [

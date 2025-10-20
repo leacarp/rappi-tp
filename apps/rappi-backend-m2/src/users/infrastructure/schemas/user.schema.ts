@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose';
 import { Profile, ProfileSchema } from './profile.schema';
 import { RatingReview, RatingReviewSchema } from './rating-review.schema';
 import { History, HistorySchema } from './history.schema';
+import { CartItem, CartItemSchema } from './cart-item.schema'; 
 
 export type UserDocument = User & Document & {
   createdAt: Date;
@@ -35,6 +36,9 @@ export class User {
 
   @Prop({ type: [RatingReviewSchema], default: [] })
   ratingsAndReviews: RatingReview[];
+
+  @Prop({ type: [CartItemSchema], default: [] })
+  cart: CartItem[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

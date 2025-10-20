@@ -18,6 +18,8 @@ import { Address as AddressSchema } from '../schemas/address.schema';
 import { RatingReview as RatingReviewSchema } from '../schemas/rating-review.schema';
 import { EarningsDetail as EarningsDetailSchema } from '../schemas/earnings-detail.schema';
 import { DriverInfo as DriverInfoSchema } from '../schemas/driver-info.schema';
+import { CartItem as CartItemSchema } from '../schemas/cart-item.schema';
+import { CartItem } from '../../domain/entities/cart-item.entity';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -216,6 +218,27 @@ export class UserRepository implements IUserRepository {
       ));
   }
 
+  async updateUserCart(userId: string, cartItems: CartItem[]): Promise<User | null> {
+    if (!Types.ObjectId.isValid(userId)) {
+      return null;
+    }
+
+    const cartDocs: CartItemSchema[] = cartItems.map(item => ({
+      productId: new Types.ObjectId(item.getProductId()),
+      name: item.getName(),
+      price: item.getPrice(),
+      quantity: item.getQuantity()
+    }));
+
+    const updatedUserSchema = await this.userModel.findByIdAndUpdate(
+      userId,
+      { $set: { cart: cartDocs } },
+      { new: true }
+    ).exec();
+
+    return updatedUserSchema ? this.mapToUserEntity(updatedUserSchema) : null;
+  }
+
   private mapToUserEntity(userDoc: UserDocument): User {
     const addresses = (userDoc.profile?.addresses || []).map((addr: AddressSchema) => 
       new Address(
@@ -263,6 +286,16 @@ export class UserRepository implements IUserRepository {
 
     const favorites = (userDoc.favorites || []).map((id: Types.ObjectId) => id.toString());
 
+
+    const cart = (userDoc.cart || []).map((ci: CartItemSchema) =>
+      new CartItem(
+        ci.productId.toString(),
+        ci.name,
+        ci.price,
+        ci.quantity
+      )
+    );
+
     return new User(
       userDoc._id.toString(),
       userDoc.email,
@@ -273,7 +306,8 @@ export class UserRepository implements IUserRepository {
       history,
       ratingsAndReviews,
       userDoc.createdAt || new Date(),
-      userDoc.updatedAt || new Date()
+      userDoc.updatedAt || new Date(),
+      cart
     );
   }
 
