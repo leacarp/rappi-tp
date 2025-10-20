@@ -4,6 +4,7 @@ import { CreateOrderRequestDto } from '../dtos/create-order-request.dto';
 import { GetOrderResponseDto } from '../dtos/get-order-response.dto';
 import { GetUserOrdersResponseDto } from '../dtos/get-orders-response.dto';
 import { UpdateOrderStatusRequestDto } from '../dtos/update-status.dto';
+import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -22,6 +23,11 @@ export class OrderController {
   @Get(':id')
   async getOrderById(@Param('id') id: string): Promise<GetOrderResponseDto> {
     return this.orderService.getOrderById(id);
+  }
+
+  @Get(':id/summary')
+  async getOrderSummary(@Param('id') id: string): Promise<SummaryDto> { 
+    return this.orderService.getOrderSummary(id);
   }
 
   @Put(':id/status')

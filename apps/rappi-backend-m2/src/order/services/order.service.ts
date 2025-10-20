@@ -25,6 +25,7 @@ import { DeliveryLocationDtoService } from './dtos/order/deliveryLocation-servic
 import { PickupLocationDtoService } from './dtos/order/pickupLocation-service.dto';
 import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
+import { SummaryDto } from '../presentation/dtos/order-dto-response/summary.dto';
 
 
 @Injectable()
@@ -226,8 +227,17 @@ export class OrderService {
           });
         }
      };
+
+     async getOrderSummary(orderId: string): Promise<SummaryDto> {
+    const orderEntity = await this.orderRepository.findById(orderId);
+    if (!orderEntity) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+    return SummaryDto.fromEntity(orderEntity.getSummary());
+  }
   
 }
+
+
+
 
 
 
