@@ -2,6 +2,7 @@ import { Address } from '../entities/address.entity';
 import { User } from '../entities/user.entity';
 import { RatingReview } from '../entities/rating-review.entity';
 import { VendorInfo } from '../entities/vendor-info.entity';
+import { CartItem } from '../entities/cart-item.entity';
 
 export interface IUserRepository {
   getUserById(userId: string): Promise<User | null>;
@@ -30,4 +31,7 @@ export interface IUserRepository {
   ): Promise<User | null>;
 
   searchRestaurantsByNameOrCategory(param: string): Promise<VendorInfo[]>;
+
+  // NUEVO
+  updateUserCart(userId: string, cartItems: CartItem[]): Promise<User | null>;
 }

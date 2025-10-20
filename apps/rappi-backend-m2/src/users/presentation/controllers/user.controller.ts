@@ -20,6 +20,9 @@ import { UpdateAddressRequest } from '../dtos/update-address-request';
 import { CreateReviewRequest } from '../dtos/create-review-request';
 import { GetReviewsResponse } from '../dtos/get-reviews-response';
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
+import { AddCartItemRequest } from '../dtos/add-cart-item-request';
+import { SetCartItemQuantityRequest } from '../dtos/set-cart-item-quantity-request';
+import { GetCartResponse } from '../dtos/get-cart-response';
 
 @Controller('users')
 // @UseGuards(JwtAuthGuard)
@@ -30,7 +33,6 @@ export class UserController {
   @Get(':userId/addresses')
   async getAddresses(@Param('userId') userId: string): Promise<GetAddressesResponse> {
     const userAddressesData = await this.userService.getAddresses(userId);
-    
     return GetAddressesResponse.fromServiceDto(userAddressesData);
   }
 
@@ -78,5 +80,34 @@ export class UserController {
   ): Promise<GetReviewsResponse> {
     const serviceResponse = await this.userService.getReviews(userId);
     return GetReviewsResponse.fromServiceDto(serviceResponse);
+  }
+
+  // NUEVO: obtener carrito
+  @Get(':userId/cart')
+  async getCart(@Param('userId') userId: string): Promise<GetCartResponse> {
+    const serviceDto = await this.userService.getCart(userId);
+    return GetCartResponse.fromServiceDto(serviceDto);
+  }
+
+  // NUEVO: agregar/incrementar item
+  @Post(':userId/cart/items')
+  @HttpCode(HttpStatus.CREATED)
+  async addCartItem(
+    @Param('userId') userId: string,
+    @Body() body: AddCartItemRequest
+  ): Promise<void> {
+    const serviceDto = body.toServiceDto();
+    await this.userService.addCartItem(userId, serviceDto);
+  }
+
+  // NUEVO: setear cantidad (0 elimina)
+  @Put(':userId/cart/items/:productId')
+  async setCartItemQuantity(
+    @Param('userId') userId: string,
+    @Param('productId') productId: string,
+    @Body() body: SetCartItemQuantityRequest
+  ): Promise<void> {
+    const serviceDto = body.toServiceDto(productId);
+    await this.userService.setCartItemQuantity(userId, serviceDto);
   }
 }

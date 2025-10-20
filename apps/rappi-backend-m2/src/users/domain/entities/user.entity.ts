@@ -1,6 +1,7 @@
 import { Profile } from './profile.entity';
 import { RatingReview } from './rating-review.entity';
 import { History } from './history.entity';
+import { CartItem } from './cart-item.entity';
 
 export class User {
   private _id: string;
@@ -13,6 +14,8 @@ export class User {
   private _ratingsAndReviews: RatingReview[];
   private _createdAt: Date;
   private _updatedAt: Date;
+  // NUEVO
+  private _cart: CartItem[];
 
   constructor(
     id: string,
@@ -24,7 +27,9 @@ export class User {
     history: History,
     ratingsAndReviews: RatingReview[],
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    // NUEVO
+    cart: CartItem[] = []
   ) {
     this._id = id;
     this._email = email;
@@ -36,6 +41,8 @@ export class User {
     this._ratingsAndReviews = ratingsAndReviews;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
+    // NUEVO
+    this._cart = cart;
   }
 
   getId(): string {
@@ -76,5 +83,45 @@ export class User {
 
   getUpdatedAt(): Date {
     return this._updatedAt;
+  }
+
+  // NUEVO
+  getCart(): CartItem[] {
+    return this._cart;
+  }
+
+  // NUEVO
+  addOrIncrementCartItem(newItem: CartItem): void {
+    const idx = this._cart.findIndex(i => i.getProductId() === newItem.getProductId());
+    if (idx >= 0) {
+      const existing = this._cart[idx];
+      this._cart[idx] = new CartItem(
+        existing.getProductId(),
+        existing.getName(),
+        existing.getPrice(),
+        existing.getQuantity() + 1
+      );
+    } else {
+      this._cart.push(newItem);
+    }
+  }
+
+  // NUEVO
+  setCartItemQuantity(productId: string, quantity: number): void {
+    const idx = this._cart.findIndex(i => i.getProductId() === productId);
+    if (idx === -1) {
+      throw new Error('Producto no encontrado en el carrito');
+    }
+    if (quantity <= 0) {
+      this._cart.splice(idx, 1);
+    } else {
+      const existing = this._cart[idx];
+      this._cart[idx] = new CartItem(
+        existing.getProductId(),
+        existing.getName(),
+        existing.getPrice(),
+        quantity
+      );
+    }
   }
 }
