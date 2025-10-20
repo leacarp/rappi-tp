@@ -19,7 +19,7 @@ export class GetCartResponseService {
       ci.getQuantity()
     ));
     const subtotal = items.reduce((acc, it) => acc + it.getPrice() * it.getQuantity(), 0);
-    const total = subtotal; // placeholder (sin envío/impuestos)
+    const total = subtotal; 
     return new GetCartResponseService(items, subtotal, total);
   }
 }

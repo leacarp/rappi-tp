@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 import { Profile, ProfileSchema } from './profile.schema';
 import { RatingReview, RatingReviewSchema } from './rating-review.schema';
 import { History, HistorySchema } from './history.schema';
-import { CartItem, CartItemSchema } from './cart-item.schema'; // FIX: ruta correcta
+import { CartItem, CartItemSchema } from './cart-item.schema'; 
 
 export type UserDocument = User & Document & {
   createdAt: Date;

@@ -14,7 +14,6 @@ export class User {
   private _ratingsAndReviews: RatingReview[];
   private _createdAt: Date;
   private _updatedAt: Date;
-  // NUEVO
   private _cart: CartItem[];
 
   constructor(
@@ -28,7 +27,6 @@ export class User {
     ratingsAndReviews: RatingReview[],
     createdAt: Date,
     updatedAt: Date,
-    // NUEVO
     cart: CartItem[] = []
   ) {
     this._id = id;
@@ -41,7 +39,6 @@ export class User {
     this._ratingsAndReviews = ratingsAndReviews;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
-    // NUEVO
     this._cart = cart;
   }
 
@@ -85,12 +82,12 @@ export class User {
     return this._updatedAt;
   }
 
-  // NUEVO
+  
   getCart(): CartItem[] {
     return this._cart;
   }
 
-  // NUEVO
+
   addOrIncrementCartItem(newItem: CartItem): void {
     const idx = this._cart.findIndex(i => i.getProductId() === newItem.getProductId());
     if (idx >= 0) {
@@ -106,7 +103,7 @@ export class User {
     }
   }
 
-  // NUEVO
+ 
   setCartItemQuantity(productId: string, quantity: number): void {
     const idx = this._cart.findIndex(i => i.getProductId() === productId);
     if (idx === -1) {

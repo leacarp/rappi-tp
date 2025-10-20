@@ -6,10 +6,10 @@ import { OrderModule } from '../order/orders.module';
 import { AuthModule } from '../auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { CartModule } from '../cart/cart.module'; // REMOVED: no existe módulo de carrito
+
 
 @Module({
-  imports: [DatabaseModule, UsersModule, ProductModule, OrderModule, AuthModule], // REMOVED CartModule
+  imports: [DatabaseModule, UsersModule, ProductModule, OrderModule, AuthModule], 
   controllers: [AppController],
   providers: [AppService],
 })

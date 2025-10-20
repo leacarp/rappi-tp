@@ -25,7 +25,6 @@ import { SetCartItemQuantityRequest } from '../dtos/set-cart-item-quantity-reque
 import { GetCartResponse } from '../dtos/get-cart-response';
 
 @Controller('users')
-// @UseGuards(JwtAuthGuard)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -82,14 +81,14 @@ export class UserController {
     return GetReviewsResponse.fromServiceDto(serviceResponse);
   }
 
-  // NUEVO: obtener carrito
+  
   @Get(':userId/cart')
   async getCart(@Param('userId') userId: string): Promise<GetCartResponse> {
     const serviceDto = await this.userService.getCart(userId);
     return GetCartResponse.fromServiceDto(serviceDto);
   }
 
-  // NUEVO: agregar/incrementar item
+  
   @Post(':userId/cart/items')
   @HttpCode(HttpStatus.CREATED)
   async addCartItem(
@@ -100,7 +99,7 @@ export class UserController {
     await this.userService.addCartItem(userId, serviceDto);
   }
 
-  // NUEVO: setear cantidad (0 elimina)
+  
   @Put(':userId/cart/items/:productId')
   async setCartItemQuantity(
     @Param('userId') userId: string,

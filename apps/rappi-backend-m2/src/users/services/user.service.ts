@@ -254,7 +254,6 @@ export class UserService {
     return await bcrypt.compare(password, hash);
   }
 
-  //  agregar/incrementar un producto en el carrito
   async addCartItem(userId: string, req: AddCartItemRequestService): Promise<void> {
     const user = await this.userRepository.getUserById(userId);
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -274,7 +273,6 @@ export class UserService {
     if (!updated) throw new NotFoundException('Usuario no encontrado');
   }
 
-  //  setear cantidad (0 elimina)
   async setCartItemQuantity(userId: string, req: SetCartItemQuantityRequestService): Promise<void> {
     const user = await this.userRepository.getUserById(userId);
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -285,7 +283,6 @@ export class UserService {
     if (!updated) throw new NotFoundException('Usuario no encontrado');
   }
 
-  //  obtener carrito con totales
   async getCart(userId: string): Promise<GetCartResponseService> {
     const user = await this.userRepository.getUserById(userId);
     if (!user) throw new NotFoundException('Usuario no encontrado');
