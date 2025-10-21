@@ -34,4 +34,11 @@ export class DriverInfo {
   getEarnings(): Earnings {
     return this._earnings;
   }
+
+  setIsAvailable(isAvailable: boolean): void {
+    if (isAvailable === undefined || isAvailable === null) {
+      throw new Error('El estado de disponibilidad es requerido');
+    }
+    this._isAvailable = isAvailable;
+  }
 }

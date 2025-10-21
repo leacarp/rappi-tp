@@ -289,4 +289,15 @@ export class UserService {
 
     return GetCartResponseService.fromEntities(user.getCart());
   }
+
+  async updateDriverAvailability(userId: string, isAvailable: boolean): Promise<void> {
+    const user = await this.userRepository.getUserById(userId);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    if (user.getRole() !== 'driver') throw new NotFoundException('Usuario no es un driver');
+    
+    user.getProfile().getDriverInfo().setIsAvailable(isAvailable);
+    
+    const updated = await this.userRepository.updateDriverAvailability(userId, isAvailable);
+    if (!updated) throw new NotFoundException('Error al actualizar la disponibilidad del driver');
+  }
 }
