@@ -32,6 +32,7 @@ export interface IUserRepository {
 
   searchRestaurantsByNameOrCategory(param: string): Promise<VendorInfo[]>;
 
-
   updateUserCart(userId: string, cartItems: CartItem[]): Promise<User | null>;
+
+  updateDriverAvailability(userId: string, isAvailable: boolean): Promise<User | null>;
 }

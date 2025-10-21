@@ -23,6 +23,7 @@ import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { AddCartItemRequest } from '../dtos/add-cart-item-request';
 import { SetCartItemQuantityRequest } from '../dtos/set-cart-item-quantity-request';
 import { GetCartResponse } from '../dtos/get-cart-response';
+import { UpdateDriverAvailabilityRequest } from '../dtos/update-driver-availability-request';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -108,5 +109,13 @@ export class UserController {
   ): Promise<void> {
     const serviceDto = body.toServiceDto(productId);
     await this.userService.setCartItemQuantity(userId, serviceDto);
+  }
+
+  @Put(':userId/driver/availability')
+  async updateDriverAvailability(
+    @Param('userId') userId: string,
+    @Body() body: UpdateDriverAvailabilityRequest
+  ): Promise<void> {
+    await this.userService.updateDriverAvailability(userId, body.isAvailable);
   }
 }

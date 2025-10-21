@@ -239,6 +239,20 @@ export class UserRepository implements IUserRepository {
     return updatedUserSchema ? this.mapToUserEntity(updatedUserSchema) : null;
   }
 
+  async updateDriverAvailability(userId: string, isAvailable: boolean): Promise<User | null> {
+    if (!Types.ObjectId.isValid(userId)) {
+      return null;
+    }
+
+    const updated = await this.userModel.findByIdAndUpdate(
+      userId,
+      { $set: { 'profile.driverInfo.isAvailable': isAvailable } },
+      { new: true }
+    ).exec();
+
+    return updated ? this.mapToUserEntity(updated) : null;
+  }
+
   private mapToUserEntity(userDoc: UserDocument): User {
     const addresses = (userDoc.profile?.addresses || []).map((addr: AddressSchema) => 
       new Address(
