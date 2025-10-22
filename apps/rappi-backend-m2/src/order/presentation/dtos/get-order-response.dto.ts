@@ -78,7 +78,7 @@ export class GetOrderResponseDto {
 
   static fromEntity(order: OrderEntity): GetOrderResponseDto {
     return new GetOrderResponseDto(
-      order.getId().toHexString(),
+      order.getId().toString(),
       UserBasicDto.fromEntity(order.getCustomer()),
       UserBasicDto.fromEntity(order.getVendor()),
       UserBasicDto.fromEntity(order.getDriver()),

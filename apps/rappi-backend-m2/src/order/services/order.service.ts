@@ -73,11 +73,10 @@ export class OrderService {
 
     const orders = await this.orderRepository.findByField(field, userId);
 
-    if(!orders.length) throw new BadRequestException(`Órdenes del usuario con id ${userId} y rol de ${role} no encontradas`)
+    if(!orders.length)
+      return new GetUserOrdersResponseDto([]);
 
-    const ordersSummary = orders.map(OrderSummaryDto.fromEntity);
-
-    return GetUserOrdersResponseDto.fromEntities(ordersSummary)
+    return GetUserOrdersResponseDto.fromEntities(orders)
   }
 
   async getProductById(id: string): Promise<ProductOfItem>{
