@@ -80,6 +80,18 @@ export class OrderService {
     return GetUserOrdersResponseDto.fromEntities(ordersSummary)
   }
 
+  async getDriverCompletedOrders(driverId: string): Promise<GetUserOrdersResponseDto> {
+    const orders = await this.orderRepository.findByDriverAndStatus(driverId, OrderStatus.Delivered);
+
+    if(!orders.length) {
+      throw new BadRequestException(`No se encontraron entregas completadas para el driver con id ${driverId}`);
+    }
+
+    const ordersSummary = orders.map(OrderSummaryDto.fromEntity);
+
+    return GetUserOrdersResponseDto.fromEntities(ordersSummary);
+  }
+
   async getProductById(id: string): Promise<ProductOfItem>{
     return this.productAdapter.getProductById(id);
   }

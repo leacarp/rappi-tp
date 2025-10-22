@@ -93,6 +93,22 @@ export class OrderRepository implements IOrderRepository{
       return orders.map(order => this.toDomain(order));
    }
 
+   async findByDriverAndStatus(driverId: string, status: OrderStatus): Promise<OrderEntity[]> {
+      if (!Types.ObjectId.isValid(driverId)) {
+        throw new BadRequestException('Id de driver no válido');
+      }
+      
+      const orders = await this.orderModel
+        .find({ 
+          driverId: new Types.ObjectId(driverId),
+          status: status
+        })
+        .sort({ createdAt: -1 })
+        .exec();
+      
+      return orders.map(order => this.toDomain(order));
+   }
+
 
   async updateStatus(orderId: string, newStatus: OrderStatus): Promise<void> {
       if(!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
