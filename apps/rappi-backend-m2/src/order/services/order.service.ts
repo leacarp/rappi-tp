@@ -79,6 +79,16 @@ export class OrderService {
     return GetUserOrdersResponseDto.fromEntities(orders)
   }
 
+  async getDriverCompletedOrders(driverId: string): Promise<GetUserOrdersResponseDto> {
+    const orders = await this.orderRepository.findByDriverAndStatus(driverId, OrderStatus.Delivered);
+
+    if(!orders.length) {
+      return new GetUserOrdersResponseDto([]);
+    }
+
+    return GetUserOrdersResponseDto.fromEntities(orders);
+  }
+
   async getProductById(id: string): Promise<ProductOfItem>{
     return this.productAdapter.getProductById(id);
   }
