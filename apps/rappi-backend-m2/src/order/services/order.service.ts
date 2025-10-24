@@ -2,11 +2,10 @@ import { Types } from 'mongoose';
 import { Injectable, Inject, BadRequestException} from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
 import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
-import { PRODUCT_ADAPTER } from '../infrastructure/constants/product-adapter.constants';
+import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product-adapter.constants';
 import { CreateOrderDto } from './dtos/order/create-order-service.dto';
 import { GetOrderResponseDto } from '../presentation/dtos/get-order-response.dto';
 import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response.dto';
-import { OrderSummaryDto } from '../presentation/dtos/order-dto-response/order-summary.dto';
 import { OrderEntity } from '../domain/entities/order.entity';
 import { PickUpLocation } from '../domain/entities/pickup-location.entity';
 import { DeliveryLocation } from '../domain/entities/deliveryLocation.entity';
@@ -14,7 +13,7 @@ import { Items } from '../domain/entities/items.entity';
 import { Summary } from '../domain/entities/summary.entity';
 import { Payment } from '../domain/entities/payment.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
-import { IProductAdapter } from '../domain/interfaces/IProductAdapter';
+import { IProductAdapter } from '../../products/domain/interfaces/IProductAdapter';
 import { OrderStatus } from '../domain/enum/order-status';
 import { ItemsDtoService } from './dtos/order/items-service.dto';
 import { CreateOrderRequestDto } from '../presentation/dtos/create-order-request.dto';
@@ -180,7 +179,6 @@ export class OrderService {
   private async loadAndValidateItems(dtoItems: ItemsDtoService[]): Promise<Items[]> {
     const invalidProducts: string[] = [];
 
-
     const items = await Promise.all(
     dtoItems.map(async (itemDto) => {
       const product = await this.productAdapter.getProductById(itemDto.getProduct().getId());
@@ -197,11 +195,17 @@ export class OrderService {
         });
       }
 
-      return new Items(product, itemDto.getQuantity());
+       const productOfItem = new ProductOfItem(
+          product.getId(),
+          product.getName(),
+          product.getPrice()
+        );
+
+      return new Items(productOfItem, itemDto.getQuantity());
       })
+
     );
 
-  
     const validItems = items.filter(i => i !== null);
   
     if (invalidProducts.length > 0) {
