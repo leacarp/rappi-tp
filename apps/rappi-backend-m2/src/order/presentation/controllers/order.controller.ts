@@ -5,6 +5,7 @@ import { GetOrderResponseDto } from '../dtos/get-order-response.dto';
 import { GetUserOrdersResponseDto } from '../dtos/get-orders-response.dto';
 import { UpdateOrderStatusRequestDto } from '../dtos/update-status.dto';
 import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
+import { OrderStatus } from '../../domain/enum/order-status';
 
 @Controller('orders')
 export class OrderController {
@@ -41,5 +42,9 @@ export class OrderController {
     return { message: 'Estado actualizado correctamente' };
   }
 
+  @Put(':id/confirm')
+  async confirmOrder(@Param('id') id: string): Promise<GetOrderResponseDto> {
+    return this.orderService.confirmOrder(id);
+  }
    
 }
