@@ -243,6 +243,19 @@ export class OrderService {
     return SummaryDto.fromEntity(orderEntity.getSummary());
   }
   
+  async confirmOrder(orderId: string): Promise<GetOrderResponseDto> {
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+
+    if (order.getStatus() !== OrderStatus.Pending) {
+      throw new BadRequestException(`Solo se puede confirmar una orden en estado 'pending'. Estado actual: '${order.getStatus()}'`);
+    }
+
+    await this.UpdateOrderStatus(orderId, OrderStatus.Accepted);
+
+    const updated = await this.orderRepository.findById(orderId);
+    return GetOrderResponseDto.fromEntity(updated!);
+  }
 }
 
 
