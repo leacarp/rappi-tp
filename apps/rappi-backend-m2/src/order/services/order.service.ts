@@ -256,6 +256,52 @@ export class OrderService {
     const updated = await this.orderRepository.findById(orderId);
     return GetOrderResponseDto.fromEntity(updated!);
   }
+  
+  async getWhatsAppLink(orderId: string, phoneRaw: string): Promise<{ url: string }> {
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+
+    const phone = (phoneRaw || '').replace(/[^0-9]/g, '');
+    if (!phone) throw new BadRequestException('Número de teléfono inválido');
+
+    const vendorName = order.getVendor()?.getName() ?? 'Desconocido';
+    const customerName = order.getCustomer()?.getName() ?? 'Desconocido';
+
+    const itemsText = order.getItems()
+      .map(i => `${i.getQuantity()} x ${i.getName()} (${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(i.getPrice())})`)
+      .join(', ');
+
+    const totalFmt = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(order.getSummary().getTotal());
+    const tracking = order.getTrackingNumber();
+    const orderIdText = order.getId().toString();
+
+    const createdAt = order.getCreatedAt();
+    const whenLocal = createdAt.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
+
+    const delivery = order.getDeliveryLocation();
+    const deliveryCoords = `(${delivery.getLatitude()}, ${delivery.getLongitude()})`;
+
+    const pay = order.getPayment();
+    const methodPretty = (pay?.getMethod() ?? '-').toLowerCase().replace(/^\w/, c => c.toUpperCase());
+    const statusPretty = (pay?.getStatus() ?? '-').toLowerCase().replace(/^\w/, c => c.toUpperCase());
+    const tx = pay?.getTransactionId();
+    const paymentLine = `Pago: ${methodPretty} • Estado: ${statusPretty}${tx ? ` • TX: ${tx}` : ''}`;
+
+    const message =
+      `Hola! Quiero confirmar mi pedido.\n` +
+      `Pedido: ${orderIdText}\n` +
+      `Fecha: ${whenLocal}\n` +
+      `Cliente: ${customerName}\n` +
+      `Vendor: ${vendorName}\n` +
+      `Entrega: ${deliveryCoords}\n` +
+      `Items: ${itemsText}\n` +
+      `Total: ${totalFmt}\n` +
+      `${paymentLine}\n` +
+      `Tracking: ${tracking}`;
+
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    return { url };
+  }
 }
 
 
