@@ -31,7 +31,7 @@ interface PopulatedCustomer extends PopulatedUser {
 
 
 @Injectable()
-export class OrderRepository implements IOrderRepository{
+export class OrderRepository implements IOrderRepository {
     constructor(
         @InjectModel(Order.name) private orderModel : Model<OrderDocument>
     ){}
@@ -145,7 +145,18 @@ export class OrderRepository implements IOrderRepository{
 
     return new CustomerBasicEntity(id, name, email, address);
   }
+  async confirm(orderId: string, trackingNumber: string): Promise<void> {
+    if(!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
+    const result = await this.orderModel.updateOne(
+      { _id: orderId },
+      { $set: { status: OrderStatus.Accepted, trackingNumber } }
+    );
 
+    if (result.matchedCount === 0) {
+      throw new BadRequestException('Orden no encontrada');
+    }
+  }
+  
   private mapUser(user: Types.ObjectId | PopulatedUser | null | undefined): UserBasicEntity | undefined {;
       if (!user || typeof user === 'string') return undefined;
       const populated = user as PopulatedUser;

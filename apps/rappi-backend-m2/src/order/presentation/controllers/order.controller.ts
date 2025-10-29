@@ -5,6 +5,8 @@ import { GetOrderResponseDto } from '../dtos/get-order-response.dto';
 import { GetUserOrdersResponseDto } from '../dtos/get-orders-response.dto';
 import { UpdateOrderStatusRequestDto } from '../dtos/update-status.dto';
 import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
+import { OrderStatus } from '../../domain/enum/order-status';
+import { ConfirmOrderResponseDto } from '../dtos/confirm-order-response.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -41,5 +43,15 @@ export class OrderController {
     return { message: 'Estado actualizado correctamente' };
   }
 
+  @Put(':id/confirm')
+  async confirmOrder(@Param('id') id: string, @Query('phone') phone?: string): Promise<ConfirmOrderResponseDto> {
+    const order = await this.orderService.confirmOrder(id);
+    let whatsappLink = '';
+    if (phone) {
+      const { url } = await this.orderService.getWhatsAppLink(id, phone);
+      whatsappLink = url;
+    }
+    return ConfirmOrderResponseDto.of(order, whatsappLink);
+  }
    
 }
