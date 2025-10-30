@@ -83,6 +83,13 @@ export class OrderService {
     return GetUserOrdersResponseDto.fromEntities(orders)
   }
 
+  async getOrdersByStatus(status?: string): Promise<GetUserOrdersResponseDto> {
+    const filter: OrderFilter = status ? { status } : {};
+    const orders = await this.orderRepository.findByFilter(filter);
+    if(!orders.length) return new GetUserOrdersResponseDto([]);
+    return GetUserOrdersResponseDto.fromEntities(orders)
+  }
+
   async getDriverCompletedOrders(driverId: string): Promise<GetUserOrdersResponseDto> {
     const orders = await this.orderRepository.findByDriverAndStatus(driverId, OrderStatus.Delivered);
 

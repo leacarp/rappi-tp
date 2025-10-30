@@ -22,21 +22,26 @@ export class OrderController {
     return this.orderService.getOrdersByUserRole(userId, role, status);
   }
 
+  
   @Get('driver/:driverId/completed')
   async getDriverCompletedOrders(@Param('driverId') driverId: string): Promise<GetUserOrdersResponseDto> {
     return this.orderService.getDriverCompletedOrders(driverId);
+  }
+  
+  @Get(':id/summary')
+  async getOrderSummary(@Param('id') id: string): Promise<SummaryDto> { 
+    return this.orderService.getOrderSummary(id);
   }
   
   @Get(':id')
   async getOrderById(@Param('id') id: string): Promise<GetOrderResponseDto> {
     return this.orderService.getOrderById(id);
   }
-
-  @Get(':id/summary')
-  async getOrderSummary(@Param('id') id: string): Promise<SummaryDto> { 
-    return this.orderService.getOrderSummary(id);
+  
+  @Get()
+  async getAllOrders(@Query('status') status?: string): Promise<GetUserOrdersResponseDto> {
+    return this.orderService.getOrdersByStatus(status);
   }
-
   @Put(':id/status')
   async updateOrderStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusRequestDto): Promise<{ message: string }> {
     await this.orderService.UpdateOrderStatus(id, dto.status);
