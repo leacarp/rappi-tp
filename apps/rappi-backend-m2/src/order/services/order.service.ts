@@ -25,6 +25,7 @@ import { PickupLocationDtoService } from './dtos/order/pickupLocation-service.dt
 import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
 import { SummaryDto } from '../presentation/dtos/order-dto-response/summary.dto';
+import { OrderFilter } from '../domain/interfaces/IOrderRepository';
 
 
 @Injectable()
@@ -65,12 +66,16 @@ export class OrderService {
     return GetOrderResponseDto.fromEntity(orderEntity);
   }
 
-  async getOrdersByUser(userId: string, role: 'customer' | 'vendor' | 'driver'): Promise<GetUserOrdersResponseDto> {
+  async getOrdersByUserRole(userId: string, role: 'customer' | 'vendor' | 'driver', status?: string): Promise<GetUserOrdersResponseDto> {
     const field = role === 'vendor' ? 'vendorId' : 
     role === 'driver' ? 'driverId' :
     'customerId';
 
-    const orders = await this.orderRepository.findByField(field, userId);
+    const filter : OrderFilter = { [field]: new Types.ObjectId(userId) };
+
+    if(status) filter.status = status;
+
+    const orders = await this.orderRepository.findByFilter(filter);
 
     if(!orders.length)
       return new GetUserOrdersResponseDto([]);

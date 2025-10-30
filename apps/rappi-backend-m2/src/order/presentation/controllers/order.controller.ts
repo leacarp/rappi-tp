@@ -18,8 +18,8 @@ export class OrderController {
   }
 
   @Get('user/:userId')
-  async getOrdersByUser(@Param('userId') userId: string, @Query('role') role: 'customer' | 'vendor' | 'driver'): Promise<GetUserOrdersResponseDto> {
-    return this.orderService.getOrdersByUser(userId, role);
+  async getOrdersByUser(@Param('userId') userId: string, @Query('role') role: 'customer' | 'vendor' | 'driver', @Query('status') status?: string): Promise<GetUserOrdersResponseDto> {
+    return this.orderService.getOrdersByUserRole(userId, role, status);
   }
 
   @Get('driver/:driverId/completed')

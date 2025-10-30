@@ -13,6 +13,7 @@ import { ProductOfItem } from '../../domain/entities/product-of-item.entity';
 import { OrderStatus } from '../../domain/enum/order-status';
 import { UserBasicEntity } from '../../domain/entities/user-basic';
 import { CustomerBasicEntity } from '../../domain/entities/customer-basic';
+import { OrderFilter } from '../../domain/interfaces/IOrderRepository';
 interface PopulatedUser {
   _id: Types.ObjectId;
   email: string;
@@ -97,8 +98,8 @@ export class OrderRepository implements IOrderRepository {
 
     
     
-   async findByField(field: string, value: string): Promise<OrderEntity[]> {
-      const orders = await this.orderModel.find({ [field]: new Types.ObjectId(value) }).exec();
+   async findByFilter(filter: OrderFilter): Promise<OrderEntity[]> {
+      const orders = await this.orderModel.find( filter ).exec();
       return orders.map(order => this.toDomain(order));
    }
 
