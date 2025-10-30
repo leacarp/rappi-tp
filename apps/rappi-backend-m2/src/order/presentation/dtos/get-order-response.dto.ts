@@ -5,11 +5,12 @@ import { PaymentDto } from "./order-dto-response/payment.dto";
 import { SummaryDto } from "./order-dto-response/summary.dto";
 import { UserBasicDto } from "./order-dto-response/user-basic.dto";
 import { OrderEntity } from "../../domain/entities/order.entity";
+import { CustomerBasicDto } from "./order-dto-response/customer-basic.dto";
 
 export class GetOrderResponseDto {
   constructor(
     private readonly _id: string,
-    private readonly _customer: UserBasicDto,
+    private readonly _customer: CustomerBasicDto,
     private readonly _vendor: UserBasicDto,
     private readonly _driver: UserBasicDto,
     private readonly _status: string,
@@ -28,7 +29,7 @@ export class GetOrderResponseDto {
     return this._id;
   }
 
-  getCustomer(): UserBasicDto {
+  getCustomer(): CustomerBasicDto {
     return this._customer;
   }
 
@@ -79,7 +80,7 @@ export class GetOrderResponseDto {
   static fromEntity(order: OrderEntity): GetOrderResponseDto {
     return new GetOrderResponseDto(
       order.getId().toString(),
-      UserBasicDto.fromEntity(order.getCustomer()),
+      CustomerBasicDto.fromEntity(order.getCustomer()),
       UserBasicDto.fromEntity(order.getVendor()),
       UserBasicDto.fromEntity(order.getDriver()),
       order.getStatus(),

@@ -7,6 +7,7 @@ import { Types } from 'mongoose';
 import { OrderStatus } from "../enum/order-status";
 import { BadRequestException } from "@nestjs/common";
 import { UserBasicEntity } from "./user-basic";
+import { CustomerBasicEntity } from "./customer-basic";
 
 
 export class OrderEntity{
@@ -23,7 +24,7 @@ export class OrderEntity{
     private _payment: Payment;
     private _trackingNumber: string;
     private _notes: string;
-    private _customer?: UserBasicEntity;
+    private _customer?: CustomerBasicEntity;
     private _vendor?: UserBasicEntity;
     private _driver?: UserBasicEntity;
 
@@ -41,7 +42,7 @@ export class OrderEntity{
         trackingNumber: string, 
         notes: string,
         createdAt?: Date,
-        customerData?: UserBasicEntity,
+        customerData?: CustomerBasicEntity,
         vendorData?: UserBasicEntity,
         driverData?: UserBasicEntity
     ){
@@ -121,7 +122,7 @@ export class OrderEntity{
         this._items.push(item);
     }
 
-    getCustomer(): UserBasicEntity | undefined{
+    getCustomer(): CustomerBasicEntity | undefined{
         return this._customer;
     }
 

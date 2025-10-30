@@ -16,7 +16,7 @@ import { ProductController } from './presentation/controllers/product.controller
 // Adapter
 import { ProductAdapter } from './infrastructure/adapters/product.adapter';
 import { PRODUCT_REPOSITORY } from './infrastructure/constants/product-repository.constants';
-import { PRODUCT_ADAPTER } from '../order/infrastructure/constants/product-adapter.constants';
+import { PRODUCT_ADAPTER } from './infrastructure/constants/product-adapter.constants';
 
 @Module({
   imports: [
