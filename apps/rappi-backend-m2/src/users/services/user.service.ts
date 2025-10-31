@@ -290,6 +290,18 @@ export class UserService {
     return GetCartResponseService.fromEntities(user.getCart());
   }
 
+  async getDriverAvailability(userId: string): Promise<boolean> {
+    const user = await this.userRepository.getUserById(userId);
+
+    if (!user)
+      throw new NotFoundException('Usuario no encontrado');
+
+    if (user.getRole() !== 'driver')
+      throw new NotFoundException('Usuario no es un driver');
+    
+    return user.getProfile().getDriverInfo().getIsAvailable();
+  }
+
   async updateDriverAvailability(userId: string, isAvailable: boolean): Promise<void> {
     const user = await this.userRepository.getUserById(userId);
     if (!user) throw new NotFoundException('Usuario no encontrado');
