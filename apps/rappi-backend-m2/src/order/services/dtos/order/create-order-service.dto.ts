@@ -1,16 +1,16 @@
+import { Types } from 'mongoose';
 import { PickupLocationDtoService } from './pickupLocation-service.dto';
-import { DeliveryLocationDtoService } from './deliveryLocation-service.dto';
 import { ItemsDtoService } from './items-service.dto';
 import { SummaryDtoService } from './summary-service.dto';
 import { PaymentDtoService } from './payment-service.dto';
 import { OrderEntity } from '../../../domain/entities/order.entity';
+import { OrderStatus } from '../../../domain/enum/order-status';
+import { Items } from '../../../domain/entities/items.entity';
 
 export class CreateOrderDto {
   private readonly _customerId: string;
   private readonly _vendorId: string;
-  private readonly _driverId: string;
   private readonly _pickupLocation: PickupLocationDtoService;
-  private readonly _deliveryLocation: DeliveryLocationDtoService;
   private readonly _items: ItemsDtoService[];
   private readonly _summary: SummaryDtoService;
   private readonly _payment: PaymentDtoService;
@@ -20,9 +20,7 @@ export class CreateOrderDto {
   constructor(
     customerId: string,
     vendorId: string,
-    driverId: string,
     pickupLocation: PickupLocationDtoService,
-    deliveryLocation: DeliveryLocationDtoService,
     items: ItemsDtoService[],
     summary: SummaryDtoService,
     payment: PaymentDtoService,
@@ -31,9 +29,7 @@ export class CreateOrderDto {
   ) {
     this._customerId = customerId;
     this._vendorId = vendorId;
-    this._driverId = driverId;
     this._pickupLocation = pickupLocation;
-    this._deliveryLocation = deliveryLocation;
     this._items = items;
     this._summary = summary;
     this._payment = payment;
@@ -49,16 +45,8 @@ export class CreateOrderDto {
     return this._vendorId;
   }
 
-  getDriverId(): string {
-    return this._driverId;
-  }
-
   getPickupLocation(): PickupLocationDtoService {
     return this._pickupLocation;
-  }
-
-  getDeliveryLocation(): DeliveryLocationDtoService {
-    return this._deliveryLocation;
   }
 
   getItems(): ItemsDtoService[] {
@@ -80,15 +68,12 @@ export class CreateOrderDto {
   getNotes(): string {
     return this._notes;
   }
-
   
   static fromEntity(order: OrderEntity): CreateOrderDto {
     return new CreateOrderDto(
       order.getCustomerId().toHexString(),
       order.getVendorId().toHexString(),
-      order.getDriverId().toHexString(),
       PickupLocationDtoService.fromEntity(order.getPickupLocation()),
-      DeliveryLocationDtoService.fromEntity(order.getDeliveryLocation()),
       order.getItems().map(ItemsDtoService.fromEntity),
       SummaryDtoService.fromEntity(order.getSummary()),
       PaymentDtoService.fromEntity(order.getPayment()),
@@ -96,5 +81,21 @@ export class CreateOrderDto {
       order.getNotes()
     );
   }
-}
 
+  static toEntity(createOrderDto: CreateOrderDto, items: Items[]): OrderEntity {
+    return new OrderEntity(
+      new Types.ObjectId(),
+      new Types.ObjectId(createOrderDto.getCustomerId()),
+      new Types.ObjectId(createOrderDto.getVendorId()),
+      null,
+      OrderStatus.Pending,
+      PickupLocationDtoService.toEntity(createOrderDto.getPickupLocation()),
+      null,
+      items,
+      SummaryDtoService.toEntity(createOrderDto.getSummary()),
+      PaymentDtoService.toEntity(createOrderDto.getPayment()),
+      createOrderDto.getTrackingNumber(),
+      createOrderDto.getNotes()
+    );
+  }
+}

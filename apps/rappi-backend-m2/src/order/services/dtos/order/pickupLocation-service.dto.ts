@@ -14,4 +14,8 @@ export class PickupLocationDtoService{
    static fromEntity(pickup: PickUpLocation): PickupLocationDtoService {
         return new PickupLocationDtoService(pickup.getLatitude(), pickup.getLongitude());
    }
+
+   static toEntity(pickupLocationDto: PickupLocationDtoService): PickUpLocation {
+    return new PickUpLocation(pickupLocationDto.getLatitude(), pickupLocationDto.getLongitude());
+   }
 }

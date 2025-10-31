@@ -6,9 +6,10 @@ export class CustomerBasicEntity extends UserBasicEntity{
     id: Types.ObjectId,
     name: string,
     email: string,
+    phone: string,
     private readonly address?: string
   ) {
-    super(id, name, email);
+    super(id, name, email, phone);
   }
 
   getAddress(): string | undefined { return this.address; }

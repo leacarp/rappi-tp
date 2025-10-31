@@ -10,7 +10,8 @@ export class DeliveryLocationDto{
     return this._longitude;
    }
 
-   static fromEntity(deliveryLocation: DeliveryLocation): DeliveryLocationDto {
-         return new DeliveryLocationDto(deliveryLocation.getLatitude(), deliveryLocation.getLongitude());
+   static fromEntity(deliveryLocation: DeliveryLocation | null): DeliveryLocationDto | null {
+      if (!deliveryLocation) return null;
+      return new DeliveryLocationDto(deliveryLocation.getLatitude(), deliveryLocation.getLongitude());
    }
 }
