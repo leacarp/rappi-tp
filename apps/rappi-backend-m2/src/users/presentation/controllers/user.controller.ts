@@ -24,6 +24,7 @@ import { AddCartItemRequest } from '../dtos/add-cart-item-request';
 import { SetCartItemQuantityRequest } from '../dtos/set-cart-item-quantity-request';
 import { GetCartResponse } from '../dtos/get-cart-response';
 import { UpdateDriverAvailabilityRequest } from '../dtos/update-driver-availability-request';
+import { GetDriverAvailabilityResponse } from '../dtos/get-driver-availability-response';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -109,6 +110,14 @@ export class UserController {
   ): Promise<void> {
     const serviceDto = body.toServiceDto(productId);
     await this.userService.setCartItemQuantity(userId, serviceDto);
+  }
+
+  @Get(':userId/driver/availability')
+  async getDriverAvailability(
+    @Param('userId') userId: string
+  ): Promise<GetDriverAvailabilityResponse> {
+    const isAvailable = await this.userService.getDriverAvailability(userId);
+    return GetDriverAvailabilityResponse.fromServiceDto(isAvailable);
   }
 
   @Put(':userId/driver/availability')
