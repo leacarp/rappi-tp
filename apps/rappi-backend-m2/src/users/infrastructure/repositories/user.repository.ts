@@ -253,6 +253,11 @@ export class UserRepository implements IUserRepository {
     return updated ? this.mapToUserEntity(updated) : null;
   }
 
+  async existsUser(userId: string): Promise<boolean> {
+    const user = await this.userModel.exists({ _id: userId });
+    return !!user;
+  }
+
   private mapToUserEntity(userDoc: UserDocument): User {
     const addresses = (userDoc.profile?.addresses || []).map((addr: AddressSchema) => 
       new Address(
