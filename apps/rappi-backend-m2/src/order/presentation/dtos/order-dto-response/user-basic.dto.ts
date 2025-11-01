@@ -15,7 +15,8 @@ export class UserBasicDto{
         return this._email;
     }
 
-    static fromEntity(user: UserBasicEntity): UserBasicDto {
+    static fromEntity(user: UserBasicEntity | undefined): UserBasicDto | null {
+        if (!user) return null;
         return new UserBasicDto(user.getId().toHexString(), user.getName(), user.getEmail());
     }
    

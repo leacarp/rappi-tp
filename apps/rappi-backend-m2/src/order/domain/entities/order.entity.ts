@@ -14,11 +14,11 @@ export class OrderEntity{
     private readonly _id: Types.ObjectId;
     private readonly _customerId: Types.ObjectId;
     private readonly _vendorId : Types.ObjectId;
-    private readonly _driverId: Types.ObjectId;
+    private readonly _driverId: Types.ObjectId | null;
     private _status: OrderStatus;
     private _createdAt: Date;
     private _pickupLocation: PickUpLocation;
-    private _deliveryLocation: DeliveryLocation;
+    private _deliveryLocation: DeliveryLocation | null;
     private _items: Items[];
     private _summary : Summary;
     private _payment: Payment;
@@ -32,10 +32,10 @@ export class OrderEntity{
         id: Types.ObjectId, 
         customerId: Types.ObjectId, 
         vendorId: Types.ObjectId, 
-        driverId: Types.ObjectId, 
+        driverId: Types.ObjectId | null, 
         status: OrderStatus, 
         pickupLocation: PickUpLocation, 
-        deliveryLocation: DeliveryLocation, 
+        deliveryLocation: DeliveryLocation | null, 
         items: Items[], 
         summary: Summary, 
         payment: Payment, 
@@ -78,7 +78,7 @@ export class OrderEntity{
         return this._vendorId;
     }
 
-    getDriverId(): Types.ObjectId{
+    getDriverId(): Types.ObjectId | null {
         return this._driverId;
     }
 
@@ -94,7 +94,7 @@ export class OrderEntity{
         return this._pickupLocation;
     }
 
-    getDeliveryLocation(): DeliveryLocation{
+    getDeliveryLocation(): DeliveryLocation | null {
         return this._deliveryLocation;
     }
 

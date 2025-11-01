@@ -1,37 +1,63 @@
 import { Summary } from "../../../domain/entities/summary.entity";
 
 export class SummaryDtoService{
-    constructor(
-        private readonly _subtotal : number, 
-        private readonly _shippingCost : number, 
-        private readonly _taxes : number, 
-        private readonly _discount : number, 
-        private readonly _total : number)
-        {}
+  private readonly _subtotal : number; 
+  private readonly _shippingCost : number; 
+  private readonly _taxes : number; 
+  private readonly _discount : number; 
+  private readonly _total : number;
 
-        getSubtotal() : number{
-            return this._subtotal;
-        }
+  constructor(
+    subtotal: number,
+    shippingCost: number,
+    taxes: number,
+    discount: number,
+    total: number
+  ) {
+    this._subtotal = subtotal;
+    this._shippingCost = shippingCost;
+    this._taxes = taxes;
+    this._discount = discount;
+    this._total = total;
+  }
 
-        getShippingCost() : number{
-            return this._shippingCost;
-        }
+  getSubtotal() : number{
+      return this._subtotal;
+  }
 
-        getTaxes() : number{
-            return this._taxes;
-        }
+  getShippingCost() : number{
+      return this._shippingCost;
+  }
 
-        getDiscount() : number{
-            return this._discount;
-        }
+  getTaxes() : number{
+      return this._taxes;
+  }
 
-        getTotal() : number{
-            return this._total;
-        }
+  getDiscount() : number{
+      return this._discount;
+  }
 
-        static fromEntity(summary : Summary) : SummaryDtoService{
-            return new SummaryDtoService(summary.getSubTotal(), summary.getShippingCost(),
-                    summary.getTaxes(), summary.getDiscount(), summary.getTotal())
-        }
-    
+  getTotal() : number{
+      return this._total;
+  }
+
+  static fromEntity(summary : Summary) : SummaryDtoService{
+    return new SummaryDtoService(
+      summary.getSubTotal(),
+      summary.getShippingCost(),
+      summary.getTaxes(),
+      summary.getDiscount(),
+      summary.getTotal()
+    );
+  }
+
+  static toEntity(summaryDto: SummaryDtoService): Summary {
+    return new Summary(
+      summaryDto.getSubtotal(),
+      summaryDto.getShippingCost(),
+      summaryDto.getTaxes(),
+      summaryDto.getDiscount(),
+      summaryDto.getTotal()
+    );
+  }
 }

@@ -19,68 +19,71 @@ interface PopulatedUser {
   email: string;
   profile?: {
     name: string;
+    phone?: string;
   };
 }
 interface PopulatedCustomer extends PopulatedUser {
   profile?: {
     name: string;
+    phone?: string;
     addresses?: Array<{
       street: string;
     }>;
   };
 }
 
-
 @Injectable()
 export class OrderRepository implements IOrderRepository {
-    constructor(
-        @InjectModel(Order.name) private orderModel : Model<OrderDocument>
-    ){}
+  constructor(
+    @InjectModel(Order.name) private orderModel : Model<OrderDocument>
+  ){}
 
-     async create(order: OrderEntity): Promise<OrderEntity> {
-          const createdOrder = new this.orderModel({
-          customerId: order.getCustomerId(),
-          vendorId: order.getVendorId(),
-          driverId: order.getDriverId(),
-          status: order.getStatus(),
-          pickUpLocation: {
-            latitude: order.getPickupLocation().getLatitude(),
-            longitude: order.getPickupLocation().getLongitude()
-          },
-          deliveryLocation: {
-            latitude: order.getDeliveryLocation().getLatitude(),
-            longitude: order.getDeliveryLocation().getLongitude()
-          },
-          items: order.getItems().map(item => ({
-            productId: item.getProductId(),
-            name: item.getName(),
-            quantity: item.getQuantity(),
-            price: item.getQuantity()
-          })),
-          summary: {
-            subtotal: order.getSummary().getSubTotal(),
-            shippingCost: order.getSummary().getShippingCost(),
-            taxes: order.getSummary().getTaxes(),
-            discount: order.getSummary().getDiscount(),
-            total: order.getSummary().getTotal()
-          },
-          payment: {
-            method: order.getPayment().getMethod(),
-            status: order.getPayment().getStatus(),
-            transactionId: order.getPayment().getTransactionId()
-          },
-          trackingNumber: order.getTrackingNumber(),
-          notes: order.getNotes(),
-          });
-    
-        const savedOrder = await createdOrder.save();
-        const populatedOrder = await this.orderModel.findById(savedOrder.id)
-          .populate('customerId', 'email profile profile.addresses')
-          .populate('vendorId', 'email profile')
-          .populate('driverId', 'email profile')
-          .exec();
-        return this.toEntity(populatedOrder);
-      }
+  async create(order: OrderEntity): Promise<OrderEntity> {
+    const createdOrder = new this.orderModel({
+      customerId: order.getCustomerId(),
+      vendorId: order.getVendorId(),
+      driverId: order.getDriverId(),
+      status: order.getStatus(),
+      pickUpLocation: {
+        latitude: order.getPickupLocation().getLatitude(),
+        longitude: order.getPickupLocation().getLongitude()
+      },
+      deliveryLocation: order.getDeliveryLocation() ? {
+        latitude: order.getDeliveryLocation()!.getLatitude(),
+        longitude: order.getDeliveryLocation()!.getLongitude()
+      } : null,
+      items: order.getItems().map(item => ({
+        productId: item.getProductId(),
+        name: item.getName(),
+        quantity: item.getQuantity(),
+        price: item.getQuantity()
+      })),
+      summary: {
+        subtotal: order.getSummary().getSubTotal(),
+        shippingCost: order.getSummary().getShippingCost(),
+        taxes: order.getSummary().getTaxes(),
+        discount: order.getSummary().getDiscount(),
+        total: order.getSummary().getTotal()
+      },
+      payment: {
+        method: order.getPayment().getMethod(),
+        status: order.getPayment().getStatus(),
+        transactionId: order.getPayment().getTransactionId()
+      },
+      trackingNumber: order.getTrackingNumber(),
+      notes: order.getNotes(),
+    });
+
+    const savedOrder = await createdOrder.save();
+
+    const populatedOrder = await this.orderModel.findById(savedOrder.id)
+      .populate('customerId', 'email profile')
+      .populate('vendorId', 'email profile')
+      .populate('driverId', 'email profile')
+      .exec();
+
+    return this.toEntity(populatedOrder);
+  }
 
     async findById(id: string): Promise<OrderEntity | null> {
         
@@ -88,9 +91,9 @@ export class OrderRepository implements IOrderRepository {
           return null;
         }
         const order = await this.orderModel.findById(id)
-        .populate('customerId', 'email profile.name profile.addresses')
-        .populate('vendorId', 'email profile.name')
-        .populate('driverId', 'email profile.name')
+        .populate('customerId', 'email profile')
+        .populate('vendorId', 'email profile')
+        .populate('driverId', 'email profile')
         .exec();
     
         return order ? this.toEntity(order) : null;
@@ -140,11 +143,12 @@ export class OrderRepository implements IOrderRepository {
       const id = populated._id;
       const email = populated.email;
       const name = populated.profile?.name ?? 'Desconocido';
+      const phone = populated.profile?.phone ?? '';
       const address = populated.profile?.addresses?.[0]?.street;
   
       if (!id || !email) return undefined;
 
-    return new CustomerBasicEntity(id, name, email, address);
+    return new CustomerBasicEntity(id, name, email, phone, address);
   }
   async confirm(orderId: string, trackingNumber: string): Promise<void> {
     if(!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
@@ -163,50 +167,47 @@ export class OrderRepository implements IOrderRepository {
       const populated = user as PopulatedUser;
       const id = populated._id;
       const email = populated.email;
-      const name = populated.profile?.name ?? 'Desconocido';      
+      const name = populated.profile?.name ?? 'Desconocido';
+      const phone = populated.profile?.phone ?? '';      
       if (!id || !email) return undefined;
 
-    return new UserBasicEntity(id, name, email);
+    return new UserBasicEntity(id, name, email, phone);
   }
 
-  
-
-
   private toEntity(orderDoc: OrderDocument): OrderEntity {
-        const items: Items[] = orderDoc.items.map(i =>
-          new Items(new ProductOfItem(i.productId, i.name, i.price), i.quantity)
-        );
+    const items: Items[] = orderDoc.items.map(i =>
+      new Items(new ProductOfItem(i.productId, i.name, i.price), i.quantity)
+    );
 
-        const customerData = this.mapCustomer(orderDoc.customerId);
-        const vendorData = this.mapUser(orderDoc.vendorId);
-        const driverData = this.mapUser(orderDoc.driverId);
+    const customerData = this.mapCustomer(orderDoc.customerId);
+    const vendorData = this.mapUser(orderDoc.vendorId);
+    const driverData = this.mapUser(orderDoc.driverId);
 
-        return new OrderEntity(
-          orderDoc._id as Types.ObjectId,
-          customerData?.getId() ?? orderDoc.customerId as Types.ObjectId,
-          vendorData?.getId() ?? orderDoc.vendorId as Types.ObjectId,
-          driverData?.getId() ?? orderDoc.driverId as Types.ObjectId,
-          orderDoc.status,
-          new PickUpLocation(orderDoc.pickUpLocation.latitude, orderDoc.pickUpLocation.longitude),
-          new DeliveryLocation(orderDoc.deliveryLocation.latitude, orderDoc.deliveryLocation.longitude),
-          items,
-          new Summary(
-            orderDoc.summary.subtotal,
-            orderDoc.summary.shippingCost,
-            orderDoc.summary.taxes,
-            orderDoc.summary.discount,
-            orderDoc.summary.total
-          ),
-          new Payment(orderDoc.payment.method, orderDoc.payment.status, orderDoc.payment.transactionId),
-          orderDoc.trackingNumber,
-          orderDoc.notes,
-          orderDoc.createdAt,
-          customerData,
-          vendorData,
-          driverData
-        );
-    }
-
+    return new OrderEntity(
+      orderDoc._id as Types.ObjectId,
+      customerData?.getId() ?? orderDoc.customerId as Types.ObjectId,
+      vendorData?.getId() ?? orderDoc.vendorId as Types.ObjectId,
+      driverData?.getId() ?? (orderDoc.driverId as Types.ObjectId | null),
+      orderDoc.status,
+      new PickUpLocation(orderDoc.pickUpLocation.latitude, orderDoc.pickUpLocation.longitude),
+      orderDoc.deliveryLocation ? new DeliveryLocation(orderDoc.deliveryLocation.latitude, orderDoc.deliveryLocation.longitude) : null,
+      items,
+      new Summary(
+        orderDoc.summary.subtotal,
+        orderDoc.summary.shippingCost,
+        orderDoc.summary.taxes,
+        orderDoc.summary.discount,
+        orderDoc.summary.total
+      ),
+      new Payment(orderDoc.payment.method, orderDoc.payment.status, orderDoc.payment.transactionId),
+      orderDoc.trackingNumber,
+      orderDoc.notes,
+      orderDoc.createdAt,
+      customerData,
+      vendorData,
+      driverData
+    );
+  }
 
     private toDomain(order: OrderDocument): OrderEntity {
       const items: Items[] = order.items.map(i =>
@@ -219,10 +220,10 @@ export class OrderRepository implements IOrderRepository {
         order.id as Types.ObjectId,
         order.customerId,
         order.vendorId,
-        order.driverId,
+        order.driverId as Types.ObjectId | null,
         order.status,
         new PickUpLocation(order.pickUpLocation.latitude, order.pickUpLocation.longitude),
-        new DeliveryLocation(order.deliveryLocation.latitude, order.deliveryLocation.longitude),
+        order.deliveryLocation ? new DeliveryLocation(order.deliveryLocation.latitude, order.deliveryLocation.longitude) : null,
         items,
         new Summary(
                         order.summary.subtotal, 

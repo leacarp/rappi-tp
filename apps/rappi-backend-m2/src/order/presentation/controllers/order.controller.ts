@@ -5,7 +5,6 @@ import { GetOrderResponseDto } from '../dtos/get-order-response.dto';
 import { GetUserOrdersResponseDto } from '../dtos/get-orders-response.dto';
 import { UpdateOrderStatusRequestDto } from '../dtos/update-status.dto';
 import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
-import { OrderStatus } from '../../domain/enum/order-status';
 import { ConfirmOrderResponseDto } from '../dtos/confirm-order-response.dto';
 
 @Controller('orders')
@@ -13,8 +12,14 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  async createOrder(@Body() createOrderRequestDto: CreateOrderRequestDto): Promise<GetOrderResponseDto> {
-    return this.orderService.createOrder(createOrderRequestDto);
+  async createOrder(@Body() createOrderRequestDto: CreateOrderRequestDto): Promise<ConfirmOrderResponseDto> {
+    const createOrderDto = createOrderRequestDto.toServiceDto();
+
+    const newOrder = await this.orderService.createOrder(createOrderDto);
+
+    const { url } = await this.orderService.getWhatsAppLink(newOrder.getId());
+    
+    return ConfirmOrderResponseDto.of(newOrder, url);
   }
 
   @Get('user/:userId')
@@ -49,14 +54,8 @@ export class OrderController {
   }
 
   @Put(':id/confirm')
-  async confirmOrder(@Param('id') id: string, @Query('phone') phone?: string): Promise<ConfirmOrderResponseDto> {
+  async confirmOrder(@Param('id') id: string): Promise<ConfirmOrderResponseDto> {
     const order = await this.orderService.confirmOrder(id);
-    let whatsappLink = '';
-    if (phone) {
-      const { url } = await this.orderService.getWhatsAppLink(id, phone);
-      whatsappLink = url;
-    }
-    return ConfirmOrderResponseDto.of(order, whatsappLink);
+    return ConfirmOrderResponseDto.of(order, '');
   }
-   
 }

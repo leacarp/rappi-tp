@@ -8,5 +8,4 @@ export class DeliveryLocationRequestDto{
   @IsNotEmpty()
   @IsNumber()
   longitude: number;
-
 }

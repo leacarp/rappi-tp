@@ -8,21 +8,49 @@ import { OrderEntity } from "../../domain/entities/order.entity";
 import { CustomerBasicDto } from "./order-dto-response/customer-basic.dto";
 
 export class GetOrderResponseDto {
+  private readonly _id: string;
+  private readonly _customer: CustomerBasicDto;
+  private readonly _vendor: UserBasicDto;
+  private readonly _driver: UserBasicDto | null;
+  private readonly _status: string;
+  private readonly _createdAt: Date;
+  private readonly _pickupLocation: PickupLocationDto;
+  private readonly _deliveryLocation: DeliveryLocationDto | null;
+  private readonly _items: ItemsDto[];
+  private readonly _summary: SummaryDto;
+  private readonly _payment: PaymentDto;
+  private readonly _trackingNumber: string;
+  private readonly _notes: string;
+
   constructor(
-    private readonly _id: string,
-    private readonly _customer: CustomerBasicDto,
-    private readonly _vendor: UserBasicDto,
-    private readonly _driver: UserBasicDto,
-    private readonly _status: string,
-    private readonly _createdAt: Date,
-    private readonly _pickupLocation: PickupLocationDto,
-    private readonly _deliveryLocation: DeliveryLocationDto,
-    private readonly _items: ItemsDto[],
-    private readonly _summary: SummaryDto,
-    private readonly _payment: PaymentDto,
-    private readonly _trackingNumber: string,
-    private readonly _notes: string
-  ) {}
+    id: string,
+    customer: CustomerBasicDto,
+    vendor: UserBasicDto,
+    driver: UserBasicDto | null,
+    status: string,
+    createdAt: Date,
+    pickupLocation: PickupLocationDto,
+    deliveryLocation: DeliveryLocationDto | null,
+    items: ItemsDto[],
+    summary: SummaryDto,
+    payment: PaymentDto,
+    trackingNumber: string,
+    notes: string
+  ) {
+    this._id = id;
+    this._customer = customer;
+    this._vendor = vendor;
+    this._driver = driver;
+    this._status = status;
+    this._createdAt = createdAt;
+    this._pickupLocation = pickupLocation;
+    this._deliveryLocation = deliveryLocation;
+    this._items = items;
+    this._summary = summary;
+    this._payment = payment;
+    this._trackingNumber = trackingNumber;
+    this._notes = notes;
+  }
 
   
   getId(): string {
@@ -37,7 +65,7 @@ export class GetOrderResponseDto {
     return this._vendor;
   }
 
-  getDriver(): UserBasicDto {
+  getDriver(): UserBasicDto | null {
     return this._driver;
   }
 
@@ -53,7 +81,7 @@ export class GetOrderResponseDto {
     return this._pickupLocation;
   }
 
-  getDeliveryLocation(): DeliveryLocationDto {
+  getDeliveryLocation(): DeliveryLocationDto | null {
     return this._deliveryLocation;
   }
 
@@ -82,11 +110,11 @@ export class GetOrderResponseDto {
       order.getId().toString(),
       CustomerBasicDto.fromEntity(order.getCustomer()),
       UserBasicDto.fromEntity(order.getVendor()),
-      UserBasicDto.fromEntity(order.getDriver()),
+      UserBasicDto.fromEntity(order.getDriver()) ?? null,
       order.getStatus(),
       order.getCreatedAt(),
       PickupLocationDto.fromEntity(order.getPickupLocation()),
-      DeliveryLocationDto.fromEntity(order.getDeliveryLocation()),
+      DeliveryLocationDto.fromEntity(order.getDeliveryLocation()) ?? null,
       order.getItems().map(ItemsDto.fromEntity),
       SummaryDto.fromEntity(order.getSummary()),
       PaymentDto.fromEntity(order.getPayment()),

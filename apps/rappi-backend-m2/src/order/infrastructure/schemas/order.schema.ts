@@ -19,8 +19,8 @@ export class Order{
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     vendorId: Types.ObjectId; 
 
-    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-    driverId: Types.ObjectId; 
+    @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+    driverId?: Types.ObjectId; 
     
     @Prop({ type: String, enum: Object.values(OrderStatus), required: true })
     status: OrderStatus;
