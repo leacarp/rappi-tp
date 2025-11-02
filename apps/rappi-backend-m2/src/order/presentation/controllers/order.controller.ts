@@ -6,6 +6,7 @@ import { GetUserOrdersResponseDto } from '../dtos/get-orders-response.dto';
 import { UpdateOrderStatusRequestDto } from '../dtos/update-status.dto';
 import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
 import { ConfirmOrderResponseDto } from '../dtos/confirm-order-response.dto';
+import { AcceptOrderDto } from '../dtos/confirm-driver.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -57,5 +58,11 @@ export class OrderController {
   async confirmOrder(@Param('id') id: string): Promise<ConfirmOrderResponseDto> {
     const order = await this.orderService.confirmOrder(id);
     return ConfirmOrderResponseDto.of(order, '');
+  }
+
+  @Put(':id/accept-driver')
+  async acceptOrderByDriver(@Param('id') orderId: string, @Body() dto: AcceptOrderDto): Promise<{message: string}> {
+    await this.orderService.acceptOrderByDriver(orderId, dto.driverId);
+    return {message: 'Driver asignado correctamente'};
   }
 }

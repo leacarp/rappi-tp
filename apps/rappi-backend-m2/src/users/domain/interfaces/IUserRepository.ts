@@ -35,4 +35,6 @@ export interface IUserRepository {
   updateUserCart(userId: string, cartItems: CartItem[]): Promise<User | null>;
 
   updateDriverAvailability(userId: string, isAvailable: boolean): Promise<User | null>;
+
+  existsUser(userId: string): Promise<boolean>;
 }

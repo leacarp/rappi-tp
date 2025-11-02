@@ -14,7 +14,7 @@ export class OrderEntity{
     private readonly _id: Types.ObjectId;
     private readonly _customerId: Types.ObjectId;
     private readonly _vendorId : Types.ObjectId;
-    private readonly _driverId: Types.ObjectId | null;
+    private _driverId: Types.ObjectId | null;
     private _status: OrderStatus;
     private _createdAt: Date;
     private _pickupLocation: PickUpLocation;
@@ -134,7 +134,13 @@ export class OrderEntity{
         return this._driver;
     }
 
+    setDriverId(driverId: Types.ObjectId) : void {
+        this._driverId = driverId;
+    } 
 
+    setStatus(status: OrderStatus): void {
+        this._status = status;
+    }
 
 
     private validateBusinessRules(): void{

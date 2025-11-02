@@ -29,15 +29,14 @@ export class OrderService {
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
+    const existingOrder = await this.orderRepository.findByTrackingNumber(createOrderDto.getTrackingNumber());
+    if(existingOrder) throw new BadRequestException(`El tracking number ${createOrderDto.getTrackingNumber()} ya existe`)
+      
+    await this.loadAndValidateUsers(createOrderDto.getCustomerId(), createOrderDto.getVendorId());
+    
     const items = await this.loadAndValidateItems(createOrderDto.getItems());  
 
-    await this.loadAndValidateUsers(
-      createOrderDto.getCustomerId(),
-      createOrderDto.getVendorId()
-    );
-
     const orderEntity = CreateOrderDto.toEntity(createOrderDto, items);
-
     const savedOrder = await this.orderRepository.create(orderEntity);
 
     return GetOrderResponseDto.fromEntity(savedOrder);
@@ -141,8 +140,8 @@ export class OrderService {
 
   private async loadAndValidateUsers(customerId: string, vendorId: string): Promise<void> {
     const [customer, vendor] = await Promise.all([
-      this.userAdapter.getUserById(customerId),
-      this.userAdapter.getUserById(vendorId),
+      this.userAdapter.existsUser(customerId),
+      this.userAdapter.existsUser(vendorId),
     ]);
   
     const errors = [];
@@ -221,6 +220,34 @@ export class OrderService {
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     return { url };
   }
+
+  async acceptOrderByDriver(orderId: string, driverId: string): Promise<void> {
+      const order = await this.orderRepository.findById(orderId);
+      if (!order) throw new BadRequestException(`Orden ${orderId} no encontrada`);
+      const driver = await this.userAdapter.existsUser(driverId);
+      if(!driver) throw new BadRequestException('El driver asignado no existe');
+
+      // Validar que la orden esté en estado correcto
+      if (order.getStatus() !== OrderStatus.ReadyForPickup) {
+        throw new BadRequestException(
+          `Solo se puede aceptar una orden en estado 'Ready for pickup'. Estado actual: '${order.getStatus()}'`
+        );
+      }
+
+      // Validar que no tenga driver asignado ya
+      if (order.getDriverId()) {
+        throw new BadRequestException('Esta orden ya tiene un driver asignado');
+      }
+
+      // Asignar driver y cambiar estado
+      order.setDriverId(new Types.ObjectId(driverId));
+      order.setStatus(OrderStatus.InTransit);
+
+      await this.orderRepository.updateOrderDriver(order);
+      
+  }
+
+
 }
 
 

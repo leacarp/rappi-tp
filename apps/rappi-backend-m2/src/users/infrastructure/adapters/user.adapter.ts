@@ -26,6 +26,10 @@ export class UserAdapter implements IUserAdapter {
         if (!user) return null;
         return fromEntityForAuth(user);
     }
+
+    async existsUser(userId: string): Promise<boolean> {
+        return this.userRepository.existsUser(userId);
+    }
 }
 
 function fromEntity(user: User): UserOfAdapter {

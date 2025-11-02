@@ -135,7 +135,33 @@ export class OrderRepository implements IOrderRepository {
       }
   }
 
+  async updateOrderDriver(order: OrderEntity): Promise<void> {
+    if (!Types.ObjectId.isValid(order.getId())) {
+      throw new BadRequestException('Id no válido');
+    }
+    
+    const result = await this.orderModel.updateOne(
+      { _id: order.getId() },
+      {
+        $set: {
+          status: order.getStatus(),
+          driverId: order.getDriverId(),
+        }
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      throw new BadRequestException('Orden no encontrada');
+    }
+  }
   
+  async findByTrackingNumber(trackingNumber: string): Promise<OrderEntity | null> {
+    const order = await this.orderModel.findOne({ trackingNumber }).exec();
+    return order ? this.toDomain(order) : null;
+  }
+
+
+
   private mapCustomer(user: Types.ObjectId | PopulatedCustomer | null | undefined): CustomerBasicEntity | undefined {
   if (!user || typeof user === 'string') return undefined;
   
