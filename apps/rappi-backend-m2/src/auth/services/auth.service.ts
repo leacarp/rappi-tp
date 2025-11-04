@@ -5,9 +5,10 @@ import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.
 import { LoginRequestService } from './dtos/login-request-service';
 import { LoginResponseService } from './dtos/login-response-service';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
+import { IAuthService } from '../domain/interfaces/IAuthService';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService {
   constructor(
     @Inject(USER_ADAPTER)
     private readonly userAdapter: IUserAdapter,

@@ -11,8 +11,10 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
-import { UserService } from '../../services/user.service';
+import { IUserService } from '../../domain/interfaces/IUserService';
+import { USER_SERVICE } from '../../infrastructure/constants/user-service.constants';
 import { CreateAddressRequest } from '../dtos/create-address-request';
 import { GetAddressResponse } from '../dtos/get-address-response';
 import { GetAddressesResponse } from '../dtos/get-addresses-response';
@@ -29,7 +31,10 @@ import { GetDriverAvailabilityResponse } from '../dtos/get-driver-availability-r
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @Inject(USER_SERVICE)
+    private readonly userService: IUserService
+  ) {}
 
   @Get(':userId/addresses')
   async getAddresses(@Param('userId') userId: string): Promise<GetAddressesResponse> {

@@ -8,6 +8,7 @@ import { ProductController } from './presentation/controllers/product.controller
 import { ProductAdapter } from './infrastructure/adapters/product.adapter';
 import { PRODUCT_REPOSITORY } from './infrastructure/constants/product-repository.constants';
 import { PRODUCT_ADAPTER } from './infrastructure/constants/product-adapter.constants';
+import { PRODUCT_SERVICE } from './infrastructure/constants/product-service.constants';
 
 @Module({
   imports: [
@@ -15,7 +16,10 @@ import { PRODUCT_ADAPTER } from './infrastructure/constants/product-adapter.cons
   ],
   controllers: [ProductController],
   providers: [
-    ProductService,
+    {
+      provide: PRODUCT_SERVICE,
+      useClass: ProductService
+    },
     {
       provide: PRODUCT_REPOSITORY,
       useClass: ProductRepository
@@ -25,6 +29,6 @@ import { PRODUCT_ADAPTER } from './infrastructure/constants/product-adapter.cons
       useClass: ProductAdapter
     }
   ],
-  exports: [ProductService, PRODUCT_ADAPTER],
+  exports: [PRODUCT_SERVICE, PRODUCT_ADAPTER],
 })
 export class ProductModule {}

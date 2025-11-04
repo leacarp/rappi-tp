@@ -5,9 +5,10 @@ import { Product } from '../domain/entities/product.entity';
 import { Types } from 'mongoose';
 import { CreateProductServiceDto } from './dtos/create-product-service.dto';
 import { UpdateProductServiceDto } from './dtos/update-product-service.dto';
+import { IProductService } from '../domain/interfaces/IProductService';
 
 @Injectable()
-export class ProductService {
+export class ProductService implements IProductService {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository

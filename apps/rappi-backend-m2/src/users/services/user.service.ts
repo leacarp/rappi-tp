@@ -19,9 +19,10 @@ import { AddCartItemRequestService } from './dtos/add-cart-item-request-service'
 import { SetCartItemQuantityRequestService } from './dtos/set-cart-item-quantity-request-service';
 import { GetCartResponseService } from './dtos/get-cart-response-service';
 import { CartItem } from '../domain/entities/cart-item.entity';
+import { IUserService } from '../domain/interfaces/IUserService';
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: IUserRepository,

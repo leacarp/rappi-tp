@@ -1,5 +1,6 @@
-import { Controller, Post, Put, Get, Param, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Query } from '@nestjs/common';
-import { UserService } from '../../services/user.service';
+import { Controller, Post, Put, Get, Param, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Query, Inject } from '@nestjs/common';
+import { IUserService } from '../../domain/interfaces/IUserService';
+import { USER_SERVICE } from '../../infrastructure/constants/user-service.constants';
 import { CreateReviewRequest } from '../dtos/create-review-request';
 import { GetReviewsResponse } from '../dtos/get-reviews-response';
 import { SearchRestaurantsResponse } from '../dtos/search-restaurants-response';
@@ -9,7 +10,10 @@ import { UpdateVendorProfileRequest } from '../dtos/update-vendor-profile-reques
 @Controller('vendors')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class VendorsController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @Inject(USER_SERVICE)
+    private readonly userService: IUserService
+  ) {}
 
   @Post(':vendorId/reviews')
   @HttpCode(HttpStatus.CREATED)

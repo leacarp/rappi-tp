@@ -6,15 +6,20 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
-import { AuthService } from '../../services/auth.service';
+import { IAuthService } from '../../domain/interfaces/IAuthService';
+import { AUTH_SERVICE } from '../../infrastructure/constants/auth-service.constants';
 import { LoginRequest } from '../dtos/login-request';
 import { LoginResponse } from '../dtos/login-response';
 
 @Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject(AUTH_SERVICE)
+    private readonly authService: IAuthService
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)

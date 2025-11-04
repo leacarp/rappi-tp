@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Get, Param, Query, Put } from '@nestjs/common';
-import { OrderService } from '../../services/order.service';
+import { Controller, Post, Body, Get, Param, Query, Put, Inject } from '@nestjs/common';
+import { IOrderService } from '../../domain/interfaces/IOrderService';
+import { ORDER_SERVICE } from '../../infrastructure/constants/order-service.constants';
 import { CreateOrderRequestDto } from '../dtos/create-order-request.dto';
 import { GetOrderResponseDto } from '../dtos/get-order-response.dto';
 import { GetUserOrdersResponseDto } from '../dtos/get-orders-response.dto';
@@ -10,7 +11,10 @@ import { AcceptOrderDto } from '../dtos/confirm-driver.dto';
 
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    @Inject(ORDER_SERVICE)
+    private readonly orderService: IOrderService
+  ) {}
 
   @Post()
   async createOrder(@Body() createOrderRequestDto: CreateOrderRequestDto): Promise<ConfirmOrderResponseDto> {
