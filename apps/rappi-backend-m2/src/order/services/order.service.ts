@@ -228,19 +228,16 @@ export class OrderService implements IOrderService {
       const driver = await this.userAdapter.existsUser(driverId);
       if(!driver) throw new BadRequestException('El driver asignado no existe');
 
-      // Validar que la orden esté en estado correcto
       if (order.getStatus() !== OrderStatus.ReadyForPickup) {
         throw new BadRequestException(
           `Solo se puede aceptar una orden en estado 'Ready for pickup'. Estado actual: '${order.getStatus()}'`
         );
       }
 
-      // Validar que no tenga driver asignado ya
       if (order.getDriverId()) {
         throw new BadRequestException('Esta orden ya tiene un driver asignado');
       }
 
-      // Asignar driver y cambiar estado
       order.setDriverId(new Types.ObjectId(driverId));
       order.setStatus(OrderStatus.InTransit);
 

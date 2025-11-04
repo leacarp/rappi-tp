@@ -45,7 +45,6 @@ export class CreateProductRequestDto {
   @IsOptional()
   promotions?: PromotionDto = { isOnPromotion: false, discountedPrice: 0 };
 
-  // Método para convertir a DTO de servicio
   toServiceDto(): CreateProductServiceDto {
     return new CreateProductServiceDto(
       this.vendorId,

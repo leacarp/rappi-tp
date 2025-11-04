@@ -41,7 +41,6 @@ export class Product {
     this.validateBusinessRules();
   }
 
-  // Getters para acceso controlado
   get id(): Types.ObjectId {
     return this._id;
   }
@@ -75,10 +74,9 @@ export class Product {
   }
 
   get promotions(): { isOnPromotion: boolean; discountedPrice: number } {
-    return { ...this._promotions }; // Retorna copia para evitar mutación externa
+    return { ...this._promotions };
   }
 
-  // Reglas de negocio del dominio
   private validateBusinessRules(): void {
     if (!this._name || this._name.trim().length === 0) {
       throw new Error('El nombre del producto es obligatorio');
@@ -97,14 +95,12 @@ export class Product {
     }
   }
 
-  // Métodos de negocio
   public updatePrice(newPrice: number): void {
     if (newPrice <= 0) {
       throw new Error('El precio debe ser mayor a 0');
     }
     this._price = newPrice;
     
-    // Si estaba en promoción, validamos que el descuento siga siendo válido
     if (this._promotions.isOnPromotion && this._promotions.discountedPrice >= newPrice) {
       this.removePromotion();
     }

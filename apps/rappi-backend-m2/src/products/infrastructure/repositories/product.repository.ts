@@ -77,7 +77,6 @@ export class ProductRepository implements IProductRepository {
     return result !== null;
   }
 
-  // Convierte documento de MongoDB a entidad del dominio
   private toEntity(productDoc: ProductDocument): ProductEntity {
     return new ProductEntity(
       productDoc._id as Types.ObjectId,
