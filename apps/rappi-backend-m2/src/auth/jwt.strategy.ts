@@ -5,7 +5,7 @@ import { IUserAdapter } from '../users/domain/interfaces/IUserAdapter';
 import { USER_ADAPTER } from '../users/infrastructure/constants/user-adapter.constants';
 
 export interface JwtPayload {
-  sub: string; // userId
+  sub: string;
   email: string;
   role: string;
 }

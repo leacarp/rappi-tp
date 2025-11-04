@@ -42,7 +42,6 @@ export class UpdateProductRequestDto {
   @IsOptional()
   promotions?: PromotionDto;
 
-  // Método para convertir a DTO de servicio
   toServiceDto(): UpdateProductServiceDto {
     return new UpdateProductServiceDto({
       name: this.name,

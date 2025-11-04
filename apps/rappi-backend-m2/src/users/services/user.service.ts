@@ -180,7 +180,6 @@ export class UserService {
     return GetReviewsResponseService.fromEntities(reviews);
   }
 
-  // VENDOR REVIEWS (vendors son usuarios con role 'vendor')
   async addVendorReview(vendorId: string, request: CreateReviewRequestService): Promise<void> {
     vendorId = (vendorId || '').trim();
     this.logger.debug(`addVendorReview vendorId=${vendorId} len=${vendorId.length}`);
@@ -189,13 +188,11 @@ export class UserService {
     if (!vendor) {
       throw new NotFoundException('Vendor no encontrado');
     }
-    // Validar que sea realmente un vendor
     if (vendor.getRole() !== 'vendor') {
       this.logger.debug(`addVendorReview role mismatch: role=${vendor.getRole()}`);
       throw new NotFoundException('Vendor no encontrado');
     }
     const entity = request.toEntity(new Date());
-    // Upsert por reviewerId: si ya existe review de ese reviewer, actualizar; sino, agregar
     const existing = await this.userRepository.getUserReviews(vendorId);
     this.logger.debug(`addVendorReview existingReviews=${existing.length}`);
     const already = existing.find(r => r.getReviewerId() === entity.getReviewerId());
@@ -263,7 +260,7 @@ export class UserService {
 
     user.addOrIncrementCartItem(
         new CartItem(
-            product.getId().toString(), // FIX: convertir ObjectId a string
+            product.getId().toString(),
             product.getName(),
             product.getPrice(),
             1
