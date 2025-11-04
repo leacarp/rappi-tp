@@ -15,10 +15,11 @@ import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
 import { SummaryDto } from '../presentation/dtos/order-dto-response/summary.dto';
 import { OrderFilter } from '../domain/interfaces/IOrderRepository';
+import { IOrderService } from '../domain/interfaces/IOrderService';
 
 
 @Injectable()
-export class OrderService {
+export class OrderService implements IOrderService {
   constructor(
     @Inject(ORDER_REPOSITORY) 
     private readonly orderRepository: IOrderRepository,

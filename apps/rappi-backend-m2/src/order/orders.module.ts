@@ -5,6 +5,7 @@ import { OrderController } from './presentation/controllers/order.controller';
 import { Order, OrderSchema } from './infrastructure/schemas/order.schema';
 import { OrderRepository } from './infrastructure/repositories/order.repository';
 import { ORDER_REPOSITORY } from './infrastructure/constants/order.constants';
+import { ORDER_SERVICE } from './infrastructure/constants/order-service.constants';
 import { ProductModule } from '../products/product.module';
 import { UsersModule } from '../users/users.module';
 
@@ -17,12 +18,15 @@ import { UsersModule } from '../users/users.module';
   ],
   controllers: [OrderController],
   providers: [
-    OrderService,
+    {
+      provide: ORDER_SERVICE,
+      useClass: OrderService
+    },
     {
       provide: ORDER_REPOSITORY,
       useClass: OrderRepository
     }
   ],
-  exports: [ORDER_REPOSITORY]
+  exports: [ORDER_SERVICE, ORDER_REPOSITORY]
 })
 export class OrderModule {}

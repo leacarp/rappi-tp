@@ -8,6 +8,7 @@ import { UserController } from './presentation/controllers/user.controller';
 import { VendorsController } from './presentation/controllers/vendors.controller';
 import { UserAdapter } from './infrastructure/adapters/user.adapter';
 import { USER_ADAPTER } from './infrastructure/constants/user-adapter.constants';
+import { USER_SERVICE } from './infrastructure/constants/user-service.constants';
 import { ProductModule } from '../products/product.module';
 
 @Module({
@@ -21,12 +22,15 @@ import { ProductModule } from '../products/product.module';
       provide: USER_REPOSITORY_TOKEN,
       useClass: UserRepository
     },
-    UserService,
+    {
+      provide: USER_SERVICE,
+      useClass: UserService
+    },
     {
       provide: USER_ADAPTER,
       useClass: UserAdapter
     }
   ],
-  exports: [UserService, USER_ADAPTER]
+  exports: [USER_SERVICE, USER_ADAPTER]
 })
 export class UsersModule {}

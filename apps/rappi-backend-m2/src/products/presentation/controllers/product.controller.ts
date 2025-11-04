@@ -11,8 +11,10 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
-import { ProductService } from '../../services/product.service';
+import { IProductService } from '../../domain/interfaces/IProductService';
+import { PRODUCT_SERVICE } from '../../infrastructure/constants/product-service.constants';
 import { CreateProductRequestDto } from '../dtos/create-product-request.dto';
 import { UpdateProductRequestDto } from '../dtos/update-product-request.dto';
 import { ProductResponseDto } from '../dtos/product-response.dto';
@@ -21,7 +23,10 @@ import { MenuResponseDto } from '../dtos/menu-response.dto';
 @Controller('products')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    @Inject(PRODUCT_SERVICE)
+    private readonly productService: IProductService
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
