@@ -56,7 +56,6 @@ export class UpdateProductServiceDto {
     return this._promotions ? { ...this._promotions } : undefined;
   }
 
-  // Método para convertir a objeto plano para el repositorio
   toUpdateData(): any {
     const updateData: any = {};
     

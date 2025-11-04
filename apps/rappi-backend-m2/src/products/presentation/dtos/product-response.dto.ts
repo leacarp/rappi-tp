@@ -99,9 +99,7 @@ export class ProductResponseDto {
     return this._discountPercentage;
   }
 
-  // Método factory para crear desde entidad del dominio
   static fromEntity(product: any): ProductResponseDto {
-    // Extraer promotions correctamente (manejar subdocumentos de Mongoose)
     const promotions = product.promotions;
     const promotionData = promotions._doc || promotions || { isOnPromotion: false, discountedPrice: 0 };
     
