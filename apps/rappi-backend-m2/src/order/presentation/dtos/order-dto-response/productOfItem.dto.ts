@@ -23,7 +23,7 @@ export class ProductOfItemDto {
     return new ProductOfItemDto(
       product.getId().toString(),
       product.getName(),
-      product.getPrice(),
+      product.getPrice()
     );
   }
 }

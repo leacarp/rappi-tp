@@ -5,7 +5,6 @@ export type PickUpLocationDocument = PickUp_Location & Document;
 
 @Schema({id: false})
 export class PickUp_Location{
-
     @Prop({required: true})
     latitude: number
 

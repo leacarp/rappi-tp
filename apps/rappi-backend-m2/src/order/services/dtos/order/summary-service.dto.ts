@@ -1,11 +1,11 @@
 import { Summary } from "../../../domain/entities/summary.entity";
 
-export class SummaryDtoService{
-  private readonly _subtotal : number; 
-  private readonly _shippingCost : number; 
-  private readonly _taxes : number; 
-  private readonly _discount : number; 
-  private readonly _total : number;
+export class SummaryDtoService {
+  private readonly _subtotal: number;
+  private readonly _shippingCost: number;
+  private readonly _taxes: number;
+  private readonly _discount: number;
+  private readonly _total: number;
 
   constructor(
     subtotal: number,
@@ -21,27 +21,27 @@ export class SummaryDtoService{
     this._total = total;
   }
 
-  getSubtotal() : number{
-      return this._subtotal;
+  getSubtotal(): number {
+    return this._subtotal;
   }
 
-  getShippingCost() : number{
-      return this._shippingCost;
+  getShippingCost(): number {
+    return this._shippingCost;
   }
 
-  getTaxes() : number{
-      return this._taxes;
+  getTaxes(): number {
+    return this._taxes;
   }
 
-  getDiscount() : number{
-      return this._discount;
+  getDiscount(): number {
+    return this._discount;
   }
 
-  getTotal() : number{
-      return this._total;
+  getTotal(): number {
+    return this._total;
   }
 
-  static fromEntity(summary : Summary) : SummaryDtoService{
+  static fromEntity(summary: Summary): SummaryDtoService {
     return new SummaryDtoService(
       summary.getSubTotal(),
       summary.getShippingCost(),

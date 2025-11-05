@@ -52,7 +52,6 @@ export class GetOrderResponseDto {
     this._notes = notes;
   }
 
-  
   getId(): string {
     return this._id;
   }

@@ -5,7 +5,6 @@ export type SummaryDocument = Summary & Document;
 
 @Schema({id: false})
 export class Summary{
-
     @Prop({required: true})
     subtotal: number
 
@@ -20,7 +19,6 @@ export class Summary{
 
     @Prop({required: true})
     total: number
-
 }
 
 export const SummarySchema = SchemaFactory.createForClass(Summary);

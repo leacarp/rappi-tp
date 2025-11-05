@@ -1,11 +1,19 @@
 import { ProductOfItem } from "../../../domain/entities/product-of-item.entity";
 
 export class ProductOfItemDtoService {
+  private readonly _id: string;
+  private readonly _name: string;
+  private readonly _price: number;
+  
   constructor(
-    private readonly _id: string,
-    private readonly _name: string,
-    private readonly _price: number,
-  ) {}
+    id: string,
+    name: string,
+    price: number
+  ) {
+    this._id = id;
+    this._name = name;
+    this._price = price;
+  }
 
   getId(): string {
     return this._id;
@@ -23,7 +31,7 @@ export class ProductOfItemDtoService {
     return new ProductOfItemDtoService(
       product.getId().toString(),
       product.getName(),
-      product.getPrice(),
+      product.getPrice()
     );
   }
 }

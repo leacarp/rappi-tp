@@ -4,8 +4,8 @@ import { Types } from "mongoose";
 export class OrderSummaryDto {
   private readonly _id: string;
   private readonly _status: string;
-  private readonly _createdAt : Date;
-  private readonly _trackingNumber : string;
+  private readonly _createdAt: Date;
+  private readonly _trackingNumber: string;
   private readonly _total: number;
 
   constructor(
@@ -22,23 +22,23 @@ export class OrderSummaryDto {
     this._total = total;
   }
 
-  getId() : string{
+  getId(): string {
     return this._id;
   }
 
-  getStatus() : string{
+  getStatus(): string {
     return this._status;
   }
 
-  getCreatedAt() : Date{
+  getCreatedAt(): Date {
     return this._createdAt;
   }
 
-  getTrackingNumber(): string{
+  getTrackingNumber(): string {
     return this._trackingNumber;
   }
 
-  getTotal(): number{
+  getTotal(): number {
     return this._total;
   }
 

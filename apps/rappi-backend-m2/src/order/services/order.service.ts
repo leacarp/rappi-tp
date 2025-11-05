@@ -1,5 +1,5 @@
-import { Types } from 'mongoose'; 
-import { Injectable, Inject, BadRequestException} from '@nestjs/common';
+import { Types } from 'mongoose';
+import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
 import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
 import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product-adapter.constants';
@@ -17,11 +17,10 @@ import { SummaryDto } from '../presentation/dtos/order-dto-response/summary.dto'
 import { OrderFilter } from '../domain/interfaces/IOrderRepository';
 import { IOrderService } from '../domain/interfaces/IOrderService';
 
-
 @Injectable()
 export class OrderService implements IOrderService {
   constructor(
-    @Inject(ORDER_REPOSITORY) 
+    @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,
     @Inject(PRODUCT_ADAPTER)
     private readonly productAdapter: IProductAdapter,
@@ -31,11 +30,11 @@ export class OrderService implements IOrderService {
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
     const existingOrder = await this.orderRepository.findByTrackingNumber(createOrderDto.getTrackingNumber());
-    if(existingOrder) throw new BadRequestException(`El tracking number ${createOrderDto.getTrackingNumber()} ya existe`)
-      
+    if (existingOrder) throw new BadRequestException(`El tracking number ${createOrderDto.getTrackingNumber()} ya existe`);
+
     await this.loadAndValidateUsers(createOrderDto.getCustomerId(), createOrderDto.getVendorId());
-    
-    const items = await this.loadAndValidateItems(createOrderDto.getItems());  
+
+    const items = await this.loadAndValidateItems(createOrderDto.getItems());
 
     const orderEntity = CreateOrderDto.toEntity(createOrderDto, items);
     const savedOrder = await this.orderRepository.create(orderEntity);
@@ -45,57 +44,58 @@ export class OrderService implements IOrderService {
 
   async getOrderById(orderId: string): Promise<GetOrderResponseDto> {
     const orderEntity = await this.orderRepository.findById(orderId);
-    if (!orderEntity) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+    if (!orderEntity) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
     return GetOrderResponseDto.fromEntity(orderEntity);
   }
 
   async getOrdersByUserRole(userId: string, role: 'customer' | 'vendor' | 'driver', status?: string): Promise<GetUserOrdersResponseDto> {
-    const field = role === 'vendor' ? 'vendorId' : 
-    role === 'driver' ? 'driverId' :
-    'customerId';
+    const field = role === 'vendor'
+      ? 'vendorId'
+      : role === 'driver'
+        ? 'driverId'
+        : 'customerId';
 
-    const filter : OrderFilter = { [field]: new Types.ObjectId(userId) };
+    const filter: OrderFilter = { [field]: new Types.ObjectId(userId) };
 
-    if(status) filter.status = status;
+    if (status)
+      filter.status = status;
 
     const orders = await this.orderRepository.findByFilter(filter);
 
-    if(!orders.length)
+    if (!orders.length)
       return new GetUserOrdersResponseDto([]);
-
-    return GetUserOrdersResponseDto.fromEntities(orders)
-  }
-
-  async getOrdersByStatus(status?: string): Promise<GetUserOrdersResponseDto> {
-    const filter: OrderFilter = status ? { status } : {};
-    const orders = await this.orderRepository.findByFilter(filter);
-    if(!orders.length) return new GetUserOrdersResponseDto([]);
-    return GetUserOrdersResponseDto.fromEntities(orders)
-  }
-
-  async getDriverCompletedOrders(driverId: string): Promise<GetUserOrdersResponseDto> {
-    const orders = await this.orderRepository.findByDriverAndStatus(driverId, OrderStatus.Delivered);
-
-    if(!orders.length) {
-      return new GetUserOrdersResponseDto([]);
-    }
 
     return GetUserOrdersResponseDto.fromEntities(orders);
   }
 
-  async getProductById(id: string): Promise<ProductOfItem>{
+  async getOrdersByStatus(status?: string): Promise<GetUserOrdersResponseDto> {
+    const filter: OrderFilter = status ? { status } : {};
+
+    const orders = await this.orderRepository.findByFilter(filter);
+    if (!orders.length) return new GetUserOrdersResponseDto([]);
+
+    return GetUserOrdersResponseDto.fromEntities(orders);
+  }
+
+  async getDriverCompletedOrders(driverId: string): Promise<GetUserOrdersResponseDto> {
+    const orders = await this.orderRepository.findByDriverAndStatus(driverId, OrderStatus.Delivered);
+    if (!orders.length) return new GetUserOrdersResponseDto([]);
+
+    return GetUserOrdersResponseDto.fromEntities(orders);
+  }
+
+  async getProductById(id: string): Promise<ProductOfItem> {
     return this.productAdapter.getProductById(id);
   }
 
-  async UpdateOrderStatus(orderId: string, newStatus: OrderStatus) : Promise<void>{
+  async UpdateOrderStatus(orderId: string, newStatus: OrderStatus): Promise<void> {
     const order = await this.orderRepository.findById(orderId);
-    if(!order) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+    if (!order) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
     order.changeStatus(newStatus);
 
-    await this.orderRepository.updateStatus( orderId, order.getStatus());
-
+    await this.orderRepository.updateStatus(orderId, order.getStatus());
   }
 
   private async loadAndValidateItems(dtoItems: ItemsDtoService[]): Promise<Items[]> {
@@ -128,7 +128,7 @@ export class OrderService implements IOrderService {
     );
 
     const validItems = items.filter(i => i !== null);
-  
+
     if (invalidProducts.length > 0) {
       throw new BadRequestException({
         message: 'Algunos productos no existen',
@@ -144,28 +144,30 @@ export class OrderService implements IOrderService {
       this.userAdapter.existsUser(customerId),
       this.userAdapter.existsUser(vendorId),
     ]);
-  
+
     const errors = [];
+
     if (!customer) errors.push({ role: 'customer', id: customerId });
     if (!vendor) errors.push({ role: 'vendor', id: vendorId });
-  
+
     if (errors.length > 0) {
       throw new BadRequestException({
         message: 'Algunos usuarios no existen',
         invalidUsers: errors
       });
     }
-  };
+  }
 
   async getOrderSummary(orderId: string): Promise<SummaryDto> {
     const orderEntity = await this.orderRepository.findById(orderId);
-    if (!orderEntity) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+    if (!orderEntity) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
+
     return SummaryDto.fromEntity(orderEntity.getSummary());
   }
-  
+
   async confirmOrder(orderId: string): Promise<GetOrderResponseDto> {
     const order = await this.orderRepository.findById(orderId);
-    if (!order) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+    if (!order) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
     if (order.getStatus() !== OrderStatus.Pending) {
       throw new BadRequestException(`Solo se puede confirmar una orden en estado 'pending'. Estado actual: '${order.getStatus()}'`);
@@ -174,13 +176,14 @@ export class OrderService implements IOrderService {
     await this.UpdateOrderStatus(orderId, OrderStatus.Accepted);
 
     const updated = await this.orderRepository.findById(orderId);
-    if (!updated) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+    if (!updated) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
+
     return GetOrderResponseDto.fromEntity(updated);
   }
-  
+
   async getWhatsAppLink(orderId: string): Promise<{ url: string }> {
     const order = await this.orderRepository.findById(orderId);
-    if (!order) throw new BadRequestException(`Orden con id ${orderId} no encontrada`);
+    if (!order) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
     const phone = order.getVendor()?.getPhone() || '';
     const vendorName = order.getVendor()?.getName() ?? 'Desconocido';
@@ -223,34 +226,25 @@ export class OrderService implements IOrderService {
   }
 
   async acceptOrderByDriver(orderId: string, driverId: string): Promise<void> {
-      const order = await this.orderRepository.findById(orderId);
-      if (!order) throw new BadRequestException(`Orden ${orderId} no encontrada`);
-      const driver = await this.userAdapter.existsUser(driverId);
-      if(!driver) throw new BadRequestException('El driver asignado no existe');
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) throw new NotFoundException(`Orden ${orderId} no encontrada`);
 
-      if (order.getStatus() !== OrderStatus.ReadyForPickup) {
-        throw new BadRequestException(
-          `Solo se puede aceptar una orden en estado 'Ready for pickup'. Estado actual: '${order.getStatus()}'`
-        );
-      }
+    const driver = await this.userAdapter.existsUser(driverId);
+    if(!driver) throw new NotFoundException('El driver asignado no existe');
 
-      if (order.getDriverId()) {
-        throw new BadRequestException('Esta orden ya tiene un driver asignado');
-      }
+    if (order.getStatus() !== OrderStatus.ReadyForPickup) {
+      throw new BadRequestException(
+        `Solo se puede aceptar una orden en estado 'Ready for pickup'. Estado actual: '${order.getStatus()}'`
+      );
+    }
 
-      order.setDriverId(new Types.ObjectId(driverId));
-      order.setStatus(OrderStatus.InTransit);
+    if (order.getDriverId()) {
+      throw new BadRequestException('Esta orden ya tiene un driver asignado');
+    }
 
-      await this.orderRepository.updateOrderDriver(order);
-      
+    order.setDriverId(new Types.ObjectId(driverId));
+    order.setStatus(OrderStatus.InTransit);
+
+    await this.orderRepository.updateOrderDriver(order);
   }
-
-
 }
-
-
-
-
-
-
-

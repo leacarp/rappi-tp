@@ -1,10 +1,10 @@
-export class PickUpLocation{
+export class PickUpLocation {
   private readonly _latitude: number;
   private readonly _longitude: number;
 
-  constructor(latitude: number, longitude: number){
+  constructor(latitude: number, longitude: number) {
     this._latitude = latitude;
-    this._longitude = longitude
+    this._longitude = longitude;
   }
 
   getLongitude(): number {
