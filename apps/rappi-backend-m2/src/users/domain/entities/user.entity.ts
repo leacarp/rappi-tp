@@ -81,12 +81,10 @@ export class User {
   getUpdatedAt(): Date {
     return this._updatedAt;
   }
-
   
   getCart(): CartItem[] {
     return this._cart;
   }
-
 
   addOrIncrementCartItem(newItem: CartItem): void {
     const idx = this._cart.findIndex(i => i.getProductId() === newItem.getProductId());
@@ -102,7 +100,6 @@ export class User {
       this._cart.push(newItem);
     }
   }
-
  
   setCartItemQuantity(productId: string, quantity: number): void {
     const idx = this._cart.findIndex(i => i.getProductId() === productId);
