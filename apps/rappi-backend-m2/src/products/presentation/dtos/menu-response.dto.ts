@@ -65,8 +65,8 @@ export class MenuItemResponseDto {
       discountPercentage: this._discountPercentage,
       isAvailable: this._isAvailable,
       promotions: {
-        isOnPromotion: this._promotions.isOnPromotion,
-        discountedPrice: this._promotions.discountedPrice,
+        isOnPromotion: this._promotions.getIsOnPromotion(),
+        discountedPrice: this._promotions.getDiscountedPrice(),
       },
     };
   }

@@ -1,3 +1,5 @@
+import { Product } from "../../domain/entities/product.entity";
+
 export class PromotionResponseDto {
   private readonly _isOnPromotion: boolean;
   private readonly _discountedPrice: number;
@@ -7,11 +9,11 @@ export class PromotionResponseDto {
     this._discountedPrice = discountedPrice;
   }
 
-  get isOnPromotion(): boolean {
+  getIsOnPromotion(): boolean {
     return this._isOnPromotion;
   }
 
-  get discountedPrice(): number {
+  getDiscountedPrice(): number {
     return this._discountedPrice;
   }
 }
@@ -55,66 +57,67 @@ export class ProductResponseDto {
     this._discountPercentage = discountPercentage;
   }
 
-  get id(): string {
+  getId(): string {
     return this._id;
   }
 
-  get vendorId(): string {
+  getVendorId(): string {
     return this._vendorId;
   }
 
-  get name(): string {
+  getName(): string {
     return this._name;
   }
 
-  get description(): string {
+  getDescription(): string {
     return this._description;
   }
 
-  get imageURL(): string {
+  getImageURL(): string {
     return this._imageURL;
   }
 
-  get price(): number {
+  getPrice(): number {
     return this._price;
   }
 
-  get category(): string {
+  getCategory(): string {
     return this._category;
   }
 
-  get isAvailable(): boolean {
+  getIsAvailable(): boolean {
     return this._isAvailable;
   }
 
-  get promotions(): PromotionResponseDto {
+  getPromotions(): PromotionResponseDto {
     return this._promotions;
   }
 
-  get finalPrice(): number {
+  getFinalPrice(): number {
     return this._finalPrice;
   }
 
-  get discountPercentage(): number {
+  getDiscountPercentage(): number {
     return this._discountPercentage;
   }
 
-  static fromEntity(product: any): ProductResponseDto {
-    const promotions = product.promotions;
-    const promotionData = promotions._doc || promotions || { isOnPromotion: false, discountedPrice: 0 };
+  static fromEntity(product: Product): ProductResponseDto {
+    const promotions = product.getPromotions();
+
+    console.log("promotions", promotions);
     
     return new ProductResponseDto(
-      product.id.toString(),
-      product.vendorId.toString(),
-      product.name,
-      product.description,
-      product.imageURL,
-      product.price,
-      product.category,
-      product.isAvailable,
+      product.getId().toString(),
+      product.getVendorId().toString(),
+      product.getName(),
+      product.getDescription(),
+      product.getImageURL(),
+      product.getPrice(),
+      product.getCategory(),
+      product.getIsAvailable(),
       new PromotionResponseDto(
-        promotionData.isOnPromotion,
-        promotionData.discountedPrice
+        promotions.isOnPromotion,
+        promotions.discountedPrice
       ),
       product.getFinalPrice(),
       product.getDiscountPercentage()

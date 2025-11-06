@@ -1,5 +1,7 @@
 import { Types } from 'mongoose';
 
+import { ProductOfItem as ProductOfItemAdapter } from '../../../products/domain/dtos/product-of-item.entity';
+
 export class ProductOfItem {
   private readonly _id: Types.ObjectId;
   private readonly _name: string;
@@ -21,5 +23,9 @@ export class ProductOfItem {
 
   getPrice(): number {
     return this._price;
+  }
+
+  static fromAdapter(adapter: ProductOfItemAdapter): ProductOfItem {
+    return new ProductOfItem(adapter.getId(), adapter.getName(), adapter.getPrice());
   }
 }

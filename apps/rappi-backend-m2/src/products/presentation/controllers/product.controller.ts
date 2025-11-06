@@ -1,18 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UsePipes,
-  ValidationPipe,
-  HttpCode,
-  HttpStatus,
-  Inject,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject } from '@nestjs/common';
+
 import { IProductService } from '../../domain/interfaces/IProductService';
 import { PRODUCT_SERVICE } from '../../infrastructure/constants/product-service.constants';
 import { CreateProductRequestDto } from '../dtos/create-product-request.dto';

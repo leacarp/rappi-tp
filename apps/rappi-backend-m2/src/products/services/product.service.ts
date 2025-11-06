@@ -1,11 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
-import { IProductRepository } from '../domain/interfaces/IProductRepository';
-import { PRODUCT_REPOSITORY } from '../infrastructure/constants/product-repository.constants';
-import { Product } from '../domain/entities/product.entity';
 import { Types } from 'mongoose';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
+
+import { Product } from '../domain/entities/product.entity';
+import { IProductRepository } from '../domain/interfaces/IProductRepository';
+import { IProductService } from '../domain/interfaces/IProductService';
 import { CreateProductServiceDto } from './dtos/create-product-service.dto';
 import { UpdateProductServiceDto } from './dtos/update-product-service.dto';
-import { IProductService } from '../domain/interfaces/IProductService';
+import { PRODUCT_REPOSITORY } from '../infrastructure/constants/product-repository.constants';
 
 @Injectable()
 export class ProductService implements IProductService {
@@ -92,8 +93,8 @@ export class ProductService implements IProductService {
     product.applyPromotion(discountedPrice);
     
     const result = await this.productRepository.update(id, { 
-      promotions: product.promotions 
-    });
+      promotions: product.getPromotions() 
+    } as Partial<Product>);
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }
@@ -105,8 +106,8 @@ export class ProductService implements IProductService {
     product.removePromotion();
     
     const result = await this.productRepository.update(id, { 
-      promotions: product.promotions 
-    });
+      promotions: product.getPromotions() 
+    } as Partial<Product>);
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }

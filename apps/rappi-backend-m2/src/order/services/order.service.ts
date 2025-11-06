@@ -1,21 +1,22 @@
 import { Types } from 'mongoose';
 import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
-import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
-import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
+
 import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product-adapter.constants';
-import { CreateOrderDto } from './dtos/order/create-order-service.dto';
-import { GetOrderResponseDto } from '../presentation/dtos/get-order-response.dto';
-import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response.dto';
-import { Items } from '../domain/entities/items.entity';
-import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { IProductAdapter } from '../../products/domain/interfaces/IProductAdapter';
-import { OrderStatus } from '../domain/enum/order-status';
-import { ItemsDtoService } from './dtos/order/items-service.dto';
 import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
-import { SummaryDto } from '../presentation/dtos/order-dto-response/summary.dto';
+import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
+import { Items } from '../domain/entities/items.entity';
+import { ProductOfItem } from '../domain/entities/product-of-item.entity';
+import { OrderStatus } from '../domain/enum/order-status';
 import { OrderFilter } from '../domain/interfaces/IOrderRepository';
 import { IOrderService } from '../domain/interfaces/IOrderService';
+import { SummaryDto } from '../presentation/dtos/order-dto-response/summary.dto';
+import { GetOrderResponseDto } from '../presentation/dtos/get-order-response.dto';
+import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response.dto';
+import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
+import { CreateOrderDto } from './dtos/order/create-order-service.dto';
+import { ItemsDtoService } from './dtos/order/items-service.dto';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -86,7 +87,10 @@ export class OrderService implements IOrderService {
   }
 
   async getProductById(id: string): Promise<ProductOfItem> {
-    return this.productAdapter.getProductById(id);
+    const product = await this.productAdapter.getProductById(id);
+    if (!product) throw new NotFoundException(`Producto con id ${id} no encontrado`);
+    
+    return ProductOfItem.fromAdapter(product);
   }
 
   async UpdateOrderStatus(orderId: string, newStatus: OrderStatus): Promise<void> {

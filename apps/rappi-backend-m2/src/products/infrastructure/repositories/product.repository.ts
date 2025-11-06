@@ -1,6 +1,7 @@
+import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+
 import { IProductRepository } from '../../domain/interfaces/IProductRepository';
 import { Product as ProductEntity } from '../../domain/entities/product.entity';
 import { Product, ProductDocument } from '../schemas/product.schema';
@@ -13,14 +14,14 @@ export class ProductRepository implements IProductRepository {
 
   async create(product: ProductEntity): Promise<ProductEntity> {
     const createdProduct = new this.productModel({
-      vendorId: product.vendorId,
-      name: product.name,
-      description: product.description,
-      imageURL: product.imageURL,
-      price: product.price,
-      category: product.category,
-      isAvailable: product.isAvailable,
-      promotions: product.promotions
+      vendorId: product.getVendorId(),
+      name: product.getName(),  
+      description: product.getDescription(),
+      imageURL: product.getImageURL(),
+      price: product.getPrice(),
+      category: product.getCategory(),
+      isAvailable: product.getIsAvailable(),
+      promotions: product.getPromotions()
     });
 
     const savedProduct = await createdProduct.save();
@@ -63,7 +64,7 @@ export class ProductRepository implements IProductRepository {
       id,
       { $set: updateData },
       { new: true }
-    ).exec();
+    ).lean().exec();
 
     return updatedProduct ? this.toEntity(updatedProduct) : null;
   }
