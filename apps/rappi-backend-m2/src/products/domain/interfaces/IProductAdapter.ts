@@ -1,5 +1,5 @@
-import { ProductOfItem } from "../../../order/domain/entities/product-of-item.entity";
+import { ProductOfItem } from "../dtos/product-of-item.entity";
 
-export interface IProductAdapter{
-    getProductById(id: string): Promise<ProductOfItem | null>;
+export interface IProductAdapter {
+  getProductById(id: string): Promise<ProductOfItem | null>;
 }
