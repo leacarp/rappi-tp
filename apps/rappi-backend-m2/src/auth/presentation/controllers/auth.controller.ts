@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UsePipes,
-  ValidationPipe,
-  HttpCode,
-  HttpStatus,
-  Inject,
-} from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject } from '@nestjs/common';
 import { IAuthService } from '../../domain/interfaces/IAuthService';
 import { AUTH_SERVICE } from '../../infrastructure/constants/auth-service.constants';
 import { LoginRequest } from '../dtos/login-request';

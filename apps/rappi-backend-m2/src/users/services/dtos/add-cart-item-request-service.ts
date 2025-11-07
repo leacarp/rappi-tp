@@ -1,4 +1,11 @@
 export class AddCartItemRequestService {
-  constructor(private readonly productId: string) {}
-  getProductId(): string { return this.productId; }
+  private readonly _productId: string;
+
+  constructor(productId: string) {
+    this._productId = productId;
+  }
+
+  getProductId(): string {
+    return this._productId;
+  }
 }

@@ -40,7 +40,6 @@ export class RestaurantSearchResult {
   getSchedule(): string {
     return this.schedule;
   }
-
 }
 
 export class SearchRestaurantsResponse {

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+
 import { Location, LocationSchema } from './location.schema';
 import { Earnings, EarningsSchema } from './earnings.schema';
 

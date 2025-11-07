@@ -1,12 +1,15 @@
 export class GetDriverAvailabilityResponse {
-  isAvailable: boolean;
+  private readonly isAvailable: boolean;
 
   constructor(isAvailable: boolean) {
     this.isAvailable = isAvailable;
+  }
+
+  getIsAvailable(): boolean {
+    return this.isAvailable;
   }
 
   static fromServiceDto(isAvailable: boolean): GetDriverAvailabilityResponse {
     return new GetDriverAvailabilityResponse(isAvailable);
   }
 }
-

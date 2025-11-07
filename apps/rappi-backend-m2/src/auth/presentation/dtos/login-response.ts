@@ -13,6 +13,22 @@ export class LoginResponse {
     this.token = token;
   }
 
+  getUserId(): string {
+    return this.userId;
+  }
+
+  getEmail(): string {
+    return this.email;
+  }
+
+  getRole(): string {
+    return this.role;
+  }
+
+  getToken(): string {
+    return this.token;
+  }
+
   static fromServiceDto(serviceDto: LoginResponseService): LoginResponse {
     return new LoginResponse(
       serviceDto.getUserId(),

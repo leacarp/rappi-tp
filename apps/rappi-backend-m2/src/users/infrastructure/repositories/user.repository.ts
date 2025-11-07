@@ -317,7 +317,6 @@ export class UserRepository implements IUserRepository {
 
     const favorites = (userDoc.favorites || []).map((id: Types.ObjectId) => id.toString());
 
-
     const cart = (userDoc.cart || []).map((ci: CartItemSchema) =>
       new CartItem(
         ci.productId.toString(),

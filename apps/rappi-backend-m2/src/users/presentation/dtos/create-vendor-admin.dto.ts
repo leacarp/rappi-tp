@@ -34,4 +34,3 @@ export class CreateVendorAdminDto {
   @IsNotEmpty()
   category: string;
 }
-

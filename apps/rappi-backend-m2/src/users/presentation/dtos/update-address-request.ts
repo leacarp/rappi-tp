@@ -1,4 +1,5 @@
 import { IsString, IsBoolean, IsNotEmpty } from 'class-validator';
+
 import { UpdateAddressRequestService } from '../../services/dtos/update-address-request-service';
 
 export class UpdateAddressRequest {

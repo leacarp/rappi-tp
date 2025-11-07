@@ -1,18 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UsePipes,
-  ValidationPipe,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Inject,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Inject } from '@nestjs/common';
+
 import { IUserService } from '../../domain/interfaces/IUserService';
 import { USER_SERVICE } from '../../infrastructure/constants/user-service.constants';
 import { CreateAddressRequest } from '../dtos/create-address-request';
@@ -21,9 +8,6 @@ import { GetAddressesResponse } from '../dtos/get-addresses-response';
 import { UpdateAddressRequest } from '../dtos/update-address-request';
 import { CreateReviewRequest } from '../dtos/create-review-request';
 import { GetReviewsResponse } from '../dtos/get-reviews-response';
-import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
-import { RolesGuard } from '../../../auth/guards/roles.guard';
-import { Roles } from '../../../auth/decorators/roles.decorator';
 import { AddCartItemRequest } from '../dtos/add-cart-item-request';
 import { SetCartItemQuantityRequest } from '../dtos/set-cart-item-quantity-request';
 import { GetCartResponse } from '../dtos/get-cart-response';
@@ -32,6 +16,9 @@ import { GetDriverAvailabilityResponse } from '../dtos/get-driver-availability-r
 import { CreateVendorAdminDto } from '../dtos/create-vendor-admin.dto';
 import { CreateDriverAdminDto } from '../dtos/create-driver-admin.dto';
 import { CreateAdminDto } from '../dtos/create-admin.dto';
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
+import { RolesGuard } from '../../../auth/guards/roles.guard';
+import { Roles } from '../../../auth/decorators/roles.decorator';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -92,14 +79,12 @@ export class UserController {
     const serviceResponse = await this.userService.getReviews(userId);
     return GetReviewsResponse.fromServiceDto(serviceResponse);
   }
-
   
   @Get(':userId/cart')
   async getCart(@Param('userId') userId: string): Promise<GetCartResponse> {
     const serviceDto = await this.userService.getCart(userId);
     return GetCartResponse.fromServiceDto(serviceDto);
   }
-
   
   @Post(':userId/cart/items')
   @HttpCode(HttpStatus.CREATED)
@@ -110,7 +95,6 @@ export class UserController {
     const serviceDto = body.toServiceDto();
     await this.userService.addCartItem(userId, serviceDto);
   }
-
   
   @Put(':userId/cart/items/:productId')
   async setCartItemQuantity(

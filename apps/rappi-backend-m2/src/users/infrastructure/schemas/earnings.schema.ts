@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+
 import { EarningsDetail, EarningsDetailSchema } from './earnings-detail.schema';
 
 export type EarningsDocument = Earnings & Document;

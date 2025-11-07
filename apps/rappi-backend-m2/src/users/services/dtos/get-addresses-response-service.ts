@@ -1,14 +1,14 @@
 import { Address } from '../../domain/entities/address.entity';
 
 export class GetAddressesResponseService {
-    private readonly addresses: AddressItemService[];
+    private readonly _addresses: AddressItemService[];
   
     constructor(addresses: AddressItemService[]) {
-      this.addresses = addresses;
+      this._addresses = addresses;
     }
 
     getAddresses(): AddressItemService[] {
-      return this.addresses;
+      return this._addresses;
     }
 
     static fromEntities(addresses: Address[]): GetAddressesResponseService {

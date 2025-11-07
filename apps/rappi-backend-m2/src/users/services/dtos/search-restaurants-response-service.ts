@@ -1,11 +1,11 @@
 import { VendorInfo } from '../../domain/entities/vendor-info.entity';
 
 export class RestaurantSearchResultService {
-  private readonly restaurantName: string;
-  private readonly description: string;
-  private readonly rating: number;
-  private readonly isAvailable: boolean;
-  private readonly schedule: string;
+  private readonly _restaurantName: string;
+  private readonly _description: string;
+  private readonly _rating: number;
+  private readonly _isAvailable: boolean;
+  private readonly _schedule: string;
 
   constructor(
     restaurantName: string,
@@ -14,31 +14,31 @@ export class RestaurantSearchResultService {
     isAvailable: boolean,
     schedule: string
   ) {
-    this.restaurantName = restaurantName;
-    this.description = description;
-    this.rating = rating;
-    this.isAvailable = isAvailable;
-    this.schedule = schedule;
+    this._restaurantName = restaurantName;
+    this._description = description;
+    this._rating = rating;
+    this._isAvailable = isAvailable;
+    this._schedule = schedule;
   }
 
   getRestaurantName(): string {
-    return this.restaurantName;
+    return this._restaurantName;
   }
 
   getDescription(): string {
-    return this.description;
+    return this._description;
   }
 
   getRating(): number {
-    return this.rating;
+    return this._rating;
   }
 
   getIsAvailable(): boolean {
-    return this.isAvailable;
+    return this._isAvailable;
   }
 
   getSchedule(): string {
-    return this.schedule;
+    return this._schedule;
   }
 
   static fromVendorInfo(vendorInfo: VendorInfo): RestaurantSearchResultService {
@@ -53,23 +53,23 @@ export class RestaurantSearchResultService {
 }
 
 export class SearchRestaurantsResponseService {
-  private readonly restaurants: RestaurantSearchResultService[];
-  private readonly total: number;
+  private readonly _restaurants: RestaurantSearchResultService[];
+  private readonly _total: number;
 
   constructor(
     restaurants: RestaurantSearchResultService[],
     total: number
   ) {
-    this.restaurants = restaurants;
-    this.total = total;
+    this._restaurants = restaurants;
+    this._total = total;
   }
 
   getRestaurants(): RestaurantSearchResultService[] {
-    return this.restaurants;
+    return this._restaurants;
   }
 
   getTotal(): number {
-    return this.total;
+    return this._total;
   }
 
   static fromVendorInfoEntities(vendorInfos: VendorInfo[]): SearchRestaurantsResponseService {

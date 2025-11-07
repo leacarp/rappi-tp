@@ -1,9 +1,13 @@
 import { Types } from 'mongoose'; 
 import * as bcrypt from 'bcrypt';
-
 import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
+
+import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product-adapter.constants';
+import { IProductAdapter } from '../../products/domain/interfaces/IProductAdapter';
 import { IUserRepository } from '../domain/interfaces/IUserRepository';
+import { IUserService } from '../domain/interfaces/IUserService';
 import { USER_REPOSITORY_TOKEN } from '../domain/tokens/user-repository.token';
+import { CartItem } from '../domain/entities/cart-item.entity';
 import { CreateAddressRequestService } from './dtos/create-address-request-service';
 import { GetAddressesResponseService } from './dtos/get-addresses-response-service';
 import { GetAddressResponseService } from './dtos/get-address-response-service';
@@ -13,13 +17,9 @@ import { GetReviewsResponseService } from './dtos/get-reviews-response-service';
 import { SearchRestaurantsResponseService } from './dtos/search-restaurants-response-service';
 import { GetVendorProfile } from './dtos/get-vendor-profile-service';
 import { UpdateVendorProfile } from './dtos/update-vendor-profile-service';
-import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product-adapter.constants';
-import { IProductAdapter } from '../../products/domain/interfaces/IProductAdapter';
 import { AddCartItemRequestService } from './dtos/add-cart-item-request-service';
 import { SetCartItemQuantityRequestService } from './dtos/set-cart-item-quantity-request-service';
 import { GetCartResponseService } from './dtos/get-cart-response-service';
-import { CartItem } from '../domain/entities/cart-item.entity';
-import { IUserService } from '../domain/interfaces/IUserService';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -241,7 +241,6 @@ export class UserService implements IUserService {
     
     return SearchRestaurantsResponseService.fromVendorInfoEntities(vendorInfos);
   }
-
   
   async hashPassword(password: string): Promise<string> {
     const saltRounds = 12;

@@ -1,11 +1,11 @@
 import { Address } from '../../domain/entities/address.entity';
 
 export class GetAddressResponseService {
-    private readonly id: string;
-    private readonly street: string;
-    private readonly city: string;
-    private readonly zipCode: string;
-    private readonly isFavorite: boolean;
+    private readonly _id: string;
+    private readonly _street: string;
+    private readonly _city: string;
+    private readonly _zipCode: string;
+    private readonly _isFavorite: boolean;
   
     constructor(
       id: string,
@@ -14,31 +14,31 @@ export class GetAddressResponseService {
       zipCode: string,
       isFavorite: boolean
     ) {
-      this.id = id;
-      this.street = street;
-      this.city = city;
-      this.zipCode = zipCode;
-      this.isFavorite = isFavorite;
+      this._id = id;
+      this._street = street;
+      this._city = city;
+      this._zipCode = zipCode;
+      this._isFavorite = isFavorite;
     }
   
     getId(): string {
-      return this.id;
+      return this._id;
     }
   
     getStreet(): string {
-      return this.street;
+      return this._street;
     }
   
     getCity(): string {
-      return this.city;
+      return this._city;
     }
   
     getZipCode(): string {
-      return this.zipCode;
+      return this._zipCode;
     }
   
     getIsFavorite(): boolean {
-      return this.isFavorite;
+      return this._isFavorite;
     }
 
     static fromEntity(address: Address): GetAddressResponseService {
@@ -50,5 +50,4 @@ export class GetAddressResponseService {
         address.getIsFavorite()
       );
     }
-  }
-  
+  }  
