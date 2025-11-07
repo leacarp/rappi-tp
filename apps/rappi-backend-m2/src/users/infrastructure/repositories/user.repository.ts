@@ -258,6 +258,17 @@ export class UserRepository implements IUserRepository {
     return !!user;
   }
 
+  async createUser(userData: any): Promise<User> {
+    const newUser = new this.userModel(userData);
+    const savedUser = await newUser.save();
+    return this.mapToUserEntity(savedUser);
+  }
+
+  async getUsersByRole(role: string): Promise<User[]> {
+    const users = await this.userModel.find({ role }).exec();
+    return users.map(user => this.mapToUserEntity(user));
+  }
+
   private mapToUserEntity(userDoc: UserDocument): User {
     const addresses = (userDoc.profile?.addresses || []).map((addr: AddressSchema) => 
       new Address(

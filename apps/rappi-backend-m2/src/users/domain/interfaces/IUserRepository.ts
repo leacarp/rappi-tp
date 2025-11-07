@@ -37,4 +37,8 @@ export interface IUserRepository {
   updateDriverAvailability(userId: string, isAvailable: boolean): Promise<User | null>;
 
   existsUser(userId: string): Promise<boolean>;
+
+  createUser(userData: any): Promise<User>;
+
+  getUsersByRole(role: string): Promise<User[]>;
 }
