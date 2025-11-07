@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject, UseGuards } from '@nestjs/common';
 
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IProductService } from '../../domain/interfaces/IProductService';
 import { PRODUCT_SERVICE } from '../../infrastructure/constants/product-service.constants';
 import { CreateProductRequestDto } from '../dtos/create-product-request.dto';
@@ -9,6 +10,7 @@ import { MenuResponseDto } from '../dtos/menu-response.dto';
 
 @Controller('products')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UseGuards(JwtAuthGuard)
 export class ProductController {
   constructor(
     @Inject(PRODUCT_SERVICE)

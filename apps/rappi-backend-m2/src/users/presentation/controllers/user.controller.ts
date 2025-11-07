@@ -25,6 +25,7 @@ import { Roles } from '../../../auth/decorators/roles.decorator';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(
     @Inject(USER_SERVICE)

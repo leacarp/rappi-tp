@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Get, Param, Query, Put, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query, Put, Inject, UseGuards } from '@nestjs/common';
 
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IOrderService } from '../../domain/interfaces/IOrderService';
 import { ORDER_SERVICE } from '../../infrastructure/constants/order-service.constants';
 import { CreateOrderRequestDto } from '../dtos/create-order-request.dto';
@@ -11,6 +12,7 @@ import { ConfirmOrderResponseDto } from '../dtos/confirm-order-response.dto';
 import { AcceptOrderDto } from '../dtos/confirm-driver.dto';
 
 @Controller('orders')
+@UseGuards(JwtAuthGuard)
 export class OrderController {
   constructor(
     @Inject(ORDER_SERVICE)
