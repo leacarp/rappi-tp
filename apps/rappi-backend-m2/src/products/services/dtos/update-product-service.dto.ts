@@ -1,3 +1,5 @@
+import { ProductUpdateData } from '../../domain/types/product-update-data.type';
+
 export class UpdateProductServiceDto {
   private readonly _name?: string;
   private readonly _description?: string;
@@ -56,8 +58,8 @@ export class UpdateProductServiceDto {
     return this._promotions ? { ...this._promotions } : undefined;
   }
 
-  toUpdateData(): any {
-    const updateData: any = {};
+  toUpdateData(): ProductUpdateData {
+    const updateData: ProductUpdateData = {};
     
     if (this._name !== undefined) updateData.name = this._name;
     if (this._description !== undefined) updateData.description = this._description;

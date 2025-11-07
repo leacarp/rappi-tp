@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { IProductRepository } from '../../domain/interfaces/IProductRepository';
+import { ProductUpdateData } from '../../domain/types/product-update-data.type';
 import { Product as ProductEntity } from '../../domain/entities/product.entity';
 import { Product, ProductDocument } from '../schemas/product.schema';
 
@@ -55,7 +56,7 @@ export class ProductRepository implements IProductRepository {
     return products.map(product => this.toEntity(product));
   }
 
-  async update(id: string, updateData: Partial<ProductEntity>): Promise<ProductEntity | null> {
+  async update(id: string, updateData: ProductUpdateData): Promise<ProductEntity | null> {
     if (!Types.ObjectId.isValid(id)) {
       return null;
     }

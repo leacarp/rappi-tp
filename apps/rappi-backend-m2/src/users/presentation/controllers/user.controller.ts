@@ -16,6 +16,9 @@ import { GetDriverAvailabilityResponse } from '../dtos/get-driver-availability-r
 import { CreateVendorAdminDto } from '../dtos/create-vendor-admin.dto';
 import { CreateDriverAdminDto } from '../dtos/create-driver-admin.dto';
 import { CreateAdminDto } from '../dtos/create-admin.dto';
+import { CreateUserResponse } from '../dtos/create-user-response.dto';
+import { VendorListItem } from '../dtos/vendor-list-item.dto';
+import { DriverListItem } from '../dtos/driver-list-item.dto';
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../auth/decorators/roles.decorator';
@@ -126,8 +129,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.CREATED)
-  async createVendor(@Body() body: CreateVendorAdminDto): Promise<any> {
-    return await this.userService.createVendor(
+  async createVendor(@Body() body: CreateVendorAdminDto): Promise<CreateUserResponse> {
+    const serviceDto = await this.userService.createVendor(
       body.email,
       body.password,
       body.name,
@@ -137,44 +140,49 @@ export class UserController {
       body.schedule,
       body.category
     );
+    return CreateUserResponse.fromServiceDto(serviceDto);
   }
 
   @Get('vendors')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  async getAllVendors(): Promise<any[]> {
-    return await this.userService.getAllVendors();
+  async getAllVendors(): Promise<VendorListItem[]> {
+    const serviceDtos = await this.userService.getAllVendors();
+    return serviceDtos.map(dto => VendorListItem.fromServiceDto(dto));
   }
 
   @Post('drivers')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.CREATED)
-  async createDriver(@Body() body: CreateDriverAdminDto): Promise<any> {
-    return await this.userService.createDriver(
+  async createDriver(@Body() body: CreateDriverAdminDto): Promise<CreateUserResponse> {
+    const serviceDto = await this.userService.createDriver(
       body.email,
       body.password,
       body.name,
       body.phone,
       body.vehicle
     );
+    return CreateUserResponse.fromServiceDto(serviceDto);
   }
 
   @Get('drivers')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  async getAllDrivers(): Promise<any[]> {
-    return await this.userService.getAllDrivers();
+  async getAllDrivers(): Promise<DriverListItem[]> {
+    const serviceDtos = await this.userService.getAllDrivers();
+    return serviceDtos.map(dto => DriverListItem.fromServiceDto(dto));
   }
 
   @Post('admins')
   @HttpCode(HttpStatus.CREATED)
-  async createAdmin(@Body() body: CreateAdminDto): Promise<any> {
-    return await this.userService.createAdmin(
+  async createAdmin(@Body() body: CreateAdminDto): Promise<CreateUserResponse> {
+    const serviceDto = await this.userService.createAdmin(
       body.email,
       body.password,
       body.name,
       body.phone
     );
+    return CreateUserResponse.fromServiceDto(serviceDto);
   }
 }

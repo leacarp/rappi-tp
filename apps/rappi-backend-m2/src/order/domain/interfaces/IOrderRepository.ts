@@ -1,7 +1,13 @@
+import { Types } from 'mongoose';
 import { OrderEntity } from "../entities/order.entity";
 import { OrderStatus } from "../enum/order-status";
 
-export type OrderFilter = Record<string, any>;
+export type OrderFilter = {
+  customerId?: Types.ObjectId;
+  vendorId?: Types.ObjectId;
+  driverId?: Types.ObjectId;
+  status?: string;
+};
 
 export interface IOrderRepository {
   create(dto: OrderEntity): Promise<OrderEntity>;

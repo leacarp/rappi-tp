@@ -1,4 +1,5 @@
 import { Product } from '../entities/product.entity';
+import { ProductUpdateData } from '../types/product-update-data.type';
 
 export interface IProductRepository {
   create(product: Product): Promise<Product>;
@@ -8,7 +9,7 @@ export interface IProductRepository {
   findByVendorId(vendorId: string): Promise<Product[]>;
   findByCategory(category: string): Promise<Product[]>;
 
-  update(id: string, product: Partial<Product>): Promise<Product | null>;
+  update(id: string, product: ProductUpdateData): Promise<Product | null>;
 
   delete(id: string): Promise<boolean>;
 }

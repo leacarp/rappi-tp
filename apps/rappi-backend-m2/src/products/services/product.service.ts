@@ -103,7 +103,7 @@ export class ProductService implements IProductService {
     
     const result = await this.productRepository.update(id, { 
       promotions: productEntity.getPromotions() 
-    } as Partial<Product>);
+    });
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }
@@ -120,7 +120,7 @@ export class ProductService implements IProductService {
     
     const result = await this.productRepository.update(id, { 
       promotions: productEntity.getPromotions() 
-    } as Partial<Product>);
+    });
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }

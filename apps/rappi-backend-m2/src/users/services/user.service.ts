@@ -20,6 +20,9 @@ import { UpdateVendorProfile } from './dtos/update-vendor-profile-service';
 import { AddCartItemRequestService } from './dtos/add-cart-item-request-service';
 import { SetCartItemQuantityRequestService } from './dtos/set-cart-item-quantity-request-service';
 import { GetCartResponseService } from './dtos/get-cart-response-service';
+import { CreateUserResponseService } from './dtos/create-user-response-service.dto';
+import { VendorListItemService } from './dtos/vendor-list-item-service.dto';
+import { DriverListItemService } from './dtos/driver-list-item-service.dto';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -319,7 +322,7 @@ export class UserService implements IUserService {
     description: string, 
     schedule: string,
     category: string
-  ): Promise<any> {
+  ): Promise<CreateUserResponseService> {
     const existingUser = await this.userRepository.getUserByEmail(email);
     if (existingUser) {
       throw new Error('El email ya está registrado');
@@ -352,13 +355,13 @@ export class UserService implements IUserService {
 
     const createdUser = await this.userRepository.createUser(userData);
     
-    return {
-      id: createdUser.getId(),
-      email: createdUser.getEmail(),
-      role: createdUser.getRole(),
-      name: createdUser.getProfile().getName(),
-      restaurantName: createdUser.getProfile().getVendorInfo()?.getRestaurantName()
-    };
+    return new CreateUserResponseService(
+      createdUser.getId(),
+      createdUser.getEmail(),
+      createdUser.getRole(),
+      createdUser.getProfile().getName(),
+      createdUser.getProfile().getVendorInfo()?.getRestaurantName()
+    );
   }
 
   async createDriver(
@@ -367,7 +370,7 @@ export class UserService implements IUserService {
     name: string, 
     phone: string, 
     vehicle: string
-  ): Promise<any> {
+  ): Promise<CreateUserResponseService> {
     const existingUser = await this.userRepository.getUserByEmail(email);
     if (existingUser) {
       throw new Error('El email ya está registrado');
@@ -400,13 +403,13 @@ export class UserService implements IUserService {
 
     const createdUser = await this.userRepository.createUser(userData);
     
-    return {
-      id: createdUser.getId(),
-      email: createdUser.getEmail(),
-      role: createdUser.getRole(),
-      name: createdUser.getProfile().getName(),
-      vehicle: createdUser.getProfile().getDriverInfo()?.getVehicle()
-    };
+    return new CreateUserResponseService(
+      createdUser.getId(),
+      createdUser.getEmail(),
+      createdUser.getRole(),
+      createdUser.getProfile().getName(),
+      createdUser.getProfile().getDriverInfo()?.getVehicle()
+    );
   }
 
   async createAdmin(
@@ -414,7 +417,7 @@ export class UserService implements IUserService {
     password: string, 
     name: string, 
     phone: string
-  ): Promise<any> {
+  ): Promise<CreateUserResponseService> {
     const existingUser = await this.userRepository.getUserByEmail(email);
     if (existingUser) {
       throw new Error('El email ya está registrado');
@@ -439,44 +442,44 @@ export class UserService implements IUserService {
 
     const createdUser = await this.userRepository.createUser(userData);
     
-    return {
-      id: createdUser.getId(),
-      email: createdUser.getEmail(),
-      role: createdUser.getRole(),
-      name: createdUser.getProfile().getName(),
-      phone: createdUser.getProfile().getPhone()
-    };
+    return new CreateUserResponseService(
+      createdUser.getId(),
+      createdUser.getEmail(),
+      createdUser.getRole(),
+      createdUser.getProfile().getName(),
+      createdUser.getProfile().getPhone()
+    );
   }
 
-  async getAllVendors(): Promise<any[]> {
+  async getAllVendors(): Promise<VendorListItemService[]> {
     const vendors = await this.userRepository.getUsersByRole('vendor');
     
-    return vendors.map(vendor => ({
-      id: vendor.getId(),
-      email: vendor.getEmail(),
-      name: vendor.getProfile().getName(),
-      phone: vendor.getProfile().getPhone(),
-      restaurantName: vendor.getProfile().getVendorInfo()?.getRestaurantName(),
-      description: vendor.getProfile().getVendorInfo()?.getDescription(),
-      schedule: vendor.getProfile().getVendorInfo()?.getSchedule(),
-      rating: vendor.getProfile().getVendorInfo()?.getRating(),
-      isAvailable: vendor.getProfile().getVendorInfo()?.getIsAvailable(),
-      createdAt: vendor.getCreatedAt()
-    }));
+    return vendors.map(vendor => new VendorListItemService(
+      vendor.getId(),
+      vendor.getEmail(),
+      vendor.getProfile().getName(),
+      vendor.getProfile().getPhone(),
+      vendor.getCreatedAt(),
+      vendor.getProfile().getVendorInfo()?.getRestaurantName(),
+      vendor.getProfile().getVendorInfo()?.getDescription(),
+      vendor.getProfile().getVendorInfo()?.getSchedule(),
+      vendor.getProfile().getVendorInfo()?.getRating(),
+      vendor.getProfile().getVendorInfo()?.getIsAvailable()
+    ));
   }
 
-  async getAllDrivers(): Promise<any[]> {
+  async getAllDrivers(): Promise<DriverListItemService[]> {
     const drivers = await this.userRepository.getUsersByRole('driver');
     
-    return drivers.map(driver => ({
-      id: driver.getId(),
-      email: driver.getEmail(),
-      name: driver.getProfile().getName(),
-      phone: driver.getProfile().getPhone(),
-      vehicle: driver.getProfile().getDriverInfo()?.getVehicle(),
-      isAvailable: driver.getProfile().getDriverInfo()?.getIsAvailable(),
-      totalEarnings: driver.getProfile().getDriverInfo()?.getEarnings().getTotal(),
-      createdAt: driver.getCreatedAt()
-    }));
+    return drivers.map(driver => new DriverListItemService(
+      driver.getId(),
+      driver.getEmail(),
+      driver.getProfile().getName(),
+      driver.getProfile().getPhone(),
+      driver.getCreatedAt(),
+      driver.getProfile().getDriverInfo()?.getVehicle(),
+      driver.getProfile().getDriverInfo()?.getIsAvailable(),
+      driver.getProfile().getDriverInfo()?.getEarnings().getTotal()
+    ));
   }
 }

@@ -15,6 +15,8 @@ import { Earnings } from '../../domain/entities/earnings.entity';
 import { EarningsDetail } from '../../domain/entities/earnings-detail.entity';
 import { EarningsBreakdown } from '../../domain/entities/earnings-breakdown.entity';
 import { CartItem } from '../../domain/entities/cart-item.entity';
+import { CreateUserData } from '../../domain/types/create-user-data.type';
+import { UpdateVendorFields } from '../../domain/types/update-vendor-fields.type';
 import { User as UserSchema, UserDocument } from '../schemas/user.schema';
 import { Address as AddressSchema } from '../schemas/address.schema';
 import { RatingReview as RatingReviewSchema } from '../schemas/rating-review.schema';
@@ -127,7 +129,7 @@ export class UserRepository implements IUserRepository {
       return null;
     }
 
-    const updateFields: any = {}
+    const updateFields: UpdateVendorFields = {}
     
     if (restaurantName !== undefined) {
       updateFields['profile.vendorInfo.restaurantName'] = restaurantName;
@@ -259,7 +261,7 @@ export class UserRepository implements IUserRepository {
     return !!user;
   }
 
-  async createUser(userData: any): Promise<User> {
+  async createUser(userData: CreateUserData): Promise<User> {
     const newUser = new this.userModel(userData);
     const savedUser = await newUser.save();
     return this.mapToUserEntity(savedUser);

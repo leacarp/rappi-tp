@@ -3,6 +3,7 @@ import { User } from '../entities/user.entity';
 import { RatingReview } from '../entities/rating-review.entity';
 import { VendorInfo } from '../entities/vendor-info.entity';
 import { CartItem } from '../entities/cart-item.entity';
+import { CreateUserData } from '../types/create-user-data.type';
 
 export interface IUserRepository {
   getUserById(userId: string): Promise<User | null>;
@@ -38,7 +39,7 @@ export interface IUserRepository {
 
   existsUser(userId: string): Promise<boolean>;
 
-  createUser(userData: any): Promise<User>;
+  createUser(userData: CreateUserData): Promise<User>;
 
   getUsersByRole(role: string): Promise<User[]>;
 }
