@@ -28,31 +28,31 @@ export class UpdateProductServiceDto {
     this._promotions = data.promotions;
   }
 
-  get name(): string | undefined {
+  getName(): string | undefined {
     return this._name;
   }
 
-  get description(): string | undefined {
+  getDescription(): string | undefined {
     return this._description;
   }
 
-  get imageURL(): string | undefined {
+  getImageURL(): string | undefined {
     return this._imageURL;
   }
 
-  get price(): number | undefined {
+  getPrice(): number | undefined {
     return this._price;
   }
 
-  get category(): string | undefined {
+  getCategory(): string | undefined {
     return this._category;
   }
 
-  get isAvailable(): boolean | undefined {
+  getIsAvailable(): boolean | undefined {
     return this._isAvailable;
   }
 
-  get promotions(): { isOnPromotion: boolean; discountedPrice: number } | undefined {
+  getPromotions(): { isOnPromotion: boolean; discountedPrice: number } | undefined {
     return this._promotions ? { ...this._promotions } : undefined;
   }
 

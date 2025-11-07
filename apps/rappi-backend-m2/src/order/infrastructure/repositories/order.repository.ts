@@ -1,19 +1,20 @@
+import { Model, Types } from 'mongoose';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+
 import { IOrderRepository } from '../../domain/interfaces/IOrderRepository';
+import { OrderFilter } from '../../domain/interfaces/IOrderRepository';
 import { OrderEntity as OrderEntity } from '../../domain/entities/order.entity';
-import { Order, OrderDocument } from '../schemas/order.schema';
 import { PickUpLocation } from '../../domain/entities/pickup-location.entity';
 import { DeliveryLocation } from '../../domain/entities/deliveryLocation.entity';
 import { Items } from '../../domain/entities/items.entity';
 import { Summary } from '../../domain/entities/summary.entity';
 import { Payment } from '../../domain/entities/payment.entity';
 import { ProductOfItem } from '../../domain/entities/product-of-item.entity';
-import { OrderStatus } from '../../domain/enum/order-status';
 import { UserBasicEntity } from '../../domain/entities/user-basic';
 import { CustomerBasicEntity } from '../../domain/entities/customer-basic';
-import { OrderFilter } from '../../domain/interfaces/IOrderRepository';
+import { OrderStatus } from '../../domain/enum/order-status';
+import { Order, OrderDocument } from '../schemas/order.schema';
 
 interface PopulatedUser {
   _id: Types.ObjectId;

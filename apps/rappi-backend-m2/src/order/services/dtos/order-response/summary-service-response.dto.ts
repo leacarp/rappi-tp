@@ -1,6 +1,6 @@
-import { SummaryServiceResponse } from "../../../services/dtos/order-response/summary-service-response.dto";
+import { Summary } from "../../../domain/entities/summary.entity";
 
-export class SummaryDto {
+export class SummaryServiceResponse {
   private readonly _subtotal: number;
   private readonly _shippingCost: number;
   private readonly _taxes: number;
@@ -35,13 +35,13 @@ export class SummaryDto {
     return this._total;
   }
 
-  static fromServiceDto(serviceDto: SummaryServiceResponse): SummaryDto {
-    return new SummaryDto(
-      serviceDto.getSubtotal(),
-      serviceDto.getShippingCost(),
-      serviceDto.getTaxes(),
-      serviceDto.getDiscount(),
-      serviceDto.getTotal()
+  static fromEntity(summary: Summary): SummaryServiceResponse {
+    return new SummaryServiceResponse(
+      summary.getSubTotal(),
+      summary.getShippingCost(),
+      summary.getTaxes(),
+      summary.getDiscount(),
+      summary.getTotal()
     );
   }
 }

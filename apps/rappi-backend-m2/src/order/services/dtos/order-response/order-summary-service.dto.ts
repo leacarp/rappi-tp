@@ -1,6 +1,7 @@
-import { OrderSummaryService } from "../../../services/dtos/order-response/order-summary-service.dto";
+import { OrderEntity } from "../../../domain/entities/order.entity";
+import { Types } from "mongoose";
 
-export class OrderSummaryDto {
+export class OrderSummaryService {
   private readonly _id: string;
   private readonly _status: string;
   private readonly _createdAt: Date;
@@ -41,13 +42,13 @@ export class OrderSummaryDto {
     return this._total;
   }
 
-  static fromServiceDto(serviceDto: OrderSummaryService): OrderSummaryDto {
-    return new OrderSummaryDto(
-      serviceDto.getId(),
-      serviceDto.getStatus(),
-      serviceDto.getCreatedAt(),
-      serviceDto.getTrackingNumber(),
-      serviceDto.getTotal()
+  static fromEntity(order: OrderEntity): OrderSummaryService {
+    return new OrderSummaryService(
+      order.getId() instanceof Types.ObjectId ? order.getId().toHexString() : order.getId().toString(),
+      order.getStatus(),
+      order.getCreatedAt(),
+      order.getTrackingNumber(),
+      order.getSummary().getTotal()
     );
   }
 }

@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
+
 import { PickupLocationDtoService } from '../../../services/dtos/order/pickupLocation-service.dto';
 
 export class PickUpLocationRequestDto {

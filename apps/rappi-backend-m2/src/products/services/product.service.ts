@@ -71,11 +71,11 @@ export class ProductService implements IProductService {
       throw new NotFoundException('Producto no encontrado');
     }
 
-    if (updateProductDto.price !== undefined && updateProductDto.price <= 0) {
+    if (updateProductDto.getPrice() !== undefined && updateProductDto.getPrice() <= 0) {
       throw new BadRequestException('El precio debe ser mayor a 0');
     }
 
-    if (updateProductDto.name !== undefined && (!updateProductDto.name || updateProductDto.name.trim().length === 0)) {
+    if (updateProductDto.getName() !== undefined && (!updateProductDto.getName() || updateProductDto.getName().trim().length === 0)) {
       throw new BadRequestException('El nombre no puede estar vacío');
     }
 

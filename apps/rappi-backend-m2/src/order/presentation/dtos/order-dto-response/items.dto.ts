@@ -1,4 +1,4 @@
-import { Items } from "../../../domain/entities/items.entity";
+import { ItemsServiceResponse } from "../../../services/dtos/order-response/items-service-response.dto";
 import { ProductOfItemDto } from "./productOfItem.dto";
 
 export class ItemsDto {
@@ -18,7 +18,7 @@ export class ItemsDto {
     return this._quantity;
   }
 
-  static fromEntity(item: Items): ItemsDto {
-    return new ItemsDto(ProductOfItemDto.fromEntity(item.getProduct()), item.getQuantity());
+  static fromServiceDto(serviceDto: ItemsServiceResponse): ItemsDto {
+    return new ItemsDto(ProductOfItemDto.fromServiceDto(serviceDto.getProduct()), serviceDto.getQuantity());
   }
 }

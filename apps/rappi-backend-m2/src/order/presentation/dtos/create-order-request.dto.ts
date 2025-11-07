@@ -1,5 +1,6 @@
 import { IsNotEmpty, ValidateNested, IsString, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
+
 import { PickUpLocationRequestDto } from './order-dto.request/pickupLocation-request.dto';
 import { ItemsRequestDto } from './order-dto.request/items-request.dto';
 import { SummaryRequestDto } from './order-dto.request/summary-request.dto';

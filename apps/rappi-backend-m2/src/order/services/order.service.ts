@@ -5,16 +5,16 @@ import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product
 import { IProductAdapter } from '../../products/domain/interfaces/IProductAdapter';
 import { USER_ADAPTER } from '../../users/infrastructure/constants/user-adapter.constants';
 import { IUserAdapter } from '../../users/domain/interfaces/IUserAdapter';
+import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
 import { IOrderRepository } from '../domain/interfaces/IOrderRepository';
+import { OrderFilter } from '../domain/interfaces/IOrderRepository';
+import { IOrderService } from '../domain/interfaces/IOrderService';
 import { Items } from '../domain/entities/items.entity';
 import { ProductOfItem } from '../domain/entities/product-of-item.entity';
 import { OrderStatus } from '../domain/enum/order-status';
-import { OrderFilter } from '../domain/interfaces/IOrderRepository';
-import { IOrderService } from '../domain/interfaces/IOrderService';
-import { SummaryDto } from '../presentation/dtos/order-dto-response/summary.dto';
-import { GetOrderResponseDto } from '../presentation/dtos/get-order-response.dto';
-import { GetUserOrdersResponseDto } from '../presentation/dtos/get-orders-response.dto';
-import { ORDER_REPOSITORY } from '../infrastructure/constants/order.constants';
+import { GetOrderResponseService } from './dtos/get-order-response-service.dto';
+import { GetOrdersResponseService } from './dtos/get-orders-response-service.dto';
+import { SummaryServiceResponse } from './dtos/order-response/summary-service-response.dto';
 import { CreateOrderDto } from './dtos/order/create-order-service.dto';
 import { ItemsDtoService } from './dtos/order/items-service.dto';
 
@@ -29,7 +29,7 @@ export class OrderService implements IOrderService {
     private readonly userAdapter: IUserAdapter
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseDto> {
+  async createOrder(createOrderDto: CreateOrderDto): Promise<GetOrderResponseService> {
     const existingOrder = await this.orderRepository.findByTrackingNumber(createOrderDto.getTrackingNumber());
     if (existingOrder) throw new BadRequestException(`El tracking number ${createOrderDto.getTrackingNumber()} ya existe`);
 
@@ -40,17 +40,17 @@ export class OrderService implements IOrderService {
     const orderEntity = CreateOrderDto.toEntity(createOrderDto, items);
     const savedOrder = await this.orderRepository.create(orderEntity);
 
-    return GetOrderResponseDto.fromEntity(savedOrder);
+    return GetOrderResponseService.fromEntity(savedOrder);
   }
 
-  async getOrderById(orderId: string): Promise<GetOrderResponseDto> {
+  async getOrderById(orderId: string): Promise<GetOrderResponseService> {
     const orderEntity = await this.orderRepository.findById(orderId);
     if (!orderEntity) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
-    return GetOrderResponseDto.fromEntity(orderEntity);
+    return GetOrderResponseService.fromEntity(orderEntity);
   }
 
-  async getOrdersByUserRole(userId: string, role: 'customer' | 'vendor' | 'driver', status?: string): Promise<GetUserOrdersResponseDto> {
+  async getOrdersByUserRole(userId: string, role: 'customer' | 'vendor' | 'driver', status?: string): Promise<GetOrdersResponseService> {
     const field = role === 'vendor'
       ? 'vendorId'
       : role === 'driver'
@@ -65,25 +65,25 @@ export class OrderService implements IOrderService {
     const orders = await this.orderRepository.findByFilter(filter);
 
     if (!orders.length)
-      return new GetUserOrdersResponseDto([]);
+      return new GetOrdersResponseService([]);
 
-    return GetUserOrdersResponseDto.fromEntities(orders);
+    return GetOrdersResponseService.fromEntities(orders);
   }
 
-  async getOrdersByStatus(status?: string): Promise<GetUserOrdersResponseDto> {
+  async getOrdersByStatus(status?: string): Promise<GetOrdersResponseService> {
     const filter: OrderFilter = status ? { status } : {};
 
     const orders = await this.orderRepository.findByFilter(filter);
-    if (!orders.length) return new GetUserOrdersResponseDto([]);
+    if (!orders.length) return new GetOrdersResponseService([]);
 
-    return GetUserOrdersResponseDto.fromEntities(orders);
+    return GetOrdersResponseService.fromEntities(orders);
   }
 
-  async getDriverCompletedOrders(driverId: string): Promise<GetUserOrdersResponseDto> {
+  async getDriverCompletedOrders(driverId: string): Promise<GetOrdersResponseService> {
     const orders = await this.orderRepository.findByDriverAndStatus(driverId, OrderStatus.Delivered);
-    if (!orders.length) return new GetUserOrdersResponseDto([]);
+    if (!orders.length) return new GetOrdersResponseService([]);
 
-    return GetUserOrdersResponseDto.fromEntities(orders);
+    return GetOrdersResponseService.fromEntities(orders);
   }
 
   async getProductById(id: string): Promise<ProductOfItem> {
@@ -162,14 +162,14 @@ export class OrderService implements IOrderService {
     }
   }
 
-  async getOrderSummary(orderId: string): Promise<SummaryDto> {
+  async getOrderSummary(orderId: string): Promise<SummaryServiceResponse> {
     const orderEntity = await this.orderRepository.findById(orderId);
     if (!orderEntity) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
-    return SummaryDto.fromEntity(orderEntity.getSummary());
+    return SummaryServiceResponse.fromEntity(orderEntity.getSummary());
   }
 
-  async confirmOrder(orderId: string): Promise<GetOrderResponseDto> {
+  async confirmOrder(orderId: string): Promise<GetOrderResponseService> {
     const order = await this.orderRepository.findById(orderId);
     if (!order) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
@@ -182,7 +182,7 @@ export class OrderService implements IOrderService {
     const updated = await this.orderRepository.findById(orderId);
     if (!updated) throw new NotFoundException(`Orden con id ${orderId} no encontrada`);
 
-    return GetOrderResponseDto.fromEntity(updated);
+    return GetOrderResponseService.fromEntity(updated);
   }
 
   async getWhatsAppLink(orderId: string): Promise<{ url: string }> {

@@ -9,11 +9,11 @@ export class ConfirmOrderResponseDto {
     this._whatsappLink = whatsappLink;
   }
 
-  get order(): GetOrderResponseDto {
+  getOrder(): GetOrderResponseDto {
     return this._order;
   }
 
-  get whatsappLink(): string {
+  getWhatsappLink(): string {
     return this._whatsappLink;
   }
 

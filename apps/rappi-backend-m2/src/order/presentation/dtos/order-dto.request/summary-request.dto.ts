@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
+
 import { SummaryDtoService } from '../../../services/dtos/order/summary-service.dto';
 
 export class SummaryRequestDto {

@@ -1,4 +1,4 @@
-import { DeliveryLocation } from "../../../domain/entities/deliveryLocation.entity";
+import { DeliveryLocationService } from "../../../services/dtos/order-response/delivery-location-service.dto";
 
 export class DeliveryLocationDto {
   private readonly _latitude: number;
@@ -17,8 +17,8 @@ export class DeliveryLocationDto {
     return this._longitude;
   }
 
-  static fromEntity(deliveryLocation: DeliveryLocation | null): DeliveryLocationDto | null {
-    if (!deliveryLocation) return null;
-    return new DeliveryLocationDto(deliveryLocation.getLatitude(), deliveryLocation.getLongitude());
+  static fromServiceDto(serviceDto: DeliveryLocationService | null): DeliveryLocationDto | null {
+    if (!serviceDto) return null;
+    return new DeliveryLocationDto(serviceDto.getLatitude(), serviceDto.getLongitude());
   }
 }

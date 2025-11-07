@@ -1,6 +1,6 @@
-import { UserBasicService } from "../../../services/dtos/order-response/user-basic-service.dto";
+import { UserBasicEntity } from "../../../domain/entities/user-basic";
 
-export class UserBasicDto {
+export class UserBasicService {
   private readonly _id: string;
   private readonly _name: string;
   private readonly _email: string;
@@ -23,8 +23,8 @@ export class UserBasicDto {
     return this._email;
   }
 
-  static fromServiceDto(serviceDto: UserBasicService | null): UserBasicDto | null {
-    if (!serviceDto) return null;
-    return new UserBasicDto(serviceDto.getId(), serviceDto.getName(), serviceDto.getEmail());
+  static fromEntity(user: UserBasicEntity | undefined): UserBasicService | null {
+    if (!user) return null;
+    return new UserBasicService(user.getId().toHexString(), user.getName(), user.getEmail());
   }
 }

@@ -1,4 +1,5 @@
 import { OrderSummaryDto } from "./order-dto-response/order-summary.dto";
+import { GetOrdersResponseService } from "../../services/dtos/get-orders-response-service.dto";
 
 export class GetUserOrdersResponseDto {
   private readonly _orders: OrderSummaryDto[];
@@ -7,12 +8,12 @@ export class GetUserOrdersResponseDto {
     this._orders = orders;
   }
 
-  get orders(): OrderSummaryDto[] {
+  getOrders(): OrderSummaryDto[] {
     return this._orders;
   }
 
-  static fromEntities(orderEntities: any[]): GetUserOrdersResponseDto {
-    const orders = orderEntities.map(order => OrderSummaryDto.fromEntity(order));
+  static fromServiceDto(serviceDto: GetOrdersResponseService): GetUserOrdersResponseDto {
+    const orders = serviceDto.getOrders().map(order => OrderSummaryDto.fromServiceDto(order));
     return new GetUserOrdersResponseDto(orders);
   }
 }

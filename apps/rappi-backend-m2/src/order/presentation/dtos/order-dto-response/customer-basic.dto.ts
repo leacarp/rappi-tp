@@ -1,4 +1,4 @@
-import { CustomerBasicEntity } from "../../../domain/entities/customer-basic";
+import { CustomerBasicService } from "../../../services/dtos/order-response/customer-basic-service.dto";
 import { UserBasicDto } from "./user-basic.dto";
 
 export class CustomerBasicDto extends UserBasicDto {
@@ -18,12 +18,12 @@ export class CustomerBasicDto extends UserBasicDto {
     return this._address;
   }
 
-  static fromEntity(customer: CustomerBasicEntity): CustomerBasicDto {
+  static fromServiceDto(serviceDto: CustomerBasicService): CustomerBasicDto {
     return new CustomerBasicDto(
-      customer.getId().toHexString(),
-      customer.getName(),
-      customer.getEmail(),
-      customer.getAddress()
+      serviceDto.getId(),
+      serviceDto.getName(),
+      serviceDto.getEmail(),
+      serviceDto.getAddress()
     );
   }
 }

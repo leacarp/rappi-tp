@@ -1,6 +1,6 @@
-import { PickupLocationService } from "../../../services/dtos/order-response/pickup-location-service.dto";
+import { PickUpLocation } from "../../../domain/entities/pickup-location.entity";
 
-export class PickupLocationDto {
+export class PickupLocationService {
   private readonly _latitude: number;
   private readonly _longitude: number;
 
@@ -17,7 +17,7 @@ export class PickupLocationDto {
     return this._longitude;
   }
 
-  static fromServiceDto(serviceDto: PickupLocationService): PickupLocationDto {
-    return new PickupLocationDto(serviceDto.getLatitude(), serviceDto.getLongitude());
+  static fromEntity(pickup: PickUpLocation): PickupLocationService {
+    return new PickupLocationService(pickup.getLatitude(), pickup.getLongitude());
   }
 }

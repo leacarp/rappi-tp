@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Get, Param, Query, Put, Inject } from '@nestjs/common';
+
 import { IOrderService } from '../../domain/interfaces/IOrderService';
 import { ORDER_SERVICE } from '../../infrastructure/constants/order-service.constants';
 import { CreateOrderRequestDto } from '../dtos/create-order-request.dto';
@@ -20,7 +21,8 @@ export class OrderController {
   async createOrder(@Body() createOrderRequestDto: CreateOrderRequestDto): Promise<ConfirmOrderResponseDto> {
     const createOrderDto = createOrderRequestDto.toServiceDto();
 
-    const newOrder = await this.orderService.createOrder(createOrderDto);
+    const newOrderServiceDto = await this.orderService.createOrder(createOrderDto);
+    const newOrder = GetOrderResponseDto.fromServiceDto(newOrderServiceDto);
 
     const { url } = await this.orderService.getWhatsAppLink(newOrder.getId());
 
@@ -29,27 +31,32 @@ export class OrderController {
 
   @Get('user/:userId')
   async getOrdersByUser(@Param('userId') userId: string, @Query('role') role: 'customer' | 'vendor' | 'driver', @Query('status') status?: string): Promise<GetUserOrdersResponseDto> {
-    return this.orderService.getOrdersByUserRole(userId, role, status);
+    const serviceDto = await this.orderService.getOrdersByUserRole(userId, role, status);
+    return GetUserOrdersResponseDto.fromServiceDto(serviceDto);
   }
 
   @Get('driver/:driverId/completed')
   async getDriverCompletedOrders(@Param('driverId') driverId: string): Promise<GetUserOrdersResponseDto> {
-    return this.orderService.getDriverCompletedOrders(driverId);
+    const serviceDto = await this.orderService.getDriverCompletedOrders(driverId);
+    return GetUserOrdersResponseDto.fromServiceDto(serviceDto);
   }
 
   @Get(':id/summary')
   async getOrderSummary(@Param('id') id: string): Promise<SummaryDto> {
-    return this.orderService.getOrderSummary(id);
+    const serviceDto = await this.orderService.getOrderSummary(id);
+    return SummaryDto.fromServiceDto(serviceDto);
   }
 
   @Get(':id')
   async getOrderById(@Param('id') id: string): Promise<GetOrderResponseDto> {
-    return this.orderService.getOrderById(id);
+    const serviceDto = await this.orderService.getOrderById(id);
+    return GetOrderResponseDto.fromServiceDto(serviceDto);
   }
 
   @Get()
   async getAllOrders(@Query('status') status?: string): Promise<GetUserOrdersResponseDto> {
-    return this.orderService.getOrdersByStatus(status);
+    const serviceDto = await this.orderService.getOrdersByStatus(status);
+    return GetUserOrdersResponseDto.fromServiceDto(serviceDto);
   }
 
   @Put(':id/status')
@@ -60,7 +67,8 @@ export class OrderController {
 
   @Put(':id/confirm')
   async confirmOrder(@Param('id') id: string): Promise<ConfirmOrderResponseDto> {
-    const order = await this.orderService.confirmOrder(id);
+    const orderServiceDto = await this.orderService.confirmOrder(id);
+    const order = GetOrderResponseDto.fromServiceDto(orderServiceDto);
     return ConfirmOrderResponseDto.of(order, '');
   }
 

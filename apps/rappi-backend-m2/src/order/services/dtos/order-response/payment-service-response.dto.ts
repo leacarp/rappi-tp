@@ -1,6 +1,6 @@
-import { PaymentServiceResponse } from "../../../services/dtos/order-response/payment-service-response.dto";
+import { Payment } from "../../../domain/entities/payment.entity";
 
-export class PaymentDto {
+export class PaymentServiceResponse {
   private readonly _method: string;
   private readonly _status: string;
   private readonly _transactionId: string;
@@ -23,7 +23,7 @@ export class PaymentDto {
     return this._transactionId;
   }
 
-  static fromServiceDto(serviceDto: PaymentServiceResponse): PaymentDto {
-    return new PaymentDto(serviceDto.getMethod(), serviceDto.getStatus(), serviceDto.getTransactionId());
+  static fromEntity(payment: Payment): PaymentServiceResponse {
+    return new PaymentServiceResponse(payment.getMethod(), payment.getStatus(), payment.getTransactionId());
   }
 }
