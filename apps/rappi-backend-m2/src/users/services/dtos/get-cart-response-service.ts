@@ -1,15 +1,31 @@
 import { CartItem } from '../../domain/entities/cart-item.entity';
 
 export class GetCartResponseService {
-  constructor(
-    private readonly items: CartItemService[],
-    private readonly subtotal: number,
-    private readonly total: number
-  ) {}
+  private readonly _items: CartItemService[];
+  private readonly _subtotal: number;
+  private readonly _total: number;
 
-  getItems(): CartItemService[] { return this.items; }
-  getSubtotal(): number { return this.subtotal; }
-  getTotal(): number { return this.total; }
+  constructor(
+    items: CartItemService[],
+    subtotal: number,
+    total: number
+  ) {
+    this._items = items;
+    this._subtotal = subtotal;
+    this._total = total;
+  }
+
+  getItems(): CartItemService[] {
+    return this._items;
+  }
+
+  getSubtotal(): number {
+    return this._subtotal;
+  }
+
+  getTotal(): number {
+    return this._total;
+  }
 
   static fromEntities(cartItems: CartItem[]): GetCartResponseService {
     const items = cartItems.map(ci => new CartItemService(
@@ -25,15 +41,36 @@ export class GetCartResponseService {
 }
 
 export class CartItemService {
-  constructor(
-    private readonly productId: string,
-    private readonly name: string,
-    private readonly price: number,
-    private readonly quantity: number
-  ) {}
+  private readonly _productId: string;
+  private readonly _name: string;
+  private readonly _price: number;
+  private readonly _quantity: number;
 
-  getProductId(): string { return this.productId; }
-  getName(): string { return this.name; }
-  getPrice(): number { return this.price; }
-  getQuantity(): number { return this.quantity; }
+  constructor(
+    productId: string,
+    name: string,
+    price: number,
+    quantity: number
+  ) {
+    this._productId = productId;
+    this._name = name;
+    this._price = price;
+    this._quantity = quantity;
+  }
+
+  getProductId(): string {
+    return this._productId;
+  }
+
+  getName(): string {
+    return this._name;
+  }
+
+  getPrice(): number {
+    return this._price;
+  }
+
+  getQuantity(): number {
+    return this._quantity;
+  }  
 }

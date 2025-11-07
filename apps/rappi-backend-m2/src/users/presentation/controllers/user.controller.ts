@@ -1,18 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  UsePipes,
-  ValidationPipe,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Inject,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Inject } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
 import { IUserService } from '../../domain/interfaces/IUserService';
 import { USER_SERVICE } from '../../infrastructure/constants/user-service.constants';
 import { CreateAddressRequest } from '../dtos/create-address-request';
@@ -21,9 +9,6 @@ import { GetAddressesResponse } from '../dtos/get-addresses-response';
 import { UpdateAddressRequest } from '../dtos/update-address-request';
 import { CreateReviewRequest } from '../dtos/create-review-request';
 import { GetReviewsResponse } from '../dtos/get-reviews-response';
-import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
-import { RolesGuard } from '../../../auth/guards/roles.guard';
-import { Roles } from '../../../auth/decorators/roles.decorator';
 import { AddCartItemRequest } from '../dtos/add-cart-item-request';
 import { SetCartItemQuantityRequest } from '../dtos/set-cart-item-quantity-request';
 import { GetCartResponse } from '../dtos/get-cart-response';
@@ -32,9 +17,18 @@ import { GetDriverAvailabilityResponse } from '../dtos/get-driver-availability-r
 import { CreateVendorAdminDto } from '../dtos/create-vendor-admin.dto';
 import { CreateDriverAdminDto } from '../dtos/create-driver-admin.dto';
 import { CreateAdminDto } from '../dtos/create-admin.dto';
+import { CreateUserResponse } from '../dtos/create-user-response.dto';
+import { VendorListItem } from '../dtos/vendor-list-item.dto';
+import { DriverListItem } from '../dtos/driver-list-item.dto';
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
+import { RolesGuard } from '../../../auth/guards/roles.guard';
+import { Roles } from '../../../auth/decorators/roles.decorator';
 
+@ApiTags('users')
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(
     @Inject(USER_SERVICE)
@@ -92,14 +86,12 @@ export class UserController {
     const serviceResponse = await this.userService.getReviews(userId);
     return GetReviewsResponse.fromServiceDto(serviceResponse);
   }
-
   
   @Get(':userId/cart')
   async getCart(@Param('userId') userId: string): Promise<GetCartResponse> {
     const serviceDto = await this.userService.getCart(userId);
     return GetCartResponse.fromServiceDto(serviceDto);
   }
-
   
   @Post(':userId/cart/items')
   @HttpCode(HttpStatus.CREATED)
@@ -110,7 +102,6 @@ export class UserController {
     const serviceDto = body.toServiceDto();
     await this.userService.addCartItem(userId, serviceDto);
   }
-
   
   @Put(':userId/cart/items/:productId')
   async setCartItemQuantity(
@@ -142,8 +133,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.CREATED)
-  async createVendor(@Body() body: CreateVendorAdminDto): Promise<any> {
-    return await this.userService.createVendor(
+  async createVendor(@Body() body: CreateVendorAdminDto): Promise<CreateUserResponse> {
+    const serviceDto = await this.userService.createVendor(
       body.email,
       body.password,
       body.name,
@@ -153,44 +144,49 @@ export class UserController {
       body.schedule,
       body.category
     );
+    return CreateUserResponse.fromServiceDto(serviceDto);
   }
 
   @Get('vendors')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  async getAllVendors(): Promise<any[]> {
-    return await this.userService.getAllVendors();
+  async getAllVendors(): Promise<VendorListItem[]> {
+    const serviceDtos = await this.userService.getAllVendors();
+    return serviceDtos.map(dto => VendorListItem.fromServiceDto(dto));
   }
 
   @Post('drivers')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.CREATED)
-  async createDriver(@Body() body: CreateDriverAdminDto): Promise<any> {
-    return await this.userService.createDriver(
+  async createDriver(@Body() body: CreateDriverAdminDto): Promise<CreateUserResponse> {
+    const serviceDto = await this.userService.createDriver(
       body.email,
       body.password,
       body.name,
       body.phone,
       body.vehicle
     );
+    return CreateUserResponse.fromServiceDto(serviceDto);
   }
 
   @Get('drivers')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  async getAllDrivers(): Promise<any[]> {
-    return await this.userService.getAllDrivers();
+  async getAllDrivers(): Promise<DriverListItem[]> {
+    const serviceDtos = await this.userService.getAllDrivers();
+    return serviceDtos.map(dto => DriverListItem.fromServiceDto(dto));
   }
 
   @Post('admins')
   @HttpCode(HttpStatus.CREATED)
-  async createAdmin(@Body() body: CreateAdminDto): Promise<any> {
-    return await this.userService.createAdmin(
+  async createAdmin(@Body() body: CreateAdminDto): Promise<CreateUserResponse> {
+    const serviceDto = await this.userService.createAdmin(
       body.email,
       body.password,
       body.name,
       body.phone
     );
+    return CreateUserResponse.fromServiceDto(serviceDto);
   }
 }

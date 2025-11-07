@@ -7,9 +7,7 @@ import {Payment, PaymentSchema} from './payment.schema'
 import {Items, ItemsSchema} from './items.schema'
 import { OrderStatus } from '../../domain/enum/order-status';
 
-
 export type OrderDocument = Order & Document;
-
 
 @Schema({ timestamps: true})
 export class Order{
@@ -24,7 +22,6 @@ export class Order{
     
     @Prop({ type: String, enum: Object.values(OrderStatus), required: true })
     status: OrderStatus;
-
 
     @Prop({ type: PickUpLocationSchema })
     pickUpLocation?: PickUp_Location;

@@ -1,13 +1,13 @@
 import { User } from '../../domain/entities/user.entity';
 
 export class GetVendorProfile {
-  private readonly restaurantName: string;
-  private readonly description: string;
-  private readonly schedule: string;
-  private readonly rating: number;
-  private readonly isAvailable: boolean;
-  private readonly phone?: string;
-  private readonly email: string;
+  private readonly _restaurantName: string;
+  private readonly _description: string;
+  private readonly _schedule: string;
+  private readonly _rating: number;
+  private readonly _isAvailable: boolean;
+  private readonly _phone?: string;
+  private readonly _email: string;
 
   constructor(
     restaurantName: string,
@@ -18,41 +18,41 @@ export class GetVendorProfile {
     email: string,
     phone?: string
   ) {
-    this.restaurantName = restaurantName;
-    this.description = description;
-    this.schedule = schedule;
-    this.rating = rating;
-    this.isAvailable = isAvailable;
-    this.email = email;
-    this.phone = phone;
+    this._restaurantName = restaurantName;
+    this._description = description;
+    this._schedule = schedule;
+    this._rating = rating;
+    this._isAvailable = isAvailable;
+    this._email = email;
+    this._phone = phone;
   }
 
   getRestaurantName(): string {
-    return this.restaurantName;
+    return this._restaurantName;
   }
 
   getDescription(): string {
-    return this.description;
+    return this._description;
   }
 
   getSchedule(): string {
-    return this.schedule;
+    return this._schedule;
   }
 
   getRating(): number {
-    return this.rating;
+    return this._rating;
   }
 
   getIsAvailable(): boolean {
-    return this.isAvailable;
+    return this._isAvailable;
   }
 
   getPhone(): string | undefined {
-    return this.phone;
+    return this._phone;
   }
 
   getEmail(): string {
-    return this.email;
+    return this._email;
   }
 
   static fromEntity(user: User): GetVendorProfile {

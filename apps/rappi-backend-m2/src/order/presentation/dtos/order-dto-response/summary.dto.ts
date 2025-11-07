@@ -1,36 +1,47 @@
-import { Summary } from "../../../domain/entities/summary.entity";
-export class SummaryDto{
-    constructor(
-        private readonly _subtotal : number, 
-        private readonly _shippingCost : number, 
-        private readonly _taxes : number, 
-        private readonly _discount : number, 
-        private readonly _total : number)
-        {}
+import { SummaryServiceResponse } from "../../../services/dtos/order-response/summary-service-response.dto";
 
-        getSubtotal() : number{
-            return this._subtotal;
-        }
+export class SummaryDto {
+  private readonly _subtotal: number;
+  private readonly _shippingCost: number;
+  private readonly _taxes: number;
+  private readonly _discount: number;
+  private readonly _total: number;
 
-        getShippingCost() : number{
-            return this._shippingCost;
-        }
+  constructor(subtotal: number, shippingCost: number, taxes: number, discount: number, total: number) {
+    this._subtotal = subtotal;
+    this._shippingCost = shippingCost;
+    this._taxes = taxes;
+    this._discount = discount;
+    this._total = total;
+  }
 
-        getTaxes() : number{
-            return this._taxes;
-        }
+  getSubtotal(): number {
+    return this._subtotal;
+  }
 
-        getDiscount() : number{
-            return this._discount;
-        }
+  getShippingCost(): number {
+    return this._shippingCost;
+  }
 
-        getTotal() : number{
-            return this._total;
-        }
+  getTaxes(): number {
+    return this._taxes;
+  }
 
-        static fromEntity(summary : Summary) : SummaryDto{
-            return new SummaryDto(summary.getSubTotal(), summary.getShippingCost(),
-                    summary.getTaxes(), summary.getDiscount(), summary.getTotal())
-        }
-    
+  getDiscount(): number {
+    return this._discount;
+  }
+
+  getTotal(): number {
+    return this._total;
+  }
+
+  static fromServiceDto(serviceDto: SummaryServiceResponse): SummaryDto {
+    return new SummaryDto(
+      serviceDto.getSubtotal(),
+      serviceDto.getShippingCost(),
+      serviceDto.getTaxes(),
+      serviceDto.getDiscount(),
+      serviceDto.getTotal()
+    );
+  }
 }

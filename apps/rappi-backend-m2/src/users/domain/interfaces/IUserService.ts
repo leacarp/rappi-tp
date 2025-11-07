@@ -10,6 +10,9 @@ import { SearchRestaurantsResponseService } from '../../services/dtos/search-res
 import { AddCartItemRequestService } from '../../services/dtos/add-cart-item-request-service';
 import { SetCartItemQuantityRequestService } from '../../services/dtos/set-cart-item-quantity-request-service';
 import { GetCartResponseService } from '../../services/dtos/get-cart-response-service';
+import { CreateUserResponseService } from '../../services/dtos/create-user-response-service.dto';
+import { VendorListItemService } from '../../services/dtos/vendor-list-item-service.dto';
+import { DriverListItemService } from '../../services/dtos/driver-list-item-service.dto';
 
 export interface IUserService {
   getVendorProfile(vendorId: string): Promise<GetVendorProfile>;
@@ -31,9 +34,9 @@ export interface IUserService {
   getCart(userId: string): Promise<GetCartResponseService>;
   getDriverAvailability(userId: string): Promise<boolean>;
   updateDriverAvailability(userId: string, isAvailable: boolean): Promise<void>;
-  createVendor(email: string, password: string, name: string, phone: string, restaurantName: string, description: string, schedule: string, category: string): Promise<any>;
-  createDriver(email: string, password: string, name: string, phone: string, vehicle: string): Promise<any>;
-  createAdmin(email: string, password: string, name: string, phone: string): Promise<any>;
-  getAllVendors(): Promise<any[]>;
-  getAllDrivers(): Promise<any[]>;
+  createVendor(email: string, password: string, name: string, phone: string, restaurantName: string, description: string, schedule: string, category: string): Promise<CreateUserResponseService>;
+  createDriver(email: string, password: string, name: string, phone: string, vehicle: string): Promise<CreateUserResponseService>;
+  createAdmin(email: string, password: string, name: string, phone: string): Promise<CreateUserResponseService>;
+  getAllVendors(): Promise<VendorListItemService[]>;
+  getAllDrivers(): Promise<DriverListItemService[]>;
 }

@@ -1,27 +1,37 @@
 import { RatingReview } from '../../domain/entities/rating-review.entity';
 
 export class ReviewItemService {
+  private readonly _reviewerId: string;
+  private readonly _score: number;
+  private readonly _date: Date;
+  private readonly _comment?: string;
+
   constructor(
-    private readonly reviewerId: string,
-    private readonly score: number,
-    private readonly date: Date,
-    private readonly comment?: string
-  ) {}
+    reviewerId: string,
+    score: number,
+    date: Date,
+    comment?: string
+  ) {
+    this._reviewerId = reviewerId;
+    this._score = score;
+    this._date = date;
+    this._comment = comment;
+  }
 
   getReviewerId(): string {
-    return this.reviewerId;
+    return this._reviewerId;
   }
 
   getScore(): number {
-    return this.score;
+    return this._score;
   }
 
   getComment(): string | undefined {
-    return this.comment;
+    return this._comment;
   }
 
   getDate(): Date {
-    return this.date;
+    return this._date;
   }
 
   static fromEntity(entity: RatingReview): ReviewItemService {
@@ -35,22 +45,30 @@ export class ReviewItemService {
 }
 
 export class GetReviewsResponseService {
+  private readonly _items: ReviewItemService[];
+  private readonly _averageScore: number;
+  private readonly _total: number;
+  
   constructor(
-    private readonly items: ReviewItemService[],
-    private readonly averageScore: number,
-    private readonly total: number
-  ) {}
+    items: ReviewItemService[],
+    averageScore: number,
+    total: number
+  ) {
+    this._items = items;
+    this._averageScore = averageScore;
+    this._total = total;
+  }
 
   getItems(): ReviewItemService[] {
-    return this.items;
+    return this._items;
   }
 
   getAverageScore(): number {
-    return this.averageScore;
+    return this._averageScore;
   }
 
   getTotal(): number {
-    return this.total;
+    return this._total;
   }
 
   static fromEntities(entities: RatingReview[]): GetReviewsResponseService {
@@ -60,4 +78,3 @@ export class GetReviewsResponseService {
     return new GetReviewsResponseService(items, Number(averageScore.toFixed(2)), total);
   }
 }
-

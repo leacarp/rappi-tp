@@ -12,13 +12,11 @@ export class Payment{
     })
     method: string
 
-
     @Prop({required: true})
     status: string
 
     @Prop({required: true})
     transactionId: string
-
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

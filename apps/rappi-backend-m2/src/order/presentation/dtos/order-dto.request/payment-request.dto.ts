@@ -1,18 +1,19 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+
 import { PaymentDtoService } from '../../../services/dtos/order/payment-service.dto';
 
-export class PaymentRequestDto{
+export class PaymentRequestDto {
   @IsNotEmpty()
   @IsString()
-  method : string;
+  method: string;
 
   @IsNotEmpty()
   @IsString()
-  status : string;
+  status: string;
 
   @IsNotEmpty()
   @IsString()
-  transactionId : string;
+  transactionId: string;
 
   toServiceDto(): PaymentDtoService {
     return new PaymentDtoService(this.method, this.status, this.transactionId);

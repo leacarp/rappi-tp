@@ -41,39 +41,39 @@ export class Product {
     this.validateBusinessRules();
   }
 
-  get id(): Types.ObjectId {
+  getId(): Types.ObjectId {
     return this._id;
   }
 
-  get vendorId(): Types.ObjectId {
+  getVendorId(): Types.ObjectId {
     return this._vendorId;
   }
 
-  get name(): string {
+  getName(): string {
     return this._name;
   }
 
-  get description(): string {
+  getDescription(): string {
     return this._description;
   }
 
-  get imageURL(): string {
+  getImageURL(): string {
     return this._imageURL;
   }
 
-  get price(): number {
+  getPrice(): number {
     return this._price;
   }
 
-  get category(): string {
+  getCategory(): string {
     return this._category;
   }
 
-  get isAvailable(): boolean {
+  getIsAvailable(): boolean {
     return this._isAvailable;
   }
 
-  get promotions(): { isOnPromotion: boolean; discountedPrice: number } {
+  getPromotions(): { isOnPromotion: boolean; discountedPrice: number } {
     return { ...this._promotions };
   }
 

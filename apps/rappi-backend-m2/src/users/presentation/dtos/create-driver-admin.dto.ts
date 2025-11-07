@@ -22,4 +22,3 @@ export class CreateDriverAdminDto {
   @IsNotEmpty()
   vehicle: string;
 }
-

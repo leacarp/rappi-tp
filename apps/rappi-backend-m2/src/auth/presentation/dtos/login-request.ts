@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+
 import { LoginRequestService } from '../../services/dtos/login-request-service';
 
 export class LoginRequest {

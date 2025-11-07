@@ -21,6 +21,26 @@ export class GetAddressResponse {
     this.isFavorite = isFavorite;
   }
 
+  getId(): string {
+    return this.id;
+  }
+
+  getStreet(): string {
+    return this.street;
+  }
+
+  getCity(): string {
+    return this.city;
+  }
+
+  getZipCode(): string {
+    return this.zipCode;
+  }
+
+  getIsFavorite(): boolean {
+    return this.isFavorite;
+  }
+
   static fromServiceDto(serviceDto: GetAddressResponseService): GetAddressResponse {
     return new GetAddressResponse(
       serviceDto.getId(),

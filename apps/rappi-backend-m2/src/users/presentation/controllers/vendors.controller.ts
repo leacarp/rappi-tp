@@ -1,4 +1,7 @@
-import { Controller, Post, Put, Get, Param, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Query, Inject } from '@nestjs/common';
+import { Controller, Post, Put, Get, Param, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Query, Inject, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IUserService } from '../../domain/interfaces/IUserService';
 import { USER_SERVICE } from '../../infrastructure/constants/user-service.constants';
 import { CreateReviewRequest } from '../dtos/create-review-request';
@@ -7,8 +10,11 @@ import { SearchRestaurantsResponse } from '../dtos/search-restaurants-response';
 import { GetVendorProfileResponse } from '../dtos/get-vendor-profile-response'
 import { UpdateVendorProfileRequest } from '../dtos/update-vendor-profile-request'
 
+@ApiTags('vendors')
+@ApiBearerAuth('JWT-auth')
 @Controller('vendors')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UseGuards(JwtAuthGuard)
 export class VendorsController {
   constructor(
     @Inject(USER_SERVICE)

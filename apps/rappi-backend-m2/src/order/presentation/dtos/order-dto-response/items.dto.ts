@@ -1,21 +1,24 @@
-import { Items } from "../../../domain/entities/items.entity";
+import { ItemsServiceResponse } from "../../../services/dtos/order-response/items-service-response.dto";
 import { ProductOfItemDto } from "./productOfItem.dto";
 
-export class ItemsDto{
-    constructor(
-        private readonly _productOfItem : ProductOfItemDto,
-        private readonly _quantity : number,
-    ) {}
+export class ItemsDto {
+  private readonly _productOfItem: ProductOfItemDto;
+  private readonly _quantity: number;
 
-    getProduct() : ProductOfItemDto{
-        return this._productOfItem;
-    }
+  constructor(productOfItem: ProductOfItemDto, quantity: number) {
+    this._productOfItem = productOfItem;
+    this._quantity = quantity;
+  }
 
-    getQuantity() : number{
-        return this._quantity;
-    }
+  getProduct(): ProductOfItemDto {
+    return this._productOfItem;
+  }
 
-    static fromEntity(item : Items) : ItemsDto{
-        return new ItemsDto(ProductOfItemDto.fromEntity(item.getProduct()), item.getQuantity())
-    }
-} 
+  getQuantity(): number {
+    return this._quantity;
+  }
+
+  static fromServiceDto(serviceDto: ItemsServiceResponse): ItemsDto {
+    return new ItemsDto(ProductOfItemDto.fromServiceDto(serviceDto.getProduct()), serviceDto.getQuantity());
+  }
+}

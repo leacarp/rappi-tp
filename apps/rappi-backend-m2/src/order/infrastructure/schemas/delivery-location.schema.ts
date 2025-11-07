@@ -5,7 +5,6 @@ export type DeliveryLocation = Delivery_Location & Document;
 
 @Schema({id: false})
 export class Delivery_Location{
-
     @Prop({required: true})
     latitude: number
 

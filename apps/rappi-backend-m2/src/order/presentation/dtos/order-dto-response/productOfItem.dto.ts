@@ -1,4 +1,4 @@
-import { ProductOfItem } from '../../../domain/entities/product-of-item.entity';
+import { ProductOfItemService } from '../../../services/dtos/order-response/product-of-item-service.dto';
 
 export class ProductOfItemDto {
   constructor(
@@ -19,11 +19,11 @@ export class ProductOfItemDto {
     return this._price;
   }
 
-  static fromEntity(product: ProductOfItem): ProductOfItemDto {
+  static fromServiceDto(serviceDto: ProductOfItemService): ProductOfItemDto {
     return new ProductOfItemDto(
-      product.getId().toString(),
-      product.getName(),
-      product.getPrice(),
+      serviceDto.getId(),
+      serviceDto.getName(),
+      serviceDto.getPrice()
     );
   }
 }

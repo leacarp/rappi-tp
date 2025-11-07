@@ -1,6 +1,7 @@
+import { Model, Types } from 'mongoose';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+
 import { IUserRepository } from '../../domain/interfaces/IUserRepository';
 import { Address } from '../../domain/entities/address.entity';
 import { User } from '../../domain/entities/user.entity';
@@ -13,13 +14,15 @@ import { Location } from '../../domain/entities/location.entity';
 import { Earnings } from '../../domain/entities/earnings.entity';
 import { EarningsDetail } from '../../domain/entities/earnings-detail.entity';
 import { EarningsBreakdown } from '../../domain/entities/earnings-breakdown.entity';
+import { CartItem } from '../../domain/entities/cart-item.entity';
+import { CreateUserData } from '../../domain/types/create-user-data.type';
+import { UpdateVendorFields } from '../../domain/types/update-vendor-fields.type';
 import { User as UserSchema, UserDocument } from '../schemas/user.schema';
 import { Address as AddressSchema } from '../schemas/address.schema';
 import { RatingReview as RatingReviewSchema } from '../schemas/rating-review.schema';
 import { EarningsDetail as EarningsDetailSchema } from '../schemas/earnings-detail.schema';
 import { DriverInfo as DriverInfoSchema } from '../schemas/driver-info.schema';
 import { CartItem as CartItemSchema } from '../schemas/cart-item.schema';
-import { CartItem } from '../../domain/entities/cart-item.entity';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -126,7 +129,7 @@ export class UserRepository implements IUserRepository {
       return null;
     }
 
-    const updateFields: any = {}
+    const updateFields: UpdateVendorFields = {}
     
     if (restaurantName !== undefined) {
       updateFields['profile.vendorInfo.restaurantName'] = restaurantName;
@@ -258,7 +261,7 @@ export class UserRepository implements IUserRepository {
     return !!user;
   }
 
-  async createUser(userData: any): Promise<User> {
+  async createUser(userData: CreateUserData): Promise<User> {
     const newUser = new this.userModel(userData);
     const savedUser = await newUser.save();
     return this.mapToUserEntity(savedUser);
@@ -315,7 +318,6 @@ export class UserRepository implements IUserRepository {
     );
 
     const favorites = (userDoc.favorites || []).map((id: Types.ObjectId) => id.toString());
-
 
     const cart = (userDoc.cart || []).map((ci: CartItemSchema) =>
       new CartItem(

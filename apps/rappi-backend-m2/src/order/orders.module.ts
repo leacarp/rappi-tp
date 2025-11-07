@@ -9,7 +9,6 @@ import { ORDER_SERVICE } from './infrastructure/constants/order-service.constant
 import { ProductModule } from '../products/product.module';
 import { UsersModule } from '../users/users.module';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
@@ -29,4 +28,5 @@ import { UsersModule } from '../users/users.module';
   ],
   exports: [ORDER_SERVICE, ORDER_REPOSITORY]
 })
+
 export class OrderModule {}

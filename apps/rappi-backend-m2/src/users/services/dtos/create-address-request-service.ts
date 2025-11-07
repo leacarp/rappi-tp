@@ -1,10 +1,10 @@
 import { Address } from '../../domain/entities/address.entity';
 
 export class CreateAddressRequestService {
-  private readonly street: string;
-  private readonly city: string;
-  private readonly zipCode: string;
-  private readonly isFavorite: boolean;
+  private readonly _street: string;
+  private readonly _city: string;
+  private readonly _zipCode: string;
+  private readonly _isFavorite: boolean;
 
   constructor(
     street: string,
@@ -12,35 +12,35 @@ export class CreateAddressRequestService {
     zipCode: string,
     isFavorite: boolean
   ) {
-    this.street = street;
-    this.city = city;
-    this.zipCode = zipCode;
-    this.isFavorite = isFavorite;
+    this._street = street;
+    this._city = city;
+    this._zipCode = zipCode;
+    this._isFavorite = isFavorite;
   }
 
   getStreet(): string {
-    return this.street;
+    return this._street;
   }
 
   getCity(): string {
-    return this.city;
+    return this._city;
   }
 
   getZipCode(): string {
-    return this.zipCode;
+    return this._zipCode;
   }
 
   getIsFavorite(): boolean {
-    return this.isFavorite;
+    return this._isFavorite;
   }
 
   toEntity(id: string): Address {
     return new Address(
       id,
-      this.street,
-      this.city,
-      this.zipCode,
-      this.isFavorite
+      this._street,
+      this._city,
+      this._zipCode,
+      this._isFavorite
     );
   }
 }

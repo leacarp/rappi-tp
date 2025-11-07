@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+
 import { UpdateVendorProfile } from '../../services/dtos/update-vendor-profile-service';
 
 export class UpdateVendorProfileRequest {

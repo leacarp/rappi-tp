@@ -7,6 +7,10 @@ export class GetAddressesResponse {
     this.addresses = addresses;
   }
 
+  getAddresses(): AddressItem[] {
+    return this.addresses;
+  }
+
   static fromServiceDto(serviceDto: GetAddressesResponseService): GetAddressesResponse {
     const addresses = serviceDto.getAddresses().map(address => 
       AddressItem.fromServiceDto(address)
@@ -34,6 +38,26 @@ export class AddressItem {
     this.city = city;
     this.zipCode = zipCode;
     this.isFavorite = isFavorite;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getStreet(): string {
+    return this.street;
+  }
+
+  getCity(): string {
+    return this.city;
+  }
+
+  getZipCode(): string {
+    return this.zipCode;
+  }
+
+  getIsFavorite(): boolean {
+    return this.isFavorite;
   }
 
   static fromServiceDto(serviceDto: AddressItemService): AddressItem {

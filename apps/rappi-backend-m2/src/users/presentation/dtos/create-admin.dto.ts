@@ -18,4 +18,3 @@ export class CreateAdminDto {
   @IsNotEmpty()
   phone: string;
 }
-

@@ -1,11 +1,10 @@
-import { OrderEntity } from "../../../domain/entities/order.entity";
-import { Types } from "mongoose";
+import { OrderSummaryService } from "../../../services/dtos/order-response/order-summary-service.dto";
 
 export class OrderSummaryDto {
   private readonly _id: string;
   private readonly _status: string;
-  private readonly _createdAt : Date;
-  private readonly _trackingNumber : string;
+  private readonly _createdAt: Date;
+  private readonly _trackingNumber: string;
   private readonly _total: number;
 
   constructor(
@@ -22,33 +21,33 @@ export class OrderSummaryDto {
     this._total = total;
   }
 
-  getId() : string{
+  getId(): string {
     return this._id;
   }
 
-  getStatus() : string{
+  getStatus(): string {
     return this._status;
   }
 
-  getCreatedAt() : Date{
+  getCreatedAt(): Date {
     return this._createdAt;
   }
 
-  getTrackingNumber(): string{
+  getTrackingNumber(): string {
     return this._trackingNumber;
   }
 
-  getTotal(): number{
+  getTotal(): number {
     return this._total;
   }
 
-  static fromEntity(order: OrderEntity): OrderSummaryDto {
+  static fromServiceDto(serviceDto: OrderSummaryService): OrderSummaryDto {
     return new OrderSummaryDto(
-      order.getId() instanceof Types.ObjectId ? order.getId().toHexString() : order.getId().toString(),
-      order.getStatus(),
-      order.getCreatedAt(),
-      order.getTrackingNumber(),
-      order.getSummary().getTotal()
+      serviceDto.getId(),
+      serviceDto.getStatus(),
+      serviceDto.getCreatedAt(),
+      serviceDto.getTrackingNumber(),
+      serviceDto.getTotal()
     );
   }
 }

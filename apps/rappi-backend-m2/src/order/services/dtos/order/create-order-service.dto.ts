@@ -68,7 +68,7 @@ export class CreateOrderDto {
   getNotes(): string {
     return this._notes;
   }
-  
+
   static fromEntity(order: OrderEntity): CreateOrderDto {
     return new CreateOrderDto(
       order.getCustomerId().toHexString(),

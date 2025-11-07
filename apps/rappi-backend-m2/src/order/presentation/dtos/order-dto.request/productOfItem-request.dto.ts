@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+
 import { ProductOfItemDtoService } from '../../../services/dtos/order/productOfItem.dto';
 
 export class ProductOfItemRequestDto {

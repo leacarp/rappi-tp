@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class DeliveryLocationRequestDto{
+export class DeliveryLocationRequestDto {
   @IsNotEmpty()
   @IsNumber()
   latitude: number;

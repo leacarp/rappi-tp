@@ -1,19 +1,21 @@
-import { BadRequestException, Injectable} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+
 import { IOrderRepository } from '../../domain/interfaces/IOrderRepository';
-import {OrderEntity as OrderEntity} from '../../domain/entities/order.entity';
-import { Order, OrderDocument } from '../schemas/order.schema';
+import { OrderFilter } from '../../domain/interfaces/IOrderRepository';
+import { OrderEntity as OrderEntity } from '../../domain/entities/order.entity';
 import { PickUpLocation } from '../../domain/entities/pickup-location.entity';
 import { DeliveryLocation } from '../../domain/entities/deliveryLocation.entity';
 import { Items } from '../../domain/entities/items.entity';
 import { Summary } from '../../domain/entities/summary.entity';
 import { Payment } from '../../domain/entities/payment.entity';
 import { ProductOfItem } from '../../domain/entities/product-of-item.entity';
-import { OrderStatus } from '../../domain/enum/order-status';
 import { UserBasicEntity } from '../../domain/entities/user-basic';
 import { CustomerBasicEntity } from '../../domain/entities/customer-basic';
-import { OrderFilter } from '../../domain/interfaces/IOrderRepository';
+import { OrderStatus } from '../../domain/enum/order-status';
+import { Order, OrderDocument } from '../schemas/order.schema';
+
 interface PopulatedUser {
   _id: Types.ObjectId;
   email: string;
@@ -22,6 +24,7 @@ interface PopulatedUser {
     phone?: string;
   };
 }
+
 interface PopulatedCustomer extends PopulatedUser {
   profile?: {
     name: string;
@@ -35,8 +38,8 @@ interface PopulatedCustomer extends PopulatedUser {
 @Injectable()
 export class OrderRepository implements IOrderRepository {
   constructor(
-    @InjectModel(Order.name) private orderModel : Model<OrderDocument>
-  ){}
+    @InjectModel(Order.name) private orderModel: Model<OrderDocument>
+  ) {}
 
   async create(order: OrderEntity): Promise<OrderEntity> {
     const createdOrder = new this.orderModel({
@@ -85,54 +88,53 @@ export class OrderRepository implements IOrderRepository {
     return this.toEntity(populatedOrder);
   }
 
-    async findById(id: string): Promise<OrderEntity | null> {
-        
-        if (!Types.ObjectId.isValid(id)) {
-          return null;
-        }
-        const order = await this.orderModel.findById(id)
-        .populate('customerId', 'email profile')
-        .populate('vendorId', 'email profile')
-        .populate('driverId', 'email profile')
-        .exec();
-    
-        return order ? this.toEntity(order) : null;
+  async findById(id: string): Promise<OrderEntity | null> {
+    if (!Types.ObjectId.isValid(id)) {
+      return null;
     }
 
-    
-    
-   async findByFilter(filter: OrderFilter): Promise<OrderEntity[]> {
-      const orders = await this.orderModel.find( filter ).exec();
-      return orders.map(order => this.toDomain(order));
-   }
+    const order = await this.orderModel.findById(id)
+      .populate('customerId', 'email profile')
+      .populate('vendorId', 'email profile')
+      .populate('driverId', 'email profile')
+      .exec();
 
-   async findByDriverAndStatus(driverId: string, status: OrderStatus): Promise<OrderEntity[]> {
-      if (!Types.ObjectId.isValid(driverId)) {
-        throw new BadRequestException('Id de driver no válido');
-      }
-      
-      const orders = await this.orderModel
-        .find({ 
-          driverId: new Types.ObjectId(driverId),
-          status: status
-        })
-        .sort({ createdAt: -1 })
-        .exec();
-      
-      return orders.map(order => this.toDomain(order));
-   }
+    return order ? this.toEntity(order) : null;
+  }
+
+  async findByFilter(filter: OrderFilter): Promise<OrderEntity[]> {
+    const orders = await this.orderModel.find(filter).exec();
+    return orders.map(order => this.toDomain(order));
+  }
+
+  async findByDriverAndStatus(driverId: string, status: OrderStatus): Promise<OrderEntity[]> {
+    if (!Types.ObjectId.isValid(driverId)) {
+      throw new BadRequestException('Id de driver no válido');
+    }
+
+    const orders = await this.orderModel
+      .find({
+        driverId: new Types.ObjectId(driverId),
+        status: status
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    return orders.map(order => this.toDomain(order));
+  }
 
 
   async updateStatus(orderId: string, newStatus: OrderStatus): Promise<void> {
-      if(!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
-      const result = await this.orderModel.updateOne(
-        { _id: orderId },
-        { $set: { status: newStatus } }
-      );
+    if (!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
+    
+    const result = await this.orderModel.updateOne(
+      { _id: orderId },
+      { $set: { status: newStatus } }
+    );
 
-      if (result.matchedCount === 0) {
-        throw new BadRequestException('Orden no encontrada');
-      }
+    if (result.matchedCount === 0) {
+      throw new BadRequestException('Orden no encontrada');
+    }
   }
 
   async updateOrderDriver(order: OrderEntity): Promise<void> {
@@ -154,30 +156,30 @@ export class OrderRepository implements IOrderRepository {
       throw new BadRequestException('Orden no encontrada');
     }
   }
-  
+
   async findByTrackingNumber(trackingNumber: string): Promise<OrderEntity | null> {
     const order = await this.orderModel.findOne({ trackingNumber }).exec();
     return order ? this.toDomain(order) : null;
   }
 
-
-
   private mapCustomer(user: Types.ObjectId | PopulatedCustomer | null | undefined): CustomerBasicEntity | undefined {
-  if (!user || typeof user === 'string') return undefined;
-  
-      const populated = user as PopulatedCustomer;
-      const id = populated._id;
-      const email = populated.email;
-      const name = populated.profile?.name ?? 'Desconocido';
-      const phone = populated.profile?.phone ?? '';
-      const address = populated.profile?.addresses?.[0]?.street;
-  
-      if (!id || !email) return undefined;
+    if (!user || typeof user === 'string') return undefined;
+
+    const populated = user as PopulatedCustomer;
+    const id = populated._id;
+    const email = populated.email;
+    const name = populated.profile?.name ?? 'Desconocido';
+    const phone = populated.profile?.phone ?? '';
+    const address = populated.profile?.addresses?.[0]?.street;
+
+    if (!id || !email) return undefined;
 
     return new CustomerBasicEntity(id, name, email, phone, address);
   }
+
   async confirm(orderId: string, trackingNumber: string): Promise<void> {
-    if(!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
+    if (!Types.ObjectId.isValid(orderId)) throw new BadRequestException('Id no válido');
+    
     const result = await this.orderModel.updateOne(
       { _id: orderId },
       { $set: { status: OrderStatus.Accepted, trackingNumber } }
@@ -187,15 +189,17 @@ export class OrderRepository implements IOrderRepository {
       throw new BadRequestException('Orden no encontrada');
     }
   }
-  
-  private mapUser(user: Types.ObjectId | PopulatedUser | null | undefined): UserBasicEntity | undefined {;
-      if (!user || typeof user === 'string') return undefined;
-      const populated = user as PopulatedUser;
-      const id = populated._id;
-      const email = populated.email;
-      const name = populated.profile?.name ?? 'Desconocido';
-      const phone = populated.profile?.phone ?? '';      
-      if (!id || !email) return undefined;
+
+  private mapUser(user: Types.ObjectId | PopulatedUser | null | undefined): UserBasicEntity | undefined {
+    if (!user || typeof user === 'string') return undefined;
+    
+    const populated = user as PopulatedUser;
+    const id = populated._id;
+    const email = populated.email;
+    const name = populated.profile?.name ?? 'Desconocido';
+    const phone = populated.profile?.phone ?? '';
+    
+    if (!id || !email) return undefined;
 
     return new UserBasicEntity(id, name, email, phone);
   }
@@ -235,33 +239,34 @@ export class OrderRepository implements IOrderRepository {
     );
   }
 
-    private toDomain(order: OrderDocument): OrderEntity {
-      const items: Items[] = order.items.map(i =>
-          new Items(
-          new ProductOfItem(i.productId, i.name, i.price),
-            i.quantity
-          )
-        );
-      return new OrderEntity(
-        order.id as Types.ObjectId,
-        order.customerId,
-        order.vendorId,
-        order.driverId as Types.ObjectId | null,
-        order.status,
-        new PickUpLocation(order.pickUpLocation.latitude, order.pickUpLocation.longitude),
-        order.deliveryLocation ? new DeliveryLocation(order.deliveryLocation.latitude, order.deliveryLocation.longitude) : null,
-        items,
-        new Summary(
-                        order.summary.subtotal, 
-                        order.summary.shippingCost,  
-                        order.summary.taxes,
-                        order.summary.discount,
-                        order.summary.total
-            ),
-        new Payment(order.payment.method, order.payment.status, order.payment.transactionId),
-        order.trackingNumber,
-        order.notes,
-        order.createdAt,
-      );
-    }
+  private toDomain(order: OrderDocument): OrderEntity {
+    const items: Items[] = order.items.map(i =>
+      new Items(
+        new ProductOfItem(i.productId, i.name, i.price),
+        i.quantity
+      )
+    );
+    
+    return new OrderEntity(
+      order.id as Types.ObjectId,
+      order.customerId,
+      order.vendorId,
+      order.driverId as Types.ObjectId | null,
+      order.status,
+      new PickUpLocation(order.pickUpLocation.latitude, order.pickUpLocation.longitude),
+      order.deliveryLocation ? new DeliveryLocation(order.deliveryLocation.latitude, order.deliveryLocation.longitude) : null,
+      items,
+      new Summary(
+        order.summary.subtotal,
+        order.summary.shippingCost,
+        order.summary.taxes,
+        order.summary.discount,
+        order.summary.total
+      ),
+      new Payment(order.payment.method, order.payment.status, order.payment.transactionId),
+      order.trackingNumber,
+      order.notes,
+      order.createdAt
+    );
+  }
 }

@@ -1,4 +1,5 @@
 import { PromotionResponseDto } from './product-response.dto';
+import { MenuItemResponseService, MenuResponseService } from '../../services/dtos/menu-response-service.dto';
 
 export class MenuItemResponseDto {
   private readonly _name: string;
@@ -30,28 +31,50 @@ export class MenuItemResponseDto {
     this._promotions = promotions;
   }
 
-  get name(): string { return this._name; }
-  get description(): string { return this._description; }
-  get imageURL(): string { return this._imageURL; }
-  get price(): number { return this._price; }
-  get finalPrice(): number { return this._finalPrice; }
-  get discountPercentage(): number { return this._discountPercentage; }
-  get isAvailable(): boolean { return this._isAvailable; }
-  get promotions(): PromotionResponseDto { return this._promotions; }
+  getName(): string {
+    return this._name;
+  }
 
-  static fromEntity(product: any): MenuItemResponseDto {
-    const promotions = product.promotions;
-    const promotionData = promotions?._doc || promotions || { isOnPromotion: false, discountedPrice: 0 };
+  getDescription(): string {
+    return this._description;
+  }
+
+  getImageURL(): string {
+    return this._imageURL;
+  }
+
+  getPrice(): number {
+    return this._price;
+  }
+  
+  getFinalPrice(): number {
+    return this._finalPrice;
+  }
+
+  getDiscountPercentage(): number {
+    return this._discountPercentage;
+  }
+
+  getIsAvailable(): boolean {
+    return this._isAvailable; 
+  }
+
+  getPromotions(): PromotionResponseDto {
+    return this._promotions;
+  }
+
+  static fromServiceDto(serviceDto: MenuItemResponseService): MenuItemResponseDto {
+    const promotions = serviceDto.getPromotions();
 
     return new MenuItemResponseDto(
-      product.name,
-      product.description,
-      product.imageURL,
-      product.price,
-      product.getFinalPrice(),
-      product.getDiscountPercentage(),
-      product.isAvailable,
-      new PromotionResponseDto(promotionData.isOnPromotion, promotionData.discountedPrice)
+      serviceDto.getName(),
+      serviceDto.getDescription(),
+      serviceDto.getImageURL(),
+      serviceDto.getPrice(),
+      serviceDto.getFinalPrice(),
+      serviceDto.getDiscountPercentage(),
+      serviceDto.getIsAvailable(),
+      new PromotionResponseDto(promotions.getIsOnPromotion(), promotions.getDiscountedPrice())
     );
   }
 
@@ -65,8 +88,8 @@ export class MenuItemResponseDto {
       discountPercentage: this._discountPercentage,
       isAvailable: this._isAvailable,
       promotions: {
-        isOnPromotion: this._promotions.isOnPromotion,
-        discountedPrice: this._promotions.discountedPrice,
+        isOnPromotion: this._promotions.getIsOnPromotion(),
+        discountedPrice: this._promotions.getDiscountedPrice(),
       },
     };
   }
@@ -81,15 +104,23 @@ export class MenuCategoryResponseDto {
     this._items = items;
   }
 
-  get categoryName(): string { return this._categoryName; }
-  get items(): MenuItemResponseDto[] { return this._items; }
-  get count(): number { return this._items.length; }
+  getCategoryName(): string {
+    return this._categoryName;
+  }
+
+  getItems(): MenuItemResponseDto[] {
+    return this._items;
+  }
+
+  getCount(): number {
+    return this._items.length;
+  }
 
   toJSON() {
     return {
       categoryName: this._categoryName,
       items: this._items.map(i => i.toJSON()),
-      count: this.count,
+      count: this.getCount(),
     };
   }
 }
@@ -105,26 +136,31 @@ export class MenuResponseDto {
     this._totalItems = totalItems;
   }
 
-  get vendorId(): string { return this._vendorId; }
-  get categories(): MenuCategoryResponseDto[] { return this._categories; }
-  get totalItems(): number { return this._totalItems; }
+  getVendorId(): string {
+    return this._vendorId;
+  }
 
-  static fromEntities(products: any[], vendorId?: string): MenuResponseDto {
-    const resolvedVendorId = vendorId ?? products[0]?.vendorId?.toString() ?? '';
-    const grouped = new Map<string, MenuItemResponseDto[]>();
+  getCategories(): MenuCategoryResponseDto[] {
+    return this._categories;
+  }
 
-    for (const product of products) {
-      const item = MenuItemResponseDto.fromEntity(product);
-      const key = product.category || 'Sin categoría';
-      if (!grouped.has(key)) grouped.set(key, []);
-      grouped.get(key)!.push(item);
-    }
+  getTotalItems(): number {
+    return this._totalItems;
+  }
 
-    const categories = Array.from(grouped.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([categoryName, items]) => new MenuCategoryResponseDto(categoryName, items));
+  static fromServiceDto(serviceDto: MenuResponseService): MenuResponseDto {
+    const categories = serviceDto.getCategories().map(categoryService => {
+      const items = categoryService.getItems().map(itemService => 
+        MenuItemResponseDto.fromServiceDto(itemService)
+      );
+      return new MenuCategoryResponseDto(categoryService.getCategoryName(), items);
+    });
 
-    return new MenuResponseDto(resolvedVendorId, categories, products.length);
+    return new MenuResponseDto(
+      serviceDto.getVendorId(),
+      categories,
+      serviceDto.getTotalItems()
+    );
   }
 
   toJSON() {

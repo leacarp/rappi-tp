@@ -1,33 +1,29 @@
 import { Payment } from "../../../domain/entities/payment.entity";
 
-export class PaymentDtoService{
-  private readonly _method : string;
+export class PaymentDtoService {
+  private readonly _method: string;
   private readonly _status: string;
-  private readonly _transactionId : string;
+  private readonly _transactionId: string;
 
-  constructor(
-    method: string,
-    status: string,
-    transactionId: string
-  ) {
+  constructor(method: string, status: string, transactionId: string) {
     this._method = method;
     this._status = status;
     this._transactionId = transactionId;
   }
 
-  getMethod() : string{
-      return this._method;
+  getMethod(): string {
+    return this._method;
   }
 
-  getStatus() : string{
-      return this._status;
+  getStatus(): string {
+    return this._status;
   }
 
-  getTransactionId() : string{
-      return this._transactionId;
+  getTransactionId(): string {
+    return this._transactionId;
   }
 
-  static fromEntity(payment : Payment) : PaymentDtoService{
+  static fromEntity(payment: Payment): PaymentDtoService {
     return new PaymentDtoService(
       payment.getMethod(),
       payment.getStatus(),

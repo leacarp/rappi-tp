@@ -4,8 +4,8 @@ import { ItemsDto } from "./order-dto-response/items.dto";
 import { PaymentDto } from "./order-dto-response/payment.dto";
 import { SummaryDto } from "./order-dto-response/summary.dto";
 import { UserBasicDto } from "./order-dto-response/user-basic.dto";
-import { OrderEntity } from "../../domain/entities/order.entity";
 import { CustomerBasicDto } from "./order-dto-response/customer-basic.dto";
+import { GetOrderResponseService } from "../../services/dtos/get-order-response-service.dto";
 
 export class GetOrderResponseDto {
   private readonly _id: string;
@@ -52,7 +52,6 @@ export class GetOrderResponseDto {
     this._notes = notes;
   }
 
-  
   getId(): string {
     return this._id;
   }
@@ -105,21 +104,21 @@ export class GetOrderResponseDto {
     return this._notes;
   }
 
-  static fromEntity(order: OrderEntity): GetOrderResponseDto {
+  static fromServiceDto(serviceDto: GetOrderResponseService): GetOrderResponseDto {
     return new GetOrderResponseDto(
-      order.getId().toString(),
-      CustomerBasicDto.fromEntity(order.getCustomer()),
-      UserBasicDto.fromEntity(order.getVendor()),
-      UserBasicDto.fromEntity(order.getDriver()) ?? null,
-      order.getStatus(),
-      order.getCreatedAt(),
-      PickupLocationDto.fromEntity(order.getPickupLocation()),
-      DeliveryLocationDto.fromEntity(order.getDeliveryLocation()) ?? null,
-      order.getItems().map(ItemsDto.fromEntity),
-      SummaryDto.fromEntity(order.getSummary()),
-      PaymentDto.fromEntity(order.getPayment()),
-      order.getTrackingNumber(),
-      order.getNotes()
+      serviceDto.getId(),
+      CustomerBasicDto.fromServiceDto(serviceDto.getCustomer()),
+      UserBasicDto.fromServiceDto(serviceDto.getVendor()),
+      UserBasicDto.fromServiceDto(serviceDto.getDriver()) ?? null,
+      serviceDto.getStatus(),
+      serviceDto.getCreatedAt(),
+      PickupLocationDto.fromServiceDto(serviceDto.getPickupLocation()),
+      DeliveryLocationDto.fromServiceDto(serviceDto.getDeliveryLocation()) ?? null,
+      serviceDto.getItems().map(ItemsDto.fromServiceDto),
+      SummaryDto.fromServiceDto(serviceDto.getSummary()),
+      PaymentDto.fromServiceDto(serviceDto.getPayment()),
+      serviceDto.getTrackingNumber(),
+      serviceDto.getNotes()
     );
   }
 }

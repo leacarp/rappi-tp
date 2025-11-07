@@ -1,24 +1,23 @@
-export class Payment{
-    private _method : string;
-    private _status: string;
-    private _transactionId: string;
+export class Payment {
+  private _method: string;
+  private _status: string;
+  private _transactionId: string;
 
-    constructor(method: string, status: string, transactionId: string){
-        this._method = method;
-        this._status = status;
-        this._transactionId = transactionId;
-    }
+  constructor(method: string, status: string, transactionId: string) {
+    this._method = method;
+    this._status = status;
+    this._transactionId = transactionId;
+  }
 
-    getMethod(): string{
-        return this._method;
-    }
+  getMethod(): string {
+    return this._method;
+  }
 
-    getStatus(): string{
-        return this._status;
-    }
+  getStatus(): string {
+    return this._status;
+  }
 
-    getTransactionId(): string{
-        return this._transactionId;
-    }
-
+  getTransactionId(): string {
+    return this._transactionId;
+  }
 }

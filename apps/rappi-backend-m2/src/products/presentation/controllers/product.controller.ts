@@ -1,18 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UsePipes,
-  ValidationPipe,
-  HttpCode,
-  HttpStatus,
-  Inject,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IProductService } from '../../domain/interfaces/IProductService';
 import { PRODUCT_SERVICE } from '../../infrastructure/constants/product-service.constants';
 import { CreateProductRequestDto } from '../dtos/create-product-request.dto';
@@ -20,8 +9,11 @@ import { UpdateProductRequestDto } from '../dtos/update-product-request.dto';
 import { ProductResponseDto } from '../dtos/product-response.dto';
 import { MenuResponseDto } from '../dtos/menu-response.dto';
 
+@ApiTags('products')
+@ApiBearerAuth('JWT-auth')
 @Controller('products')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UseGuards(JwtAuthGuard)
 export class ProductController {
   constructor(
     @Inject(PRODUCT_SERVICE)
@@ -32,44 +24,52 @@ export class ProductController {
   @HttpCode(HttpStatus.CREATED)
   async createProduct(@Body() createProductDto: CreateProductRequestDto): Promise<ProductResponseDto> {
     const serviceDto = createProductDto.toServiceDto();
-    const product = await this.productService.createProduct(serviceDto);
-    return ProductResponseDto.fromEntity(product);
+    const productServiceDto = await this.productService.createProduct(serviceDto);
+    return ProductResponseDto.fromServiceDto(productServiceDto);
   }
 
   @Get()
   async getAllProducts(): Promise<ProductResponseDto[]> {
-    const products = await this.productService.getAllProducts();
-    return products.map(product => ProductResponseDto.fromEntity(product));
+    const productsServiceDto = await this.productService.getAllProducts();
+    return productsServiceDto.getProducts().map(productService => 
+      ProductResponseDto.fromServiceDto(productService)
+    );
   }
   
   @Get('search')
   async searchProducts(@Query('category') category: string): Promise<ProductResponseDto[]> {
-    const products = await this.productService.getProductsByCategory(category);
-    return products.map(product => ProductResponseDto.fromEntity(product));
+    const productsServiceDto = await this.productService.getProductsByCategory(category);
+    return productsServiceDto.getProducts().map(productService => 
+      ProductResponseDto.fromServiceDto(productService)
+    );
   }
 
   @Get(':id')
   async getProductById(@Param('id') id: string): Promise<ProductResponseDto> {
-    const product = await this.productService.getProductById(id);
-    return ProductResponseDto.fromEntity(product);
+    const productServiceDto = await this.productService.getProductById(id);
+    return ProductResponseDto.fromServiceDto(productServiceDto);
   }
 
   @Get('vendor/:vendorId')
   async getProductsByVendor(@Param('vendorId') vendorId: string): Promise<ProductResponseDto[]> {
-    const products = await this.productService.getProductsByVendor(vendorId);
-    return products.map(product => ProductResponseDto.fromEntity(product));
+    const productsServiceDto = await this.productService.getProductsByVendor(vendorId);
+    return productsServiceDto.getProducts().map(productService => 
+      ProductResponseDto.fromServiceDto(productService)
+    );
   }
 
   @Get('category/:category')
   async getProductsByCategory(@Param('category') category: string): Promise<ProductResponseDto[]> {
-    const products = await this.productService.getProductsByCategory(category);
-    return products.map(product => ProductResponseDto.fromEntity(product));
+    const productsServiceDto = await this.productService.getProductsByCategory(category);
+    return productsServiceDto.getProducts().map(productService => 
+      ProductResponseDto.fromServiceDto(productService)
+    );
   }
 
   @Get('vendor/:vendorId/menu')
   async getVendorMenu(@Param('vendorId') vendorId: string): Promise<MenuResponseDto> {
-    const products = await this.productService.getProductsByVendor(vendorId);
-    return MenuResponseDto.fromEntities(products, vendorId);
+    const menuServiceDto = await this.productService.getVendorMenu(vendorId);
+    return MenuResponseDto.fromServiceDto(menuServiceDto);
   }
 
   @Put(':id')
@@ -78,8 +78,8 @@ export class ProductController {
     @Body() updateProductDto: UpdateProductRequestDto
   ): Promise<ProductResponseDto> {
     const serviceDto = updateProductDto.toServiceDto();
-    const product = await this.productService.updateProduct(id, serviceDto);
-    return ProductResponseDto.fromEntity(product);
+    const productServiceDto = await this.productService.updateProduct(id, serviceDto);
+    return ProductResponseDto.fromServiceDto(productServiceDto);
   }
 
   @Delete(':id')
@@ -93,13 +93,13 @@ export class ProductController {
     @Param('id') id: string,
     @Body() body: { discountedPrice: number }
   ): Promise<ProductResponseDto> {
-    const product = await this.productService.applyPromotionToProduct(id, body.discountedPrice);
-    return ProductResponseDto.fromEntity(product);
+    const productServiceDto = await this.productService.applyPromotionToProduct(id, body.discountedPrice);
+    return ProductResponseDto.fromServiceDto(productServiceDto);
   }
 
   @Delete(':id/promotion')
   async removePromotion(@Param('id') id: string): Promise<ProductResponseDto> {
-    const product = await this.productService.removePromotionFromProduct(id);
-    return ProductResponseDto.fromEntity(product);
+    const productServiceDto = await this.productService.removePromotionFromProduct(id);
+    return ProductResponseDto.fromServiceDto(productServiceDto);
   }
 }

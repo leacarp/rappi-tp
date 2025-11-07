@@ -1,5 +1,17 @@
 export class SetCartItemQuantityRequestService {
-  constructor(private readonly productId: string, private readonly quantity: number) {}
-  getProductId(): string { return this.productId; }
-  getQuantity(): number { return this.quantity; }
+  private readonly _productId: string;
+  private readonly _quantity: number;
+
+  constructor(productId: string, quantity: number) {
+    this._productId = productId;
+    this._quantity = quantity;
+  }
+
+  getProductId(): string {
+    return this._productId;
+  }
+
+  getQuantity(): number {
+    return this._quantity;
+  }
 }
