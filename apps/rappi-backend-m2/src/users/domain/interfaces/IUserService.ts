@@ -31,4 +31,9 @@ export interface IUserService {
   getCart(userId: string): Promise<GetCartResponseService>;
   getDriverAvailability(userId: string): Promise<boolean>;
   updateDriverAvailability(userId: string, isAvailable: boolean): Promise<void>;
+  createVendor(email: string, password: string, name: string, phone: string, restaurantName: string, description: string, schedule: string, category: string): Promise<any>;
+  createDriver(email: string, password: string, name: string, phone: string, vehicle: string): Promise<any>;
+  createAdmin(email: string, password: string, name: string, phone: string): Promise<any>;
+  getAllVendors(): Promise<any[]>;
+  getAllDrivers(): Promise<any[]>;
 }
