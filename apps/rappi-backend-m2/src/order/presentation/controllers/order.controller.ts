@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Get, Param, Query, Put, Inject, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IOrderService } from '../../domain/interfaces/IOrderService';
@@ -11,6 +12,8 @@ import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
 import { ConfirmOrderResponseDto } from '../dtos/confirm-order-response.dto';
 import { AcceptOrderDto } from '../dtos/confirm-driver.dto';
 
+@ApiTags('orders')
+@ApiBearerAuth('JWT-auth')
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
 export class OrderController {

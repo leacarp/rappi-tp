@@ -1,9 +1,12 @@
 import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { IAuthService } from '../../domain/interfaces/IAuthService';
 import { AUTH_SERVICE } from '../../infrastructure/constants/auth-service.constants';
 import { LoginRequest } from '../dtos/login-request';
 import { LoginResponse } from '../dtos/login-response';
 
+@ApiTags('auth')
 @Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class AuthController {

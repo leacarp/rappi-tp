@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IProductService } from '../../domain/interfaces/IProductService';
@@ -8,6 +9,8 @@ import { UpdateProductRequestDto } from '../dtos/update-product-request.dto';
 import { ProductResponseDto } from '../dtos/product-response.dto';
 import { MenuResponseDto } from '../dtos/menu-response.dto';
 
+@ApiTags('products')
+@ApiBearerAuth('JWT-auth')
 @Controller('products')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 @UseGuards(JwtAuthGuard)

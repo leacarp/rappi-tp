@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Inject } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { IUserService } from '../../domain/interfaces/IUserService';
 import { USER_SERVICE } from '../../infrastructure/constants/user-service.constants';
@@ -23,6 +24,8 @@ import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../auth/decorators/roles.decorator';
 
+@ApiTags('users')
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 @UseGuards(JwtAuthGuard)
