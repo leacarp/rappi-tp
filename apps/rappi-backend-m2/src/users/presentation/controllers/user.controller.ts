@@ -22,11 +22,16 @@ import { UpdateAddressRequest } from '../dtos/update-address-request';
 import { CreateReviewRequest } from '../dtos/create-review-request';
 import { GetReviewsResponse } from '../dtos/get-reviews-response';
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
+import { RolesGuard } from '../../../auth/guards/roles.guard';
+import { Roles } from '../../../auth/decorators/roles.decorator';
 import { AddCartItemRequest } from '../dtos/add-cart-item-request';
 import { SetCartItemQuantityRequest } from '../dtos/set-cart-item-quantity-request';
 import { GetCartResponse } from '../dtos/get-cart-response';
 import { UpdateDriverAvailabilityRequest } from '../dtos/update-driver-availability-request';
 import { GetDriverAvailabilityResponse } from '../dtos/get-driver-availability-response';
+import { CreateVendorAdminDto } from '../dtos/create-vendor-admin.dto';
+import { CreateDriverAdminDto } from '../dtos/create-driver-admin.dto';
+import { CreateAdminDto } from '../dtos/create-admin.dto';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -131,5 +136,61 @@ export class UserController {
     @Body() body: UpdateDriverAvailabilityRequest
   ): Promise<void> {
     await this.userService.updateDriverAvailability(userId, body.isAvailable);
+  }
+  
+  @Post('vendors')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @HttpCode(HttpStatus.CREATED)
+  async createVendor(@Body() body: CreateVendorAdminDto): Promise<any> {
+    return await this.userService.createVendor(
+      body.email,
+      body.password,
+      body.name,
+      body.phone,
+      body.restaurantName,
+      body.description,
+      body.schedule,
+      body.category
+    );
+  }
+
+  @Get('vendors')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  async getAllVendors(): Promise<any[]> {
+    return await this.userService.getAllVendors();
+  }
+
+  @Post('drivers')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @HttpCode(HttpStatus.CREATED)
+  async createDriver(@Body() body: CreateDriverAdminDto): Promise<any> {
+    return await this.userService.createDriver(
+      body.email,
+      body.password,
+      body.name,
+      body.phone,
+      body.vehicle
+    );
+  }
+
+  @Get('drivers')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  async getAllDrivers(): Promise<any[]> {
+    return await this.userService.getAllDrivers();
+  }
+
+  @Post('admins')
+  @HttpCode(HttpStatus.CREATED)
+  async createAdmin(@Body() body: CreateAdminDto): Promise<any> {
+    return await this.userService.createAdmin(
+      body.email,
+      body.password,
+      body.name,
+      body.phone
+    );
   }
 }

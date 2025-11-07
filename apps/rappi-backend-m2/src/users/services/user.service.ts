@@ -310,4 +310,174 @@ export class UserService implements IUserService {
     const updated = await this.userRepository.updateDriverAvailability(userId, isAvailable);
     if (!updated) throw new NotFoundException('Error al actualizar la disponibilidad del driver');
   }
+
+  async createVendor(
+    email: string, 
+    password: string, 
+    name: string, 
+    phone: string, 
+    restaurantName: string, 
+    description: string, 
+    schedule: string,
+    category: string
+  ): Promise<any> {
+    const existingUser = await this.userRepository.getUserByEmail(email);
+    if (existingUser) {
+      throw new Error('El email ya está registrado');
+    }
+
+    const hashedPassword = await this.hashPassword(password);
+
+    const userData = {
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+      role: 'vendor',
+      profile: {
+        name,
+        phone,
+        addresses: [],
+        vendorInfo: {
+          restaurantName,
+          description,
+          schedule,
+          rating: 0,
+          isAvailable: true,
+          category
+        }
+      },
+      favorites: [],
+      history: { orders: [], deliveries: [] },
+      ratingsAndReviews: [],
+      cart: []
+    };
+
+    const createdUser = await this.userRepository.createUser(userData);
+    
+    return {
+      id: createdUser.getId(),
+      email: createdUser.getEmail(),
+      role: createdUser.getRole(),
+      name: createdUser.getProfile().getName(),
+      restaurantName: createdUser.getProfile().getVendorInfo()?.getRestaurantName()
+    };
+  }
+
+  async createDriver(
+    email: string, 
+    password: string, 
+    name: string, 
+    phone: string, 
+    vehicle: string
+  ): Promise<any> {
+    const existingUser = await this.userRepository.getUserByEmail(email);
+    if (existingUser) {
+      throw new Error('El email ya está registrado');
+    }
+
+    const hashedPassword = await this.hashPassword(password);
+
+    const userData = {
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+      role: 'driver',
+      profile: {
+        name,
+        phone,
+        addresses: [],
+        driverInfo: {
+          vehicle,
+          isAvailable: true,
+          earnings: {
+            total: 0,
+            details: []
+          }
+        }
+      },
+      favorites: [],
+      history: { orders: [], deliveries: [] },
+      ratingsAndReviews: [],
+      cart: []
+    };
+
+    const createdUser = await this.userRepository.createUser(userData);
+    
+    return {
+      id: createdUser.getId(),
+      email: createdUser.getEmail(),
+      role: createdUser.getRole(),
+      name: createdUser.getProfile().getName(),
+      vehicle: createdUser.getProfile().getDriverInfo()?.getVehicle()
+    };
+  }
+
+  async createAdmin(
+    email: string, 
+    password: string, 
+    name: string, 
+    phone: string
+  ): Promise<any> {
+    const existingUser = await this.userRepository.getUserByEmail(email);
+    if (existingUser) {
+      throw new Error('El email ya está registrado');
+    }
+
+    const hashedPassword = await this.hashPassword(password);
+
+    const userData = {
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+      role: 'admin',
+      profile: {
+        name,
+        phone,
+        addresses: []
+      },
+      favorites: [],
+      history: { orders: [], deliveries: [] },
+      ratingsAndReviews: [],
+      cart: []
+    };
+
+    const createdUser = await this.userRepository.createUser(userData);
+    
+    return {
+      id: createdUser.getId(),
+      email: createdUser.getEmail(),
+      role: createdUser.getRole(),
+      name: createdUser.getProfile().getName(),
+      phone: createdUser.getProfile().getPhone()
+    };
+  }
+
+  async getAllVendors(): Promise<any[]> {
+    const vendors = await this.userRepository.getUsersByRole('vendor');
+    
+    return vendors.map(vendor => ({
+      id: vendor.getId(),
+      email: vendor.getEmail(),
+      name: vendor.getProfile().getName(),
+      phone: vendor.getProfile().getPhone(),
+      restaurantName: vendor.getProfile().getVendorInfo()?.getRestaurantName(),
+      description: vendor.getProfile().getVendorInfo()?.getDescription(),
+      schedule: vendor.getProfile().getVendorInfo()?.getSchedule(),
+      rating: vendor.getProfile().getVendorInfo()?.getRating(),
+      isAvailable: vendor.getProfile().getVendorInfo()?.getIsAvailable(),
+      createdAt: vendor.getCreatedAt()
+    }));
+  }
+
+  async getAllDrivers(): Promise<any[]> {
+    const drivers = await this.userRepository.getUsersByRole('driver');
+    
+    return drivers.map(driver => ({
+      id: driver.getId(),
+      email: driver.getEmail(),
+      name: driver.getProfile().getName(),
+      phone: driver.getProfile().getPhone(),
+      vehicle: driver.getProfile().getDriverInfo()?.getVehicle(),
+      isAvailable: driver.getProfile().getDriverInfo()?.getIsAvailable(),
+      totalEarnings: driver.getProfile().getDriverInfo()?.getEarnings().getTotal(),
+      createdAt: driver.getCreatedAt()
+    }));
+  }
 }
