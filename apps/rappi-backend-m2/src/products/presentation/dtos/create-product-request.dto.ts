@@ -1,5 +1,6 @@
 import { IsString, IsNumber, IsBoolean, IsNotEmpty, IsOptional, ValidateNested, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+
 import { CreateProductServiceDto } from '../../services/dtos/create-product-service.dto';
 
 class PromotionDto {

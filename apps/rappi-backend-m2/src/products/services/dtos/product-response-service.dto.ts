@@ -1,6 +1,6 @@
-import { ProductResponseService } from "../../services/dtos/product-response-service.dto";
+import { Product } from '../../domain/entities/product.entity';
 
-export class PromotionResponseDto {
+export class PromotionResponseService {
   private readonly _isOnPromotion: boolean;
   private readonly _discountedPrice: number;
 
@@ -18,7 +18,7 @@ export class PromotionResponseDto {
   }
 }
 
-export class ProductResponseDto {
+export class ProductResponseService {
   private readonly _id: string;
   private readonly _vendorId: string;
   private readonly _name: string;
@@ -27,7 +27,7 @@ export class ProductResponseDto {
   private readonly _price: number;
   private readonly _category: string;
   private readonly _isAvailable: boolean;
-  private readonly _promotions: PromotionResponseDto;
+  private readonly _promotions: PromotionResponseService;
   private readonly _finalPrice: number;
   private readonly _discountPercentage: number;
 
@@ -40,7 +40,7 @@ export class ProductResponseDto {
     price: number,
     category: string,
     isAvailable: boolean,
-    promotions: PromotionResponseDto,
+    promotions: PromotionResponseService,
     finalPrice: number,
     discountPercentage: number
   ) {
@@ -89,7 +89,7 @@ export class ProductResponseDto {
     return this._isAvailable;
   }
 
-  getPromotions(): PromotionResponseDto {
+  getPromotions(): PromotionResponseService {
     return this._promotions;
   }
 
@@ -101,24 +101,24 @@ export class ProductResponseDto {
     return this._discountPercentage;
   }
 
-  static fromServiceDto(serviceDto: ProductResponseService): ProductResponseDto {
-    const promotions = serviceDto.getPromotions();
+  static fromEntity(product: Product): ProductResponseService {
+    const promotions = product.getPromotions();
     
-    return new ProductResponseDto(
-      serviceDto.getId(),
-      serviceDto.getVendorId(),
-      serviceDto.getName(),
-      serviceDto.getDescription(),
-      serviceDto.getImageURL(),
-      serviceDto.getPrice(),
-      serviceDto.getCategory(),
-      serviceDto.getIsAvailable(),
-      new PromotionResponseDto(
-        promotions.getIsOnPromotion(),
-        promotions.getDiscountedPrice()
+    return new ProductResponseService(
+      product.getId().toString(),
+      product.getVendorId().toString(),
+      product.getName(),
+      product.getDescription(),
+      product.getImageURL(),
+      product.getPrice(),
+      product.getCategory(),
+      product.getIsAvailable(),
+      new PromotionResponseService(
+        promotions.isOnPromotion,
+        promotions.discountedPrice
       ),
-      serviceDto.getFinalPrice(),
-      serviceDto.getDiscountPercentage()
+      product.getFinalPrice(),
+      product.getDiscountPercentage()
     );
   }
 }

@@ -6,6 +6,9 @@ import { IProductRepository } from '../domain/interfaces/IProductRepository';
 import { IProductService } from '../domain/interfaces/IProductService';
 import { CreateProductServiceDto } from './dtos/create-product-service.dto';
 import { UpdateProductServiceDto } from './dtos/update-product-service.dto';
+import { ProductResponseService } from './dtos/product-response-service.dto';
+import { ProductsResponseService } from './dtos/products-response-service.dto';
+import { MenuResponseService } from './dtos/menu-response-service.dto';
 import { PRODUCT_REPOSITORY } from '../infrastructure/constants/product-repository.constants';
 
 @Injectable()
@@ -15,51 +18,54 @@ export class ProductService implements IProductService {
     private readonly productRepository: IProductRepository
   ) {}
 
-  async createProduct(createProductDto: CreateProductServiceDto): Promise<Product> {
-    if (!Types.ObjectId.isValid(createProductDto.vendorId)) {
+  async createProduct(createProductDto: CreateProductServiceDto): Promise<ProductResponseService> {
+    if (!Types.ObjectId.isValid(createProductDto.getVendorId())) {
       throw new BadRequestException('El vendorId debe ser un ObjectId válido');
     }
 
-    const product = new Product(
-      new Types.ObjectId(),
-      new Types.ObjectId(createProductDto.vendorId),
-      createProductDto.name,
-      createProductDto.description,
-      createProductDto.imageURL,
-      createProductDto.price,
-      createProductDto.category,
-      createProductDto.isAvailable,
-      createProductDto.promotions
-    );
+    const product = createProductDto.toEntity();
 
-    return await this.productRepository.create(product);
+    const createdProduct = await this.productRepository.create(product);
+    return ProductResponseService.fromEntity(createdProduct);
   }
 
-  async getProductById(id: string): Promise<Product> {
+  async getProductById(id: string): Promise<ProductResponseService> {
     const product = await this.productRepository.findById(id);
     if (!product) {
       throw new NotFoundException('Producto no encontrado');
     }
-    return product;
+    return ProductResponseService.fromEntity(product);
   }
 
-  async getAllProducts(): Promise<Product[]> {
-    return await this.productRepository.findAll();
+  async getAllProducts(): Promise<ProductsResponseService> {
+    const products = await this.productRepository.findAll();
+    return ProductsResponseService.fromEntities(products);
   }
 
-  async getProductsByVendor(vendorId: string): Promise<Product[]> {
+  async getProductsByVendor(vendorId: string): Promise<ProductsResponseService> {
     if (!Types.ObjectId.isValid(vendorId)) {
       throw new BadRequestException('El vendorId debe ser un ObjectId válido');
     }
     
-    return await this.productRepository.findByVendorId(vendorId);
+    const products = await this.productRepository.findByVendorId(vendorId);
+    return ProductsResponseService.fromEntities(products);
   }
 
-  async getProductsByCategory(category: string): Promise<Product[]> {
-    return await this.productRepository.findByCategory(category);
+  async getProductsByCategory(category: string): Promise<ProductsResponseService> {
+    const products = await this.productRepository.findByCategory(category);
+    return ProductsResponseService.fromEntities(products);
   }
 
-  async updateProduct(id: string, updateProductDto: UpdateProductServiceDto): Promise<Product> {
+  async getVendorMenu(vendorId: string): Promise<MenuResponseService> {
+    if (!Types.ObjectId.isValid(vendorId)) {
+      throw new BadRequestException('El vendorId debe ser un ObjectId válido');
+    }
+    
+    const products = await this.productRepository.findByVendorId(vendorId);
+    return MenuResponseService.fromEntities(products, vendorId);
+  }
+
+  async updateProduct(id: string, updateProductDto: UpdateProductServiceDto): Promise<ProductResponseService> {
     const existingProduct = await this.productRepository.findById(id);
     if (!existingProduct) {
       throw new NotFoundException('Producto no encontrado');
@@ -77,7 +83,7 @@ export class ProductService implements IProductService {
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }
-    return result;
+    return ProductResponseService.fromEntity(result);
   }
 
   async deleteProduct(id: string): Promise<void> {
@@ -87,30 +93,37 @@ export class ProductService implements IProductService {
     }
   }
 
-  async applyPromotionToProduct(id: string, discountedPrice: number): Promise<Product> {
-    const product = await this.getProductById(id);
+  async applyPromotionToProduct(id: string, discountedPrice: number): Promise<ProductResponseService> {
+    const productEntity = await this.productRepository.findById(id);
+    if (!productEntity) {
+      throw new NotFoundException('Producto no encontrado');
+    }
     
-    product.applyPromotion(discountedPrice);
+    productEntity.applyPromotion(discountedPrice);
     
     const result = await this.productRepository.update(id, { 
-      promotions: product.getPromotions() 
+      promotions: productEntity.getPromotions() 
     } as Partial<Product>);
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }
-    return result;
+    return ProductResponseService.fromEntity(result);
   }
 
-  async removePromotionFromProduct(id: string): Promise<Product> {
-    const product = await this.getProductById(id);
-    product.removePromotion();
+  async removePromotionFromProduct(id: string): Promise<ProductResponseService> {
+    const productEntity = await this.productRepository.findById(id);
+    if (!productEntity) {
+      throw new NotFoundException('Producto no encontrado');
+    }
+    
+    productEntity.removePromotion();
     
     const result = await this.productRepository.update(id, { 
-      promotions: product.getPromotions() 
+      promotions: productEntity.getPromotions() 
     } as Partial<Product>);
     if (!result) {
       throw new NotFoundException('Producto no encontrado');
     }
-    return result;
+    return ProductResponseService.fromEntity(result);
   }
 }

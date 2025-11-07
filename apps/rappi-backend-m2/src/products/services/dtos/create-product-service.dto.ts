@@ -1,3 +1,7 @@
+import { Types } from "mongoose";
+
+import { Product } from "../../domain/entities/product.entity";
+
 export class CreateProductServiceDto {
   private readonly _vendorId: string;
   private readonly _name: string;
@@ -31,35 +35,49 @@ export class CreateProductServiceDto {
     this._promotions = promotions;
   }
 
-  get vendorId(): string {
+  getVendorId(): string {
     return this._vendorId;
   }
 
-  get name(): string {
+  getName(): string {
     return this._name;
   }
 
-  get description(): string {
+  getDescription(): string {
     return this._description;
   }
 
-  get imageURL(): string {
+  getImageURL(): string {
     return this._imageURL;
   }
 
-  get price(): number {
+  getPrice(): number {
     return this._price;
   }
 
-  get category(): string {
+  getCategory(): string {
     return this._category;
   }
 
-  get isAvailable(): boolean {
+  getIsAvailable(): boolean {
     return this._isAvailable;
   }
 
-  get promotions(): { isOnPromotion: boolean; discountedPrice: number } {
+  getPromotions(): { isOnPromotion: boolean; discountedPrice: number } {
     return { ...this._promotions };
+  }
+
+  toEntity(): Product {
+    return new Product(
+      new Types.ObjectId(),
+      new Types.ObjectId(this.getVendorId()),
+      this.getName(),
+      this.getDescription(),
+      this.getImageURL(),
+      this.getPrice(),
+      this.getCategory(),
+      this.getIsAvailable(),
+      this.getPromotions()
+    );
   }
 }
