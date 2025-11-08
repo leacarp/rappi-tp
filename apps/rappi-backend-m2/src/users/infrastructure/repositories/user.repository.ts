@@ -1,5 +1,5 @@
 import { Model, Types } from 'mongoose';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { IUserRepository } from '../../domain/interfaces/IUserRepository';
@@ -28,8 +28,6 @@ import { CartItem as CartItemSchema } from '../schemas/cart-item.schema';
 export class UserRepository implements IUserRepository {
   constructor(@InjectModel(UserSchema.name) private userModel: Model<UserDocument>) {}
 
-  private readonly logger = new Logger(UserRepository.name);
-
   private buildIdFilter(id: string): { _id: Types.ObjectId | string } {
     const trimmed = (id || '').trim();
     if (Types.ObjectId.isValid(trimmed)) {
@@ -41,11 +39,8 @@ export class UserRepository implements IUserRepository {
 
   async getUserById(userId: string): Promise<User | null> {
     const filter = this.buildIdFilter(userId);
-    const isObjId = filter._id instanceof Types.ObjectId;
-    this.logger.debug(`getUserById id=${userId} len=${userId?.length} isObjId=${isObjId} collection=${this.userModel.collection.name}`);
 
     const userSchema = await this.userModel.findOne(filter).exec();
-    this.logger.debug(`getUserById found=${!!userSchema}`);
     if (!userSchema) {
       return null;
     }

@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'; 
 import * as bcrypt from 'bcrypt';
-import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 
 import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product-adapter.constants';
 import { IProductAdapter } from '../../products/domain/interfaces/IProductAdapter';
@@ -32,8 +32,6 @@ export class UserService implements IUserService {
     @Inject(PRODUCT_ADAPTER)
     private readonly productAdapter: IProductAdapter
   ) {}
-
-  private readonly logger = new Logger(UserService.name);
 
   async getVendorProfile(vendorId: string): Promise<GetVendorProfile> {
     const vendor = await this.userRepository.getUserById(vendorId);
@@ -186,19 +184,15 @@ export class UserService implements IUserService {
 
   async addVendorReview(vendorId: string, request: CreateReviewRequestService): Promise<void> {
     vendorId = (vendorId || '').trim();
-    this.logger.debug(`addVendorReview vendorId=${vendorId} len=${vendorId.length}`);
+
     const vendor = await this.userRepository.getUserById(vendorId);
-    this.logger.debug(`addVendorReview vendor found? ${!!vendor}`);
-    if (!vendor) {
+    if (!vendor || vendor.getRole() !== 'vendor') {
       throw new NotFoundException('Vendor no encontrado');
     }
-    if (vendor.getRole() !== 'vendor') {
-      this.logger.debug(`addVendorReview role mismatch: role=${vendor.getRole()}`);
-      throw new NotFoundException('Vendor no encontrado');
-    }
+
     const entity = request.toEntity(new Date());
     const existing = await this.userRepository.getUserReviews(vendorId);
-    this.logger.debug(`addVendorReview existingReviews=${existing.length}`);
+    
     const already = existing.find(r => r.getReviewerId() === entity.getReviewerId());
     if (already) {
       const updated = await this.userRepository.updateUserReview(
@@ -208,13 +202,12 @@ export class UserService implements IUserService {
         entity.getComment(),
         entity.getDate()
       );
-      this.logger.debug(`addVendorReview updatedExisting=${!!updated}`);
+      
       if (!updated) {
         throw new NotFoundException('Vendor no encontrado');
       }
     } else {
       const updated = await this.userRepository.addUserReview(vendorId, entity);
-      this.logger.debug(`addVendorReview insertedNew=${!!updated}`);
       if (!updated) {
         throw new NotFoundException('Vendor no encontrado');
       }
@@ -223,14 +216,13 @@ export class UserService implements IUserService {
 
   async getVendorReviews(vendorId: string): Promise<GetReviewsResponseService> {
     vendorId = (vendorId || '').trim();
-    this.logger.debug(`getVendorReviews vendorId=${vendorId} len=${vendorId.length}`);
+    
     const vendor = await this.userRepository.getUserById(vendorId);
-    this.logger.debug(`getVendorReviews vendor found? ${!!vendor}`);
     if (!vendor) {
       throw new NotFoundException('Vendor no encontrado');
     }
+    
     const reviews = await this.userRepository.getUserReviews(vendorId);
-    this.logger.debug(`getVendorReviews reviewsCount=${reviews.length}`);
     return GetReviewsResponseService.fromEntities(reviews);
   }
 
