@@ -2,14 +2,14 @@ import { PromotionResponseDto } from './product-response.dto';
 import { MenuItemResponseService, MenuResponseService } from '../../services/dtos/menu-response-service.dto';
 
 export class MenuItemResponseDto {
-  private readonly _name: string;
-  private readonly _description: string;
-  private readonly _imageURL: string;
-  private readonly _price: number;
-  private readonly _finalPrice: number;
-  private readonly _discountPercentage: number;
-  private readonly _isAvailable: boolean;
-  private readonly _promotions: PromotionResponseDto;
+  private readonly name: string;
+  private readonly description: string;
+  private readonly imageURL: string;
+  private readonly price: number;
+  private readonly finalPrice: number;
+  private readonly discountPercentage: number;
+  private readonly isAvailable: boolean;
+  private readonly promotions: PromotionResponseDto;
 
   constructor(
     name: string,
@@ -21,46 +21,46 @@ export class MenuItemResponseDto {
     isAvailable: boolean,
     promotions: PromotionResponseDto
   ) {
-    this._name = name;
-    this._description = description;
-    this._imageURL = imageURL;
-    this._price = price;
-    this._finalPrice = finalPrice;
-    this._discountPercentage = discountPercentage;
-    this._isAvailable = isAvailable;
-    this._promotions = promotions;
+    this.name = name;
+    this.description = description;
+    this.imageURL = imageURL;
+    this.price = price;
+    this.finalPrice = finalPrice;
+    this.discountPercentage = discountPercentage;
+    this.isAvailable = isAvailable;
+    this.promotions = promotions;
   }
 
   getName(): string {
-    return this._name;
+    return this.name;
   }
 
   getDescription(): string {
-    return this._description;
+    return this.description;
   }
 
   getImageURL(): string {
-    return this._imageURL;
+    return this.imageURL;
   }
 
   getPrice(): number {
-    return this._price;
+    return this.price;
   }
   
   getFinalPrice(): number {
-    return this._finalPrice;
+    return this.finalPrice;
   }
 
   getDiscountPercentage(): number {
-    return this._discountPercentage;
+    return this.discountPercentage;
   }
 
   getIsAvailable(): boolean {
-    return this._isAvailable; 
+    return this.isAvailable; 
   }
 
   getPromotions(): PromotionResponseDto {
-    return this._promotions;
+    return this.promotions;
   }
 
   static fromServiceDto(serviceDto: MenuItemResponseService): MenuItemResponseDto {
@@ -80,72 +80,72 @@ export class MenuItemResponseDto {
 
   toJSON() {
     return {
-      name: this._name,
-      description: this._description,
-      imageURL: this._imageURL,
-      price: this._price,
-      finalPrice: this._finalPrice,
-      discountPercentage: this._discountPercentage,
-      isAvailable: this._isAvailable,
+      name: this.name,
+      description: this.description,
+      imageURL: this.imageURL,
+      price: this.price,
+      finalPrice: this.finalPrice,
+      discountPercentage: this.discountPercentage,
+      isAvailable: this.isAvailable,
       promotions: {
-        isOnPromotion: this._promotions.getIsOnPromotion(),
-        discountedPrice: this._promotions.getDiscountedPrice(),
+        isOnPromotion: this.promotions.getIsOnPromotion(),
+        discountedPrice: this.promotions.getDiscountedPrice(),
       },
     };
   }
 }
 
 export class MenuCategoryResponseDto {
-  private readonly _categoryName: string;
-  private readonly _items: MenuItemResponseDto[];
+  private readonly categoryName: string;
+  private readonly items: MenuItemResponseDto[];
 
   constructor(categoryName: string, items: MenuItemResponseDto[]) {
-    this._categoryName = categoryName;
-    this._items = items;
+    this.categoryName = categoryName;
+    this.items = items;
   }
 
   getCategoryName(): string {
-    return this._categoryName;
+    return this.categoryName;
   }
 
   getItems(): MenuItemResponseDto[] {
-    return this._items;
+    return this.items;
   }
 
   getCount(): number {
-    return this._items.length;
+    return this.items.length;
   }
 
   toJSON() {
     return {
-      categoryName: this._categoryName,
-      items: this._items.map(i => i.toJSON()),
+      categoryName: this.categoryName,
+      items: this.items.map(i => i.toJSON()),
       count: this.getCount(),
     };
   }
 }
 
 export class MenuResponseDto {
-  private readonly _vendorId: string;
-  private readonly _categories: MenuCategoryResponseDto[];
-  private readonly _totalItems: number;
+  private readonly vendorId: string;
+  private readonly categories: MenuCategoryResponseDto[];
+  private readonly totalItems: number;
 
   constructor(vendorId: string, categories: MenuCategoryResponseDto[], totalItems: number) {
-    this._vendorId = vendorId;
-    this._categories = categories;
-    this._totalItems = totalItems;
+    this.vendorId = vendorId;
+    this.categories = categories;
+    this.totalItems = totalItems;
   }
 
   getVendorId(): string {
-    return this._vendorId;
+    return this.vendorId;
   }
 
   getCategories(): MenuCategoryResponseDto[] {
-    return this._categories;
+    return this.categories;
   }
 
   getTotalItems(): number {
-    return this._totalItems;
+    return this.totalItems;
   }
 
   static fromServiceDto(serviceDto: MenuResponseService): MenuResponseDto {
@@ -165,9 +165,9 @@ export class MenuResponseDto {
 
   toJSON() {
     return {
-      vendorId: this._vendorId,
-      categories: this._categories.map(c => c.toJSON()),
-      totalItems: this._totalItems,
+      vendorId: this.vendorId,
+      categories: this.categories.map(c => c.toJSON()),
+      totalItems: this.totalItems,
     };
   }
 }

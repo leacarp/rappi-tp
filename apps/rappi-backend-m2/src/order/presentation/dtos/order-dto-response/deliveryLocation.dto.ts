@@ -1,20 +1,20 @@
 import { DeliveryLocationService } from "../../../services/dtos/order-response/delivery-location-service.dto";
 
 export class DeliveryLocationDto {
-  private readonly _latitude: number;
-  private readonly _longitude: number;
+  private readonly latitude: number;
+  private readonly longitude: number;
 
   constructor(latitude: number, longitude: number) {
-    this._latitude = latitude;
-    this._longitude = longitude;
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 
   getLatitude(): number {
-    return this._latitude;
+    return this.latitude;
   }
 
   getLongitude(): number {
-    return this._longitude;
+    return this.longitude;
   }
 
   static fromServiceDto(serviceDto: DeliveryLocationService | null): DeliveryLocationDto | null {

@@ -1,26 +1,26 @@
 import { UserBasicService } from "../../../services/dtos/order-response/user-basic-service.dto";
 
 export class UserBasicDto {
-  private readonly _id: string;
-  private readonly _name: string;
-  private readonly _email: string;
+  private readonly id: string;
+  private readonly name: string;
+  private readonly email: string;
 
   constructor(id: string, name: string, email: string) {
-    this._id = id;
-    this._name = name;
-    this._email = email;
+    this.id = id;
+    this.name = name;
+    this.email = email;
   }
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getName(): string {
-    return this._name;
+    return this.name;
   }
 
   getEmail(): string {
-    return this._email;
+    return this.email;
   }
 
   static fromServiceDto(serviceDto: UserBasicService | null): UserBasicDto | null {

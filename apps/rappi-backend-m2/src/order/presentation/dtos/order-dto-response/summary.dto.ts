@@ -1,38 +1,38 @@
 import { SummaryServiceResponse } from "../../../services/dtos/order-response/summary-service-response.dto";
 
 export class SummaryDto {
-  private readonly _subtotal: number;
-  private readonly _shippingCost: number;
-  private readonly _taxes: number;
-  private readonly _discount: number;
-  private readonly _total: number;
+  private readonly subtotal: number;
+  private readonly shippingCost: number;
+  private readonly taxes: number;
+  private readonly discount: number;
+  private readonly total: number;
 
   constructor(subtotal: number, shippingCost: number, taxes: number, discount: number, total: number) {
-    this._subtotal = subtotal;
-    this._shippingCost = shippingCost;
-    this._taxes = taxes;
-    this._discount = discount;
-    this._total = total;
+    this.subtotal = subtotal;
+    this.shippingCost = shippingCost;
+    this.taxes = taxes;
+    this.discount = discount;
+    this.total = total;
   }
 
   getSubtotal(): number {
-    return this._subtotal;
+    return this.subtotal;
   }
 
   getShippingCost(): number {
-    return this._shippingCost;
+    return this.shippingCost;
   }
 
   getTaxes(): number {
-    return this._taxes;
+    return this.taxes;
   }
 
   getDiscount(): number {
-    return this._discount;
+    return this.discount;
   }
 
   getTotal(): number {
-    return this._total;
+    return this.total;
   }
 
   static fromServiceDto(serviceDto: SummaryServiceResponse): SummaryDto {

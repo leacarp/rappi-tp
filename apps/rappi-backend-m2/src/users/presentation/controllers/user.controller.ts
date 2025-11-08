@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Inject, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { IUserService } from '../../domain/interfaces/IUserService';
@@ -20,6 +20,9 @@ import { CreateAdminDto } from '../dtos/create-admin.dto';
 import { CreateUserResponse } from '../dtos/create-user-response.dto';
 import { VendorListItem } from '../dtos/vendor-list-item.dto';
 import { DriverListItem } from '../dtos/driver-list-item.dto';
+import { UpdateVendorProfileRequest } from '../dtos/update-vendor-profile-request';
+import { GetVendorProfileResponse } from '../dtos/get-vendor-profile-response';
+import { SearchRestaurantsResponse } from '../dtos/search-restaurants-response';
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Roles } from '../../../auth/decorators/roles.decorator';
@@ -67,24 +70,6 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAddress(@Param('userId') userId: string, @Param('addressId') addressId: string) {
     await this.userService.deleteAddress(userId, addressId);
-  }
-
-  @Post(':userId/reviews')
-  @HttpCode(HttpStatus.CREATED)
-  async addReview(
-    @Param('userId') userId: string,
-    @Body() body: CreateReviewRequest
-  ): Promise<void> {
-    const serviceDto = body.toServiceDto();
-    await this.userService.addReview(userId, serviceDto);
-  }
-
-  @Get(':userId/reviews')
-  async getReviews(
-    @Param('userId') userId: string
-  ): Promise<GetReviewsResponse> {
-    const serviceResponse = await this.userService.getReviews(userId);
-    return GetReviewsResponse.fromServiceDto(serviceResponse);
   }
   
   @Get(':userId/cart')
@@ -153,6 +138,40 @@ export class UserController {
   async getAllVendors(): Promise<VendorListItem[]> {
     const serviceDtos = await this.userService.getAllVendors();
     return serviceDtos.map(dto => VendorListItem.fromServiceDto(dto));
+  }
+
+  @Get('vendors/:vendorId/reviews')
+  async getReviews(@Param('vendorId') vendorId: string): Promise<GetReviewsResponse> {
+    const serviceResp = await this.userService.getVendorReviews(vendorId);
+    return GetReviewsResponse.fromServiceDto(serviceResp);
+  }
+
+  @Post('vendors/:vendorId/reviews')
+  @HttpCode(HttpStatus.CREATED)
+  async addReview(
+    @Param('vendorId') vendorId: string,
+    @Body() body: CreateReviewRequest
+  ): Promise<void> {
+    const serviceDto = body.toServiceDto();
+    await this.userService.addVendorReview(vendorId, serviceDto);
+  }
+
+  @Get('vendors/:vendorId/profile')
+  async getProfile(@Param('vendorId') vendorId: string): Promise<GetVendorProfileResponse> {
+    const serviceResp = await this.userService.getVendorProfile(vendorId);
+    return GetVendorProfileResponse.fromServiceDto(serviceResp);
+  }
+
+  @Put('vendors/:vendorId/profile')
+  async updateProfile(@Param('vendorId') vendorId: string, @Body() body: UpdateVendorProfileRequest): Promise<void> {
+    const serviceDto = body.toServiceDto();
+    await this.userService.updateVendorProfile(vendorId, serviceDto);
+  }
+
+  @Get('vendors/searchRestaurants')
+  async searchRestaurants(@Query('param') param: string): Promise<SearchRestaurantsResponse> {
+    const serviceResponse = await this.userService.searchRestaurantsByNameOrCategory(param);
+    return SearchRestaurantsResponse.fromServiceDto(serviceResponse);
   }
 
   @Post('drivers')

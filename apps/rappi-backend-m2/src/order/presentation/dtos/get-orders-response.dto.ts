@@ -2,14 +2,14 @@ import { OrderSummaryDto } from "./order-dto-response/order-summary.dto";
 import { GetOrdersResponseService } from "../../services/dtos/get-orders-response-service.dto";
 
 export class GetUserOrdersResponseDto {
-  private readonly _orders: OrderSummaryDto[];
+  private readonly orders: OrderSummaryDto[];
 
   constructor(orders: OrderSummaryDto[]) {
-    this._orders = orders;
+    this.orders = orders;
   }
 
   getOrders(): OrderSummaryDto[] {
-    return this._orders;
+    return this.orders;
   }
 
   static fromServiceDto(serviceDto: GetOrdersResponseService): GetUserOrdersResponseDto {

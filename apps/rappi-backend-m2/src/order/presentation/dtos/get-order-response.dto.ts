@@ -8,19 +8,19 @@ import { CustomerBasicDto } from "./order-dto-response/customer-basic.dto";
 import { GetOrderResponseService } from "../../services/dtos/get-order-response-service.dto";
 
 export class GetOrderResponseDto {
-  private readonly _id: string;
-  private readonly _customer: CustomerBasicDto;
-  private readonly _vendor: UserBasicDto;
-  private readonly _driver: UserBasicDto | null;
-  private readonly _status: string;
-  private readonly _createdAt: Date;
-  private readonly _pickupLocation: PickupLocationDto;
-  private readonly _deliveryLocation: DeliveryLocationDto | null;
-  private readonly _items: ItemsDto[];
-  private readonly _summary: SummaryDto;
-  private readonly _payment: PaymentDto;
-  private readonly _trackingNumber: string;
-  private readonly _notes: string;
+  private readonly id: string;
+  private readonly customer: CustomerBasicDto;
+  private readonly vendor: UserBasicDto;
+  private readonly driver: UserBasicDto | null;
+  private readonly status: string;
+  private readonly createdAt: Date;
+  private readonly pickupLocation: PickupLocationDto;
+  private readonly deliveryLocation: DeliveryLocationDto | null;
+  private readonly items: ItemsDto[];
+  private readonly summary: SummaryDto;
+  private readonly payment: PaymentDto;
+  private readonly trackingNumber: string;
+  private readonly notes: string;
 
   constructor(
     id: string,
@@ -37,71 +37,71 @@ export class GetOrderResponseDto {
     trackingNumber: string,
     notes: string
   ) {
-    this._id = id;
-    this._customer = customer;
-    this._vendor = vendor;
-    this._driver = driver;
-    this._status = status;
-    this._createdAt = createdAt;
-    this._pickupLocation = pickupLocation;
-    this._deliveryLocation = deliveryLocation;
-    this._items = items;
-    this._summary = summary;
-    this._payment = payment;
-    this._trackingNumber = trackingNumber;
-    this._notes = notes;
+    this.id = id;
+    this.customer = customer;
+    this.vendor = vendor;
+    this.driver = driver;
+    this.status = status;
+    this.createdAt = createdAt;
+    this.pickupLocation = pickupLocation;
+    this.deliveryLocation = deliveryLocation;
+    this.items = items;
+    this.summary = summary;
+    this.payment = payment;
+    this.trackingNumber = trackingNumber;
+    this.notes = notes;
   }
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getCustomer(): CustomerBasicDto {
-    return this._customer;
+    return this.customer;
   }
 
   getVendor(): UserBasicDto {
-    return this._vendor;
+    return this.vendor;
   }
 
   getDriver(): UserBasicDto | null {
-    return this._driver;
+    return this.driver;
   }
 
   getStatus(): string {
-    return this._status;
+    return this.status;
   }
 
   getCreatedAt(): Date {
-    return this._createdAt;
+    return this.createdAt;
   }
 
   getPickupLocation(): PickupLocationDto {
-    return this._pickupLocation;
+    return this.pickupLocation;
   }
 
   getDeliveryLocation(): DeliveryLocationDto | null {
-    return this._deliveryLocation;
+    return this.deliveryLocation;
   }
 
   getItems(): ItemsDto[] {
-    return this._items;
+    return this.items;
   }
 
   getSummary(): SummaryDto {
-    return this._summary;
+    return this.summary;
   }
 
   getPayment(): PaymentDto {
-    return this._payment;
+    return this.payment;
   }
 
   getTrackingNumber(): string {
-    return this._trackingNumber;
+    return this.trackingNumber;
   }
 
   getNotes(): string {
-    return this._notes;
+    return this.notes;
   }
 
   static fromServiceDto(serviceDto: GetOrderResponseService): GetOrderResponseDto {
