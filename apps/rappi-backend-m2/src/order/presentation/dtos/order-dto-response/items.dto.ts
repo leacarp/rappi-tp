@@ -2,20 +2,20 @@ import { ItemsServiceResponse } from "../../../services/dtos/order-response/item
 import { ProductOfItemDto } from "./productOfItem.dto";
 
 export class ItemsDto {
-  private readonly _productOfItem: ProductOfItemDto;
-  private readonly _quantity: number;
+  private readonly productOfItem: ProductOfItemDto;
+  private readonly quantity: number;
 
   constructor(productOfItem: ProductOfItemDto, quantity: number) {
-    this._productOfItem = productOfItem;
-    this._quantity = quantity;
+    this.productOfItem = productOfItem;
+    this.quantity = quantity;
   }
 
   getProduct(): ProductOfItemDto {
-    return this._productOfItem;
+    return this.productOfItem;
   }
 
   getQuantity(): number {
-    return this._quantity;
+    return this.quantity;
   }
 
   static fromServiceDto(serviceDto: ItemsServiceResponse): ItemsDto {

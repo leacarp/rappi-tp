@@ -1,20 +1,20 @@
 import { GetOrderResponseDto } from './get-order-response.dto';
 
 export class ConfirmOrderResponseDto {
-  private readonly _order: GetOrderResponseDto;
-  private readonly _whatsappLink: string;
+  private readonly order: GetOrderResponseDto;
+  private readonly whatsappLink: string;
 
   constructor(order: GetOrderResponseDto, whatsappLink: string) {
-    this._order = order;
-    this._whatsappLink = whatsappLink;
+    this.order = order;
+    this.whatsappLink = whatsappLink;
   }
 
   getOrder(): GetOrderResponseDto {
-    return this._order;
+    return this.order;
   }
 
   getWhatsappLink(): string {
-    return this._whatsappLink;
+    return this.whatsappLink;
   }
 
   static of(order: GetOrderResponseDto, whatsappLink: string): ConfirmOrderResponseDto {

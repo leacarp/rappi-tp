@@ -2,7 +2,7 @@ import { CustomerBasicService } from "../../../services/dtos/order-response/cust
 import { UserBasicDto } from "./user-basic.dto";
 
 export class CustomerBasicDto extends UserBasicDto {
-  private readonly _address?: string;
+  private readonly address?: string;
 
   constructor(
     id: string,
@@ -11,11 +11,11 @@ export class CustomerBasicDto extends UserBasicDto {
     address?: string
   ) {
     super(id, name, email);
-    this._address = address;
+    this.address = address;
   }
 
   getAddress(): string | undefined {
-    return this._address;
+    return this.address;
   }
 
   static fromServiceDto(serviceDto: CustomerBasicService): CustomerBasicDto {

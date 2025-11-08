@@ -1,26 +1,26 @@
 import { PaymentServiceResponse } from "../../../services/dtos/order-response/payment-service-response.dto";
 
 export class PaymentDto {
-  private readonly _method: string;
-  private readonly _status: string;
-  private readonly _transactionId: string;
+  private readonly method: string;
+  private readonly status: string;
+  private readonly transactionId: string;
 
   constructor(method: string, status: string, transactionId: string) {
-    this._method = method;
-    this._status = status;
-    this._transactionId = transactionId;
+    this.method = method;
+    this.status = status;
+    this.transactionId = transactionId;
   }
 
   getMethod(): string {
-    return this._method;
+    return this.method;
   }
 
   getStatus(): string {
-    return this._status;
+    return this.status;
   }
 
   getTransactionId(): string {
-    return this._transactionId;
+    return this.transactionId;
   }
 
   static fromServiceDto(serviceDto: PaymentServiceResponse): PaymentDto {

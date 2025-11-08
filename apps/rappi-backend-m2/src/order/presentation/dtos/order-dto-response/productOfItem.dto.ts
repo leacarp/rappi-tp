@@ -1,22 +1,26 @@
 import { ProductOfItemService } from '../../../services/dtos/order-response/product-of-item-service.dto';
 
 export class ProductOfItemDto {
-  constructor(
-    private readonly _id: string,
-    private readonly _name: string,
-    private readonly _price: number,
-  ) {}
+  private readonly id: string;
+  private readonly name: string;
+  private readonly price: number;
+
+  constructor(id: string, name: string, price: number) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+  }
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getName(): string {
-    return this._name;
+    return this.name;
   }
 
   getPrice(): number {
-    return this._price;
+    return this.price;
   }
 
   static fromServiceDto(serviceDto: ProductOfItemService): ProductOfItemDto {

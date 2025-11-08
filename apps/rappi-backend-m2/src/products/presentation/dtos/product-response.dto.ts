@@ -1,35 +1,35 @@
 import { ProductResponseService } from "../../services/dtos/product-response-service.dto";
 
 export class PromotionResponseDto {
-  private readonly _isOnPromotion: boolean;
-  private readonly _discountedPrice: number;
+  private readonly isOnPromotion: boolean;
+  private readonly discountedPrice: number;
 
   constructor(isOnPromotion: boolean, discountedPrice: number) {
-    this._isOnPromotion = isOnPromotion;
-    this._discountedPrice = discountedPrice;
+    this.isOnPromotion = isOnPromotion;
+    this.discountedPrice = discountedPrice;
   }
 
   getIsOnPromotion(): boolean {
-    return this._isOnPromotion;
+    return this.isOnPromotion;
   }
 
   getDiscountedPrice(): number {
-    return this._discountedPrice;
+    return this.discountedPrice;
   }
 }
 
 export class ProductResponseDto {
-  private readonly _id: string;
-  private readonly _vendorId: string;
-  private readonly _name: string;
-  private readonly _description: string;
-  private readonly _imageURL: string;
-  private readonly _price: number;
-  private readonly _category: string;
-  private readonly _isAvailable: boolean;
-  private readonly _promotions: PromotionResponseDto;
-  private readonly _finalPrice: number;
-  private readonly _discountPercentage: number;
+  private readonly id: string;
+  private readonly vendorId: string;
+  private readonly name: string;
+  private readonly description: string;
+  private readonly imageURL: string;
+  private readonly price: number;
+  private readonly category: string;
+  private readonly isAvailable: boolean;
+  private readonly promotions: PromotionResponseDto;
+  private readonly finalPrice: number;
+  private readonly discountPercentage: number;
 
   constructor(
     id: string,
@@ -44,61 +44,61 @@ export class ProductResponseDto {
     finalPrice: number,
     discountPercentage: number
   ) {
-    this._id = id;
-    this._vendorId = vendorId;
-    this._name = name;
-    this._description = description;
-    this._imageURL = imageURL;
-    this._price = price;
-    this._category = category;
-    this._isAvailable = isAvailable;
-    this._promotions = promotions;
-    this._finalPrice = finalPrice;
-    this._discountPercentage = discountPercentage;
+    this.id = id;
+    this.vendorId = vendorId;
+    this.name = name;
+    this.description = description;
+    this.imageURL = imageURL;
+    this.price = price;
+    this.category = category;
+    this.isAvailable = isAvailable;
+    this.promotions = promotions;
+    this.finalPrice = finalPrice;
+    this.discountPercentage = discountPercentage;
   }
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getVendorId(): string {
-    return this._vendorId;
+    return this.vendorId;
   }
 
   getName(): string {
-    return this._name;
+    return this.name;
   }
 
   getDescription(): string {
-    return this._description;
+    return this.description;
   }
 
   getImageURL(): string {
-    return this._imageURL;
+    return this.imageURL;
   }
 
   getPrice(): number {
-    return this._price;
+    return this.price;
   }
 
   getCategory(): string {
-    return this._category;
+    return this.category;
   }
 
   getIsAvailable(): boolean {
-    return this._isAvailable;
+    return this.isAvailable;
   }
 
   getPromotions(): PromotionResponseDto {
-    return this._promotions;
+    return this.promotions;
   }
 
   getFinalPrice(): number {
-    return this._finalPrice;
+    return this.finalPrice;
   }
 
   getDiscountPercentage(): number {
-    return this._discountPercentage;
+    return this.discountPercentage;
   }
 
   static fromServiceDto(serviceDto: ProductResponseService): ProductResponseDto {
