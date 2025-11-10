@@ -1,18 +1,22 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { UpdateVendorProfile } from '../../services/dtos/update-vendor-profile-service';
 
 export class UpdateVendorProfileRequest {
+  @ApiProperty({ type: String, required: false })
   @IsOptional()
   @IsString({ message: 'El nombre del restaurante debe ser un string' })
   @IsNotEmpty({ message: 'El nombre del restaurante no puede estar vacío' })
   private readonly restaurantName?: string;
 
+  @ApiProperty({ type: String, required: false })
   @IsOptional()
   @IsString({ message: 'El horario debe ser un string' })
   @IsNotEmpty({ message: 'El horario no puede estar vacío' })
   private readonly schedule?: string;
 
+  @ApiProperty({ type: String, required: false })
   @IsOptional()
   @IsString({ message: 'El teléfono debe ser un string' })
   @IsNotEmpty({ message: 'El teléfono no puede estar vacío' })

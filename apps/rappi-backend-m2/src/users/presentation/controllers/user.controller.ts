@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Inject, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 import { IUserService } from '../../domain/interfaces/IUserService';
 import { USER_SERVICE } from '../../infrastructure/constants/user-service.constants';
@@ -53,6 +53,8 @@ export class UserController {
 
   @Post(':userId/addresses')
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: CreateAddressRequest })
+  @ApiResponse({ status: 201 })
   async addAddress(@Param('userId') userId: string, @Body() body: CreateAddressRequest): Promise<void> {
     const requestService = body.toServiceDto();
 
@@ -60,6 +62,8 @@ export class UserController {
   }
 
   @Put(':userId/addresses/:addressId')
+  @ApiBody({ type: UpdateAddressRequest })
+  @ApiResponse({ status: 200 })
   async updateAddress(@Param('userId') userId: string, @Param('addressId') addressId: string, @Body() body: UpdateAddressRequest): Promise<void> {
     const requestService = body.toServiceDto(addressId);
 
@@ -80,6 +84,8 @@ export class UserController {
   
   @Post(':userId/cart/items')
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: AddCartItemRequest })
+  @ApiResponse({ status: 201 })
   async addCartItem(
     @Param('userId') userId: string,
     @Body() body: AddCartItemRequest
@@ -89,6 +95,8 @@ export class UserController {
   }
   
   @Put(':userId/cart/items/:productId')
+  @ApiBody({ type: SetCartItemQuantityRequest })
+  @ApiResponse({ status: 200 })
   async setCartItemQuantity(
     @Param('userId') userId: string,
     @Param('productId') productId: string,
@@ -107,6 +115,8 @@ export class UserController {
   }
 
   @Put(':userId/driver/availability')
+  @ApiBody({ type: UpdateDriverAvailabilityRequest })
+  @ApiResponse({ status: 200 })
   async updateDriverAvailability(
     @Param('userId') userId: string,
     @Body() body: UpdateDriverAvailabilityRequest
@@ -118,6 +128,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: CreateVendorAdminDto })
+  @ApiResponse({ status: 201, type: CreateUserResponse })
   async createVendor(@Body() body: CreateVendorAdminDto): Promise<CreateUserResponse> {
     const serviceDto = await this.userService.createVendor(
       body.email,
@@ -148,6 +160,8 @@ export class UserController {
 
   @Post('vendors/:vendorId/reviews')
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: CreateReviewRequest })
+  @ApiResponse({ status: 201 })
   async addReview(
     @Param('vendorId') vendorId: string,
     @Body() body: CreateReviewRequest
@@ -163,6 +177,8 @@ export class UserController {
   }
 
   @Put('vendors/:vendorId/profile')
+  @ApiBody({ type: UpdateVendorProfileRequest })
+  @ApiResponse({ status: 200 })
   async updateProfile(@Param('vendorId') vendorId: string, @Body() body: UpdateVendorProfileRequest): Promise<void> {
     const serviceDto = body.toServiceDto();
     await this.userService.updateVendorProfile(vendorId, serviceDto);
@@ -178,6 +194,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: CreateDriverAdminDto })
+  @ApiResponse({ status: 201, type: CreateUserResponse })
   async createDriver(@Body() body: CreateDriverAdminDto): Promise<CreateUserResponse> {
     const serviceDto = await this.userService.createDriver(
       body.email,
@@ -199,6 +217,8 @@ export class UserController {
 
   @Post('admins')
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: CreateAdminDto })
+  @ApiResponse({ status: 201, type: CreateUserResponse })
   async createAdmin(@Body() body: CreateAdminDto): Promise<CreateUserResponse> {
     const serviceDto = await this.userService.createAdmin(
       body.email,

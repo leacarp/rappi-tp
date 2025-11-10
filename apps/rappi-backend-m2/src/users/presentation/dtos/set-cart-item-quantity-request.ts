@@ -1,8 +1,10 @@
 import { IsInt, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { SetCartItemQuantityRequestService } from '../../services/dtos/set-cart-item-quantity-request-service';
 
 export class SetCartItemQuantityRequest {
+  @ApiProperty({ type: Number })
   @IsInt({ message: 'La cantidad debe ser entero' })
   @Min(0, { message: 'La cantidad mínima es 0' })
   private readonly quantity: number;
