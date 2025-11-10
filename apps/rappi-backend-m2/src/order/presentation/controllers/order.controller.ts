@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Query, Put, Inject, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query, Put, Inject, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
@@ -11,6 +11,9 @@ import { UpdateOrderStatusRequestDto } from '../dtos/update-status.dto';
 import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
 import { ConfirmOrderResponseDto } from '../dtos/confirm-order-response.dto';
 import { AcceptOrderDto } from '../dtos/confirm-driver.dto';
+import { AssignDriverDto } from '../dtos/assing-driver.dto';
+import { Roles } from '../../../auth/decorators/roles.decorator';
+import { RolesGuard } from '../../../auth/guards/roles.guard';
 
 @ApiTags('orders')
 @ApiBearerAuth('JWT-auth')
@@ -81,5 +84,14 @@ export class OrderController {
   async acceptOrderByDriver(@Param('id') orderId: string, @Body() dto: AcceptOrderDto): Promise<{ message: string }> {
     await this.orderService.acceptOrderByDriver(orderId, dto.driverId);
     return { message: 'Driver asignado correctamente' };
+  }
+
+  @Put(':id/assign-driver')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @HttpCode(HttpStatus.OK)
+  async assignDriverByAdmin(@Param('id') orderId: string, @Body() dto: AssignDriverDto): Promise<{message: string}> {
+    await this.orderService.assignDriverByAdmin(orderId, dto.driverId);
+    return {message: 'Driver asignado correctamente'};
   }
 }

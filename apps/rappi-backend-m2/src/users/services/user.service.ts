@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'; 
 import * as bcrypt from 'bcrypt';
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 
 import { PRODUCT_ADAPTER } from '../../products/infrastructure/constants/product-adapter.constants';
 import { IProductAdapter } from '../../products/domain/interfaces/IProductAdapter';
@@ -317,7 +317,7 @@ export class UserService implements IUserService {
   ): Promise<CreateUserResponseService> {
     const existingUser = await this.userRepository.getUserByEmail(email);
     if (existingUser) {
-      throw new Error('El email ya está registrado');
+      throw new BadRequestException('El email ya está registrado');
     }
 
     const hashedPassword = await this.hashPassword(password);
