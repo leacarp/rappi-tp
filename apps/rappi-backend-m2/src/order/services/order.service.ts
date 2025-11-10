@@ -17,7 +17,6 @@ import { GetOrdersResponseService } from './dtos/get-orders-response-service.dto
 import { SummaryServiceResponse } from './dtos/order-response/summary-service-response.dto';
 import { CreateOrderDto } from './dtos/order/create-order-service.dto';
 import { ItemsDtoService } from './dtos/order/items-service.dto';
-import { Order } from '../infrastructure/schemas/order.schema';
 
 @Injectable()
 export class OrderService implements IOrderService {

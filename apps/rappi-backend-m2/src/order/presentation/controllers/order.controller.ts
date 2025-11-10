@@ -12,8 +12,8 @@ import { SummaryDto } from '../dtos/order-dto-response/summary.dto';
 import { ConfirmOrderResponseDto } from '../dtos/confirm-order-response.dto';
 import { AcceptOrderDto } from '../dtos/confirm-driver.dto';
 import { AssignDriverDto } from '../dtos/assing-driver.dto';
-import { Roles } from 'apps/rappi-backend-m2/src/auth/decorators/roles.decorator';
-import { RolesGuard } from 'apps/rappi-backend-m2/src/auth/guards/roles.guard';
+import { Roles } from '../../../auth/decorators/roles.decorator';
+import { RolesGuard } from '../../../auth/guards/roles.guard';
 
 @ApiTags('orders')
 @ApiBearerAuth('JWT-auth')
