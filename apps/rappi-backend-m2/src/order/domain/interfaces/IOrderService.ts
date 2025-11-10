@@ -17,4 +17,5 @@ export interface IOrderService {
   confirmOrder(orderId: string): Promise<GetOrderResponseService>;
   getWhatsAppLink(orderId: string): Promise<{ url: string }>;
   acceptOrderByDriver(orderId: string, driverId: string): Promise<void>;
+  assignDriverByAdmin(orderId: string, driverId: string) : Promise<void>;
 }

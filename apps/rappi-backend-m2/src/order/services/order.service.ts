@@ -17,6 +17,7 @@ import { GetOrdersResponseService } from './dtos/get-orders-response-service.dto
 import { SummaryServiceResponse } from './dtos/order-response/summary-service-response.dto';
 import { CreateOrderDto } from './dtos/order/create-order-service.dto';
 import { ItemsDtoService } from './dtos/order/items-service.dto';
+import { Order } from '../infrastructure/schemas/order.schema';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -250,5 +251,20 @@ export class OrderService implements IOrderService {
     order.setStatus(OrderStatus.InTransit);
 
     await this.orderRepository.updateOrderDriver(order);
+  }
+
+  async assignDriverByAdmin(orderId: string, driverId: string) : Promise<void>{
+    const order = await this.orderRepository.findById(orderId);
+    if(!order) throw new BadRequestException(`Orden ${orderId} no encontrada`)
+    const driver = await this.userAdapter.existsUser(driverId);
+    if(!driver) throw new BadRequestException('El driver asignado no existe');
+
+    order.setDriverId(new Types.ObjectId(driverId));
+
+    if(order.getStatus() === OrderStatus.Pending) order.setStatus(OrderStatus.Accepted);
+    else if(order.getStatus() === OrderStatus.ReadyForPickup) order.setStatus(OrderStatus.InTransit);
+
+    await this.orderRepository.updateOrderDriver(order);
+
   }
 }
