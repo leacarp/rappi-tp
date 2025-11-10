@@ -1,9 +1,18 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 import { LoginResponseService } from '../../services/dtos/login-response-service';
 
 export class LoginResponse {
+  @ApiProperty({ type: String })
   private readonly userId: string;
+
+  @ApiProperty({ type: String })
   private readonly email: string;
+
+  @ApiProperty({ type: String })
   private readonly role: string;
+
+  @ApiProperty({ type: String })
   private readonly token: string;
 
   constructor(userId: string, email: string, role: string, token: string) {

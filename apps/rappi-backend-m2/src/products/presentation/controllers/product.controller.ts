@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IProductService } from '../../domain/interfaces/IProductService';
@@ -22,6 +22,8 @@ export class ProductController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: CreateProductRequestDto })
+  @ApiResponse({ status: 201, type: ProductResponseDto })
   async createProduct(@Body() createProductDto: CreateProductRequestDto): Promise<ProductResponseDto> {
     const serviceDto = createProductDto.toServiceDto();
     const productServiceDto = await this.productService.createProduct(serviceDto);
@@ -73,6 +75,8 @@ export class ProductController {
   }
 
   @Put(':id')
+  @ApiBody({ type: UpdateProductRequestDto })
+  @ApiResponse({ status: 200, type: ProductResponseDto })
   async updateProduct(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductRequestDto
@@ -89,6 +93,8 @@ export class ProductController {
   }
 
   @Put(':id/promotion')
+  @ApiBody({ schema: { type: 'object', properties: { discountedPrice: { type: 'number' } } } })
+  @ApiResponse({ status: 200, type: ProductResponseDto })
   async applyPromotion(
     @Param('id') id: string,
     @Body() body: { discountedPrice: number }

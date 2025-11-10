@@ -1,20 +1,25 @@
 import { IsString, IsBoolean, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { UpdateAddressRequestService } from '../../services/dtos/update-address-request-service';
 
 export class UpdateAddressRequest {
+  @ApiProperty({ type: String })
   @IsString({ message: 'La calle es requerida' })
   @IsNotEmpty({ message: 'La calle no puede estar vacía' })
   private readonly street: string;
 
+  @ApiProperty({ type: String })
   @IsString({ message: 'La ciudad es requerida' })
   @IsNotEmpty({ message: 'La ciudad no puede estar vacía' })
   private readonly city: string;
 
+  @ApiProperty({ type: String })
   @IsString({ message: 'El código postal es requerido' })
   @IsNotEmpty({ message: 'El código postal no puede estar vacío' })
   private readonly zipCode: string;
 
+  @ApiProperty({ type: Boolean })
   @IsBoolean({ message: 'isFavorite debe ser un valor booleano' })
   private readonly isFavorite: boolean;
 

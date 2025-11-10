@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Inject } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 import { IAuthService } from '../../domain/interfaces/IAuthService';
 import { AUTH_SERVICE } from '../../infrastructure/constants/auth-service.constants';
@@ -17,6 +17,8 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: LoginRequest })
+  @ApiResponse({ status: 200, type: LoginResponse })
   async login(@Body() body: LoginRequest): Promise<LoginResponse> {
     const requestService = body.toServiceDto();
     const serviceResponse = await this.authService.login(requestService);

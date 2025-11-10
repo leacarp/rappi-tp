@@ -43,11 +43,10 @@ async function bootstrap() {
       },
       'JWT-auth',
     )
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('users', 'User management endpoints')
-    .addTag('vendors', 'Vendor endpoints')
-    .addTag('products', 'Product management endpoints')
-    .addTag('orders', 'Order management endpoints')
+    .addTag('auth', 'Endpoints de autenticación')
+    .addTag('users', 'Endpoints de gestión de usuarios')
+    .addTag('products', 'Endpoints de gestión de productos')
+    .addTag('orders', 'Endpoints de gestión de pedidos')
     .build();
     
   const document = SwaggerModule.createDocument(app, config);

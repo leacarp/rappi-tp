@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, Param, Query, Put, Inject, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../../auth/jwt-auth.guard';
 import { IOrderService } from '../../domain/interfaces/IOrderService';
@@ -26,6 +26,8 @@ export class OrderController {
   ) {}
 
   @Post()
+  @ApiBody({ type: CreateOrderRequestDto })
+  @ApiResponse({ status: 201, type: ConfirmOrderResponseDto })
   async createOrder(@Body() createOrderRequestDto: CreateOrderRequestDto): Promise<ConfirmOrderResponseDto> {
     const createOrderDto = createOrderRequestDto.toServiceDto();
 
@@ -68,6 +70,8 @@ export class OrderController {
   }
 
   @Put(':id/status')
+  @ApiBody({ type: UpdateOrderStatusRequestDto })
+  @ApiResponse({ status: 200, type: Object })
   async updateOrderStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusRequestDto): Promise<{ message: string }> {
     await this.orderService.UpdateOrderStatus(id, dto.status);
     return { message: 'Estado actualizado correctamente' };
@@ -81,6 +85,8 @@ export class OrderController {
   }
 
   @Put(':id/accept-driver')
+  @ApiBody({ type: AcceptOrderDto })
+  @ApiResponse({ status: 200, type: Object })
   async acceptOrderByDriver(@Param('id') orderId: string, @Body() dto: AcceptOrderDto): Promise<{ message: string }> {
     await this.orderService.acceptOrderByDriver(orderId, dto.driverId);
     return { message: 'Driver asignado correctamente' };
@@ -90,6 +96,8 @@ export class OrderController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: AssignDriverDto })
+  @ApiResponse({ status: 200, type: Object })
   async assignDriverByAdmin(@Param('id') orderId: string, @Body() dto: AssignDriverDto): Promise<{message: string}> {
     await this.orderService.assignDriverByAdmin(orderId, dto.driverId);
     return {message: 'Driver asignado correctamente'};
