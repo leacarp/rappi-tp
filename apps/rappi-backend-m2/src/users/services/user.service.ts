@@ -365,7 +365,7 @@ export class UserService implements IUserService {
   ): Promise<CreateUserResponseService> {
     const existingUser = await this.userRepository.getUserByEmail(email);
     if (existingUser) {
-      throw new Error('El email ya está registrado');
+      throw new BadRequestException('El email ya está registrado');
     }
 
     const hashedPassword = await this.hashPassword(password);
