@@ -1,6 +1,7 @@
 import { VendorInfo } from '../../domain/entities/vendor-info.entity';
 
 export class RestaurantSearchResultService {
+  private readonly _restaurantId: string;
   private readonly _restaurantName: string;
   private readonly _description: string;
   private readonly _rating: number;
@@ -8,17 +9,23 @@ export class RestaurantSearchResultService {
   private readonly _schedule: string;
 
   constructor(
+    restaurantId: string,
     restaurantName: string,
     description: string,
     rating: number,
     isAvailable: boolean,
     schedule: string
   ) {
+    this._restaurantId = restaurantId;
     this._restaurantName = restaurantName;
     this._description = description;
     this._rating = rating;
     this._isAvailable = isAvailable;
     this._schedule = schedule;
+  }
+
+  getRestaurantId(): string {
+    return this._restaurantId;
   }
 
   getRestaurantName(): string {
@@ -41,8 +48,9 @@ export class RestaurantSearchResultService {
     return this._schedule;
   }
 
-  static fromVendorInfo(vendorInfo: VendorInfo): RestaurantSearchResultService {
+  static fromVendorInfo(vendorInfo: VendorInfo, userId: string): RestaurantSearchResultService {
     return new RestaurantSearchResultService(
+      userId,
       vendorInfo.getRestaurantName(),
       vendorInfo.getDescription(),
       vendorInfo.getRating(),
@@ -72,9 +80,9 @@ export class SearchRestaurantsResponseService {
     return this._total;
   }
 
-  static fromVendorInfoEntities(vendorInfos: VendorInfo[]): SearchRestaurantsResponseService {
-    const restaurants = vendorInfos.map((vendorInfo) => 
-      RestaurantSearchResultService.fromVendorInfo(vendorInfo)
+  static fromVendorInfoEntities(vendorInfos: { vendorInfo: VendorInfo, userId: string }[]): SearchRestaurantsResponseService {
+    const restaurants = vendorInfos.map(({ vendorInfo, userId }) => 
+      RestaurantSearchResultService.fromVendorInfo(vendorInfo, userId)
     );
 
     return new SearchRestaurantsResponseService(restaurants, restaurants.length);

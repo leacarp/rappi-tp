@@ -188,7 +188,7 @@ export class UserRepository implements IUserRepository {
     );
   }
 
-  async searchRestaurantsByNameOrCategory(param: string): Promise<VendorInfo[]> {
+  async searchRestaurantsByNameOrCategory(param: string): Promise<{ vendorInfo: VendorInfo, userId: string }[]> {
     const trimmedParam = (param || '').trim();
     if (!trimmedParam) {
       return [];
@@ -207,13 +207,16 @@ export class UserRepository implements IUserRepository {
       
     return usersWithRestaurantInfo
       .filter(user => user.profile?.vendorInfo)
-      .map(user => new VendorInfo(
-        user.profile.vendorInfo.restaurantName,
-        user.profile.vendorInfo.description,
-        user.profile.vendorInfo.schedule,
-        user.profile.vendorInfo.rating,
-        user.profile.vendorInfo.isAvailable
-      ));
+      .map(user => ({
+        vendorInfo: new VendorInfo(
+          user.profile.vendorInfo.restaurantName,
+          user.profile.vendorInfo.description,
+          user.profile.vendorInfo.schedule,
+          user.profile.vendorInfo.rating,
+          user.profile.vendorInfo.isAvailable
+        ),
+        userId: user._id.toString()
+      }));
   }
 
   async updateUserCart(userId: string, cartItems: CartItem[]): Promise<User | null> {
