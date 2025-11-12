@@ -474,4 +474,43 @@ export class UserService implements IUserService {
       driver.getProfile().getDriverInfo()?.getEarnings().getTotal()
     ));
   }
+
+  async createCustomer(
+    email: string, 
+    password: string, 
+    name: string, 
+    phone: string
+  ): Promise<CreateUserResponseService> {
+    const existingUser = await this.userRepository.getUserByEmail(email);
+    if (existingUser) {
+      throw new BadRequestException('El email ya está registrado');
+    }
+
+    const hashedPassword = await this.hashPassword(password);
+
+    const userData = {
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+      role: 'customer',
+      profile: {
+        name,
+        phone,
+        addresses: []
+      },
+      favorites: [],
+      history: { orders: [], deliveries: [] },
+      ratingsAndReviews: [],
+      cart: []
+    };
+
+    const createdUser = await this.userRepository.createUser(userData);
+    
+    return new CreateUserResponseService(
+      createdUser.getId(),
+      createdUser.getEmail(),
+      createdUser.getRole(),
+      createdUser.getProfile().getName(),
+      createdUser.getProfile().getPhone()
+    );
+  }
 }

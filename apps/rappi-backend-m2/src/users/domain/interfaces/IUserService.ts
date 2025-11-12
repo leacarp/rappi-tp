@@ -37,6 +37,7 @@ export interface IUserService {
   createVendor(email: string, password: string, name: string, phone: string, restaurantName: string, description: string, schedule: string, category: string): Promise<CreateUserResponseService>;
   createDriver(email: string, password: string, name: string, phone: string, vehicle: string): Promise<CreateUserResponseService>;
   createAdmin(email: string, password: string, name: string, phone: string): Promise<CreateUserResponseService>;
+  createCustomer(email: string, password: string, name: string, phone: string): Promise<CreateUserResponseService>;
   getAllVendors(): Promise<VendorListItemService[]>;
   getAllDrivers(): Promise<DriverListItemService[]>;
 }
