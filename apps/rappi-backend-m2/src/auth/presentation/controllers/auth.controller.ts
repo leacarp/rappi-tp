@@ -5,6 +5,7 @@ import { IAuthService } from '../../domain/interfaces/IAuthService';
 import { AUTH_SERVICE } from '../../infrastructure/constants/auth-service.constants';
 import { LoginRequest } from '../dtos/login-request';
 import { LoginResponse } from '../dtos/login-response';
+import { RegisterCustomerDto } from '../dtos/register-customer.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,6 +23,17 @@ export class AuthController {
   async login(@Body() body: LoginRequest): Promise<LoginResponse> {
     const requestService = body.toServiceDto();
     const serviceResponse = await this.authService.login(requestService);
+    
+    return LoginResponse.fromServiceDto(serviceResponse);
+  }
+
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBody({ type: RegisterCustomerDto })
+  @ApiResponse({ status: 201, type: LoginResponse })
+  async register(@Body() body: RegisterCustomerDto): Promise<LoginResponse> {
+    const requestService = body.toServiceDto();
+    const serviceResponse = await this.authService.register(requestService);
     
     return LoginResponse.fromServiceDto(serviceResponse);
   }
